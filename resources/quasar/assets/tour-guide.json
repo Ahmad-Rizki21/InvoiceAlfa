@@ -1,0 +1,930 @@
+{
+  "default": [
+    {
+      "title": "Welcome!",
+      "content": "This is a short guide to get you know how to use this system. Press arrow right on your keyboard to continue.",
+      "target": null,
+      "beforeEnter": {
+        "options": {
+          "closeButton": false,
+          "exitOnEscape": false,
+          "exitOnClickOutside": false,
+          "showStepDots": false,
+          "autoScroll": true
+        }
+      }
+    },
+    {
+      "title": "The Menu",
+      "content": "This is the menu list for you to navigate through feature exists in this system.",
+      "target": ".sidebar-content-list",
+      "beforeEnter": {
+        "options": {
+          "closeButton": false,
+          "exitOnEscape": false,
+          "exitOnClickOutside": false,
+          "showStepDots": false
+        }
+      }
+    },
+    {
+      "title": "Account Settings",
+      "content": "You may click here to go to update your account, change your password, or logout from the system.",
+      "target": ".btn-topbar-menu-item-user .q-btn__content"
+    },
+    {
+      "title": "Activate The Guide",
+      "content": "Whenever you get lost, you may activate the guide by clicking this button. Try to click this button yourself after this guide closed.",
+      "target": ".btn-sidebar-activate-help",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": false,
+          "exitOnClickOutside": false
+        }
+      }
+    }
+  ],
+  "index": [
+    {
+      "title": "Dashboard",
+      "content": "This is the dashboard where everything is simplify summarized.",
+      "target": ".sidebar-menu-item-dashboard",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        }
+      },
+      "afterEnter": {
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": "Monthly Stats",
+      "content": "This is a very simplified monthly stats on your system.",
+      "target": ".dashboard-card-mini-monthly-stats"
+    },
+    {
+      "title": "Monthly Working Clock",
+      "content": "This is the average or median of Working Clock for current month.",
+      "target": ".dashboard-card-mini-working-clock"
+    },
+    {
+      "title": "Monthly Working Clock",
+      "content": "Working Clock is a running timer for an open ticket where the timer is NOT on a PENDING state.",
+      "target": ".dashboard-card-mini-working-clock"
+    },
+    {
+      "title": "Total Users",
+      "content": "This is the all-time total users registered in the system. This one only visible for super admin.",
+      "target": ".card-mini-summary-all-time-users"
+    },
+    {
+      "title": "Charts",
+      "content": "These are charts which showing you the last 7 days of total clock timer and ticket submitted.",
+      "target": ".dashboard-chart-average-total-ticket",
+      "afterEnter": {
+        "scrollIntoView": "#tg-dialog-body"
+      }
+    }
+  ],
+  "tickets": [
+    {
+      "title": {
+        "text": "Create {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "You may click here to open a new ticket.",
+      "target": ".btn-page-tickets-create",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "When a ticket successfully opened, you'll see the ticket appear on this list here.",
+      "target": ".page-tickets .q-table__container",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": false
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "View & Update {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "You can view and also edit a ticket by clicking on this eye button.",
+      "target": ".page-tickets .btn-datatable-view-ticket",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Delete {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "To delete a ticket, simply click on this trash button.",
+      "target": ".page-tickets .btn-datatable-delete-ticket"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "By default, newest ticket will appear first on the list. You can click here to sort the ticket between newest or oldest.",
+      "target": ".page-tickets .table-header-id"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "You can also sort the ticket list by clicking on other table header which has arrow icon when you hover it. Such as this ticket no.",
+      "target": ".page-tickets .table-header-no"
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "You can also do quick filter to the ticket list as by default, all tickets will appear on the list.",
+      "target": ".page-tickets .quick-search-datatable"
+    },
+    {
+      "title": "Advanced Search",
+      "content": "You can also open the advanced search to filter the result to be more precise.",
+      "target": ".page-tickets .btn-datatable-advanced-search"
+    },
+    {
+      "title": "Show/Hide Table Columns",
+      "content": "Click here to show or hide table columns from the list.",
+      "target": ".page-tickets .btn-datatable-view-columns"
+    }
+  ],
+  "tickets.create": [
+    {
+      "title": "Customer",
+      "content": "Select customer for this ticket. Note that * mark indicates required field.",
+      "target": ".page-ticket-create .input-form-page-ticket-customer",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": "Remote Location",
+      "content": "Select remote location. These shown remote locations are based on customer you've selected beforehand.",
+      "target": ".page-ticket-create .input-form-page-ticket-remote-location"
+    },
+    {
+      "title": "Title (Optional)",
+      "content": "This ticket title is optional to be filled.",
+      "target": ".page-ticket-create .input-form-page-ticket-title"
+    },
+    {
+      "title": "Ticket Content",
+      "content": "Fill in the ticket content.",
+      "target": ".page-ticket-create .input-form-page-ticket-content"
+    },
+    {
+      "title": "Down Time Causer",
+      "content": "Select down time causer. This needs to be selected to determine service availability on the report page.",
+      "target": ".page-ticket-create .input-form-page-ticket-down-time-caused-by"
+    },
+    {
+      "title": "Auto Start Timer",
+      "content": "When you left this to be ticked, right after you create this ticket, the OPEN clock timer will automatically started.",
+      "target": ".page-ticket-create .input-form-page-auto-start-timer"
+    },
+    {
+      "title": "Create The Ticket",
+      "content": "Last, click on this button to create the ticket.",
+      "target": ".page-ticket-create .btn-form-page-ticket-submit"
+    }
+  ],
+  "tickets.show": [
+    {
+      "title": {
+        "text": "{entity} Details",
+        "payload": {
+          "entity": "Ticket"
+        }
+      },
+      "content": "This is the ticket detail you have created beforehand.",
+      "target": ".page-ticket-show .form-page .form-entry",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": "Ticket No.",
+      "content": "Whenever a ticket created, it will has a ticket number automatically generated.",
+      "target": ".page-ticket-show .input-form-page-ticket-no input"
+    },
+    {
+      "title": "Action",
+      "content": "Click this button to edit or delete a ticket. Note: you have to have a given permission to edit or delete a ticket.",
+      "target": ".page-ticket-show .form-page .btn-form-page-action",
+      "beforeEnter": {
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        }
+      }
+    },
+    {
+      "title": "Ticket Clock/Timer",
+      "content": "These are the ticket timers which divided into three states. Open, pending, and start clock/timer.",
+      "target": ".page-ticket-show .form-entry.form-timer"
+    },
+    {
+      "title": "Open Clock",
+      "content": "Open clock counts the first time ticket open (or first timer started) until you pause the timer.",
+      "target": ".page-ticket-show .form-entry.form-timer .form-timer-item.open"
+    },
+    {
+      "title": "Pending Clock",
+      "content": "Once you pause the timer, this pending clock will start to count. Until you start the timer again.",
+      "target": ".page-ticket-show .form-entry.form-timer .form-timer-item.pending"
+    },
+    {
+      "title": "Start Clock",
+      "content": "After you start the timer again, this start clock will be running to count.",
+      "target": ".page-ticket-show .form-entry.form-timer .form-timer-item.start"
+    },
+    {
+      "title": "Update Timer State",
+      "content": "Use this button to update timer state. A popup where you can put a note of things related to the next state will appear after you click on this button.",
+      "target": ".page-ticket-show .form-entry.form-timer .btn-form-timer-ticket"
+    },
+    {
+      "title": "Notes/Progress",
+      "content": "Right after you update the timer state, the note you've submitted each update will appear on this note/progress area.",
+      "target": ".page-ticket-show .form-notes"
+    },
+    {
+      "title": "Clock Status",
+      "content": "This is the current clock status. It will be either OPEN, PENDING, STARTED, or COMPLETED.",
+      "target": ".page-ticket-show .page-ticket-show-clock-status"
+    },
+    {
+      "title": "Ticket Status",
+      "content": "This is the current ticket status. It will be either OPEN or CLOSED. Once the ticket CLOSED, you can not do anything with the timer.",
+      "target": ".page-ticket-show .page-ticket-show-status"
+    }
+  ],
+  "users": [
+    {
+      "title": {
+        "text": "Create {entity}",
+        "payload": {
+          "entity": "Users"
+        }
+      },
+      "content": "You can click here to register a new user.",
+      "target": ".btn-page-users-create",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "options": {
+          "autoScroll": true
+        },
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Users"
+        }
+      },
+      "content": "This is the list of registered users on this system.",
+      "target": ".page-users .q-table__container",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": false
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "View {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "You can view a user detail by clicking on this eye button.",
+      "target": ".page-users .btn-datatable-view-user",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Edit {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "You can edit a user detail by clicking on this pencil button.",
+      "target": ".page-users .btn-datatable-edit-user"
+    },
+    {
+      "title": {
+        "text": "Update {entity}",
+        "payload": {
+          "entity": "Password"
+        }
+      },
+      "content": "Click here to change user's password.",
+      "target": ".page-users .btn-datatable-update-password-user"
+    },
+    {
+      "title": {
+        "text": "Delete {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "To delete a user, simply click on this trash button. Note: The first user can not be deleted.",
+      "target": ".page-users .btn-datatable-delete-user"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "By default, oldest user will appear first on the list. You can click here to sort the user between newest or oldest.",
+      "target": ".page-users .table-header-id"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "You can also sort the user list by clicking on other table header which has arrow icon when you hover it. Such as this user name.",
+      "target": ".page-users .table-header-name"
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "User"
+        }
+      },
+      "content": "You can also do quick filter to the user list as by default, all users will appear on the list.",
+      "target": ".page-users .quick-search-datatable"
+    },
+    {
+      "title": "Advanced Search",
+      "content": "You can also open the advanced search to filter the result to be more precise.",
+      "target": ".page-users .btn-datatable-advanced-search"
+    },
+    {
+      "title": "Show/Hide Table Columns",
+      "content": "Click here to show or hide table columns from the list.",
+      "target": ".page-users .btn-datatable-view-columns"
+    }
+  ],
+  "user-access": [
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Role"
+        }
+      },
+      "content": "This is the roles available in your system.",
+      "target": ".page-user-access .role-list",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Create {entity}",
+        "payload": {
+          "entity": "Role"
+        }
+      },
+      "content": "You can create a new role and assign permission to it afterward.",
+      "target": ".page-user-access .role-list .btn-role-list-create"
+    },
+    {
+      "title": {
+        "text": "Update {entity}",
+        "payload": {
+          "entity": "Permission"
+        }
+      },
+      "content": "To update a role's permission, click on the role first, then edit its permission on the permission list.",
+      "target": ".page-user-access .role-list .q-item__section--main"
+    },
+    {
+      "title": {
+        "text": "Update {entity}",
+        "payload": {
+          "entity": "Role"
+        }
+      },
+      "content": "You can also edit or delete a role by clicking on this pencil button. Note: The first role can not be deleted; You have to have correct permission to be able to edit or delete.",
+      "target": ".page-user-access .role-list .btn-role-list-edit"
+    },
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Permission"
+        }
+      },
+      "content": "This is the permission list.",
+      "target": ".page-user-access .permission-list",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": false
+        }
+      },
+      "afterEnter": {
+        "options": {
+          "autoScroll": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Update {entity}",
+        "payload": {
+          "entity": "Permission"
+        }
+      },
+      "content": "Tick the permission name to assign a permission to the selected role.",
+      "target": ".page-user-access .permission-list .btn-permission-item-3"
+    },
+    {
+      "title": {
+        "text": "Update {entity}",
+        "payload": {
+          "entity": "Permission"
+        }
+      },
+      "content": "When you're done tweaking permissions for selected role, save the change by clicking this button.",
+      "target": ".page-user-access .permission-list .btn-permission-save"
+    }
+  ],
+
+  "customers": [
+    {
+      "title": {
+        "text": "Create {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "You can click here to create a customer.",
+      "target": ".btn-page-customers-create",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "This is the list of registered customers on this system.",
+      "target": ".page-customers .q-table__container",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": false
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "View & Update {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "You can view and also edit a customer by clicking on this eye button.",
+      "target": ".page-customers .btn-datatable-view-customer",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        }
+      }
+    },
+    {
+      "title": "Remote Locations",
+      "content": "View remote location under this customer by clicking on this button.",
+      "target": ".page-customers .btn-datatable-remote-location-customer"
+    },
+    {
+      "title": {
+        "text": "Delete {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "To delete a customer, simply click on this trash button. Note: whenever you delete a customer, all corresponding remote, tickets and reports would also be deleted.",
+      "target": ".page-customers .btn-datatable-delete-customer"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "By default, oldest customer will appear first on the list. You can click here to sort the customer between newest or oldest.",
+      "target": ".page-customers .table-header-id"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "You can also sort the customer list by clicking on other table header which has arrow icon when you hover it. Such as this customer name.",
+      "target": ".page-customers .table-header-name"
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "You can also do quick filter to the customer list as by default, all customers will appear on the list.",
+      "target": ".page-customers .quick-search-datatable"
+    },
+    {
+      "title": "Advanced Search",
+      "content": "You can also open the advanced search to filter the result to be more precise.",
+      "target": ".page-customers .btn-datatable-advanced-search"
+    },
+    {
+      "title": "Show/Hide Table Columns",
+      "content": "Click here to show or hide table columns from the list.",
+      "target": ".page-customers .btn-datatable-view-columns"
+    }
+  ],
+  "remote-locations": [
+    {
+      "title": {
+        "text": "Create {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "You can click here to create a remote location.",
+      "target": ".btn-page-remote-locations-create",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "This is the list of registered remote locations on this system.",
+      "target": ".page-remote-locations .q-table__container",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": false
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "View & Update {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "You can view and also edit a remote location by clicking on this eye button.",
+      "target": ".page-remote-locations .btn-datatable-view-remote-location",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": true
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Delete {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "To delete a remote location, simply click on this trash button. Note: whenever you delete a remote location, all corresponding tickets and reports would also be deleted.",
+      "target": ".page-remote-locations .btn-datatable-delete-remote-location"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "By default, oldest remote location will appear first on the list. You can click here to sort the remote location between newest or oldest.",
+      "target": ".page-remote-locations .table-header-id"
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "You can also sort the remote location list by clicking on other table header which has arrow icon when you hover it. Such as this terminal name.",
+      "target": ".page-remote-locations .table-header-terminal_name"
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "Remote Location"
+        }
+      },
+      "content": "You can also do quick filter to the remote location list as by default, all remote locations will appear on the list.",
+      "target": ".page-remote-locations .quick-search-datatable"
+    },
+    {
+      "title": "Advanced Search",
+      "content": "You can also open the advanced search to filter the result to be more precise.",
+      "target": ".page-remote-locations .btn-datatable-advanced-search"
+    },
+    {
+      "title": "Show/Hide Table Columns",
+      "content": "Click here to show or hide table columns from the list.",
+      "target": ".page-remote-locations .btn-datatable-view-columns"
+    }
+  ],
+  "reports": [
+    {
+      "title": {
+        "text": "{entity} List",
+        "payload": {
+          "entity": "Report"
+        }
+      },
+      "content": "This is the list of summarized report for tickets for each terminal/remote location.",
+      "target": ".page-reports .q-table__container",
+      "beforeEnter": {
+        "options": {
+          "closeButton": true,
+          "exitOnEscape": true,
+          "exitOnClickOutside": true,
+          "autoScroll": false
+        },
+        "methods": {
+          "refresh": true
+        }
+      },
+      "afterEnter": {
+        "methods": {
+          "updatePositions": true
+        },
+        "store": {
+          "finish": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Sort {entity}",
+        "payload": {
+          "entity": "Report"
+        }
+      },
+      "content": "You can sort the report list by clicking on table header which has arrow icon when you hover it. Such as this terminal name.",
+      "target": ".page-reports .table-header-terminal_name",
+      "beforeEnter": {
+        "options": {
+          "autoScroll": true
+        }
+      }
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "Period"
+        }
+      },
+      "content": "This report is showing based on month you selected here.",
+      "target": ".page-reports .input-quick-search-applicable_month"
+    },
+    {
+      "title": {
+        "text": "Filter {entity}",
+        "payload": {
+          "entity": "Customer"
+        }
+      },
+      "content": "You can also filter the result to only show report for specific customer as selected here.",
+      "target": ".page-reports .input-quick-search-customer_id"
+    },
+    {
+      "title": "Show/Hide Table Columns",
+      "content": "Click here to show or hide table columns from the list.",
+      "target": ".page-reports .btn-datatable-view-columns"
+    },
+    {
+      "title": {
+        "text": "Export {entity}",
+        "payload": {
+          "entity": "Report"
+        }
+      },
+      "content": "You can click here to export report. Take a note that this export produces results based on filter you've selected.",
+      "target": ".page-reports .btn-page-reports-export",
+      "beforeEnter": {
+        "methods": {
+          "refresh": true
+        }
+      }
+    }
+  ]
+}

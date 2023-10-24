@@ -1,0 +1,95 @@
+@page { margin: 0 }
+wrapper { margin: 0 }
+.print-paper {
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  page-break-after: always;
+  transform-origin: top center;
+}
+
+/** Paper sizes **/
+.print-paper-wrapper.A3               .print-paper { width: 297mm; height: 419mm }
+.print-paper-wrapper.A3.landscape     .print-paper { width: 420mm; height: 296mm }
+.print-paper-wrapper.A4               .print-paper { width: 210mm; height: 296mm }
+.print-paper-wrapper.A4.landscape     .print-paper { width: 297mm; height: 209mm }
+.print-paper-wrapper.A5               .print-paper { width: 148mm; height: 209mm }
+.print-paper-wrapper.A5.landscape     .print-paper { width: 210mm; height: 147mm }
+.print-paper-wrapper.letter           .print-paper { width: 216mm; height: 279mm }
+.print-paper-wrapper.letter.landscape .print-paper { width: 280mm; height: 215mm }
+.print-paper-wrapper.legal            .print-paper { width: 216mm; height: 356mm }
+.print-paper-wrapper.legal.landscape  .print-paper { width: 357mm; height: 215mm }
+
+/** Padding area **/
+.print-paper.padding-10mm { padding: 10mm }
+.print-paper.padding-15mm { padding: 15mm }
+.print-paper.padding-20mm { padding: 20mm }
+.print-paper.padding-25mm { padding: 25mm }
+
+/** For screen preview **/
+@media screen {
+  // .print-paper-wrapper {
+  //   background: #e0e0e0;
+  // }
+  .print-paper {
+    background: white;
+    margin: 5mm auto;
+    box-shadow: 0 4px 25px rgba(35, 35, 35, 0.12), 0 2px 10px rgba(35, 35, 35, 0.07), 0 3px 1px -2px rgba(35, 35, 35, 0.06);
+  }
+
+  .body--dark {
+    .print-paper {
+      background: var(--q-color-dark);
+    }
+  }
+}
+
+/** Fix for Chrome issue #273306 **/
+@media print {
+           .print-paper-wrapper.A3.landscape { width: 420mm }
+  .print-paper-wrapper.A3, .print-paper-wrapper.A4.landscape { width: 297mm }
+  .print-paper-wrapper.A4, .print-paper-wrapper.A5.landscape { width: 210mm }
+  .print-paper-wrapper.A5                    { width: 148mm }
+  .print-paper-wrapper.letter, .print-paper-wrapper.legal    { width: 216mm }
+  .print-paper-wrapper.letter.landscape      { width: 280mm }
+  .print-paper-wrapper.legal.landscape       { width: 357mm }
+}
+
+
+.page-template .print-paper,
+.form-invoice .print-paper,
+.form-receipt .print-paper {
+	 padding-top: 10mm;
+	 padding-left: 10mm;
+	 padding-right: 10mm;
+}
+ .page-template .paper-content,
+ .form-invoice .paper-content,
+ .form-receipt .paper-content {
+	 border: 1px solid #000;
+}
+ .dialog-print-preview > .q-dialog__backdrop {
+	 background-color: rgba(0, 0, 0, 0.75);
+}
+ @media print {
+	 .form-print-preview .form-invoice, .form-print-preview .form-receipt {
+		 margin: 0 !important;
+		 margin-bottom: 0 !important;
+		 padding: 0 !important;
+		 padding-bottom: 0 !important;
+	}
+	 .form-print-preview .form-invoice .print-paper-wrapper,
+   .form-print-preview .form-receipt .print-paper-wrapper,
+   .form-print-preview .form-invoice .print-paper,
+   .form-print-preview .form-receipt .print-paper {
+		 margin: 0 !important;
+		 margin-top: 0 !important;
+		 margin-bottom: 0 !important;
+		 box-shadow: none;
+	}
+	 .form-print-preview .form-invoice .print-paper,
+   .form-print-preview .form-receipt .print-paper {
+		 page-break-after: auto;
+	}
+}

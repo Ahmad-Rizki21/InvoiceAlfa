@@ -1,0 +1,360 @@
+@import "@sjmc11/tourguidejs/src/scss/tour.scss";
+
+:root {
+  --animate-duration: 150ms;
+  --q-color-default: #{$default};
+  --q-text-color-default: #{$dark};
+}
+.body--dark {
+  --q-color-default: #{$default-dark};
+}
+.q-btn {
+  text-transform: none;
+
+  // > .q-btn__wrapper {
+  //   > .q-btn__content {
+  //     > .q-icon {
+  //       margin-right: 0.2rem;
+  //     }
+  //   }
+  // }
+
+  .q-icon,
+  .q-spinner {
+    font-size: 1.467515em;
+  }
+}
+
+.form-entry {
+  width: 100%;
+
+  &.readonly {
+    .q-field--with-bottom {
+      padding-bottom: 0;
+    }
+
+    .q-field__bottom {
+      display: none !important;
+    }
+
+    .q-select__dropdown-icon {
+      display: none;
+    }
+  }
+}
+
+.text-color-default {
+  color: var(--q-text-color-default);
+}
+
+.text-default {
+  color: $default !important;
+  color: var(--q-color-default) !important;
+}
+.bg-default {
+  background: $default !important;
+  background: var(--q-color-default) !important;
+}
+
+.q-btn {
+  &.bg-default {
+    color: #{$dark} !important;
+  }
+}
+
+.body--dark {
+  .q-btn {
+    &.bg-default {
+      color: #fff !important;
+    }
+  }
+}
+
+
+.double-input {
+  .q-field__control {
+    padding-right: 0;
+    &:before {
+      opacity: 1;
+      // background-color: rgba(0, 0, 0, 0.12);
+      background-color: transparent;
+      border-bottom: transparent;
+    }
+
+    .q-field__control {
+      padding-left: 12px;
+    }
+
+    .q-field__inner .q-field__control {
+      border-top-left-radius: 0;
+    }
+  }
+
+
+  &.q-field--float,
+  .q-field--float {
+    .q-field__shadow {
+      opacity: 0.5;
+    }
+  }
+
+  &.q-field--focused .q-field--focused {
+      .q-field__shadow {
+        opacity: 0;
+      }
+
+  }
+
+  .q-field--borderless {
+    width: 100%;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+}
+
+.no-arrows {
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+}
+
+.monthpicker {
+  width: 15.45rem;
+  padding: 0.5rem 1rem 0.5rem;
+
+  .monthpicker-months {
+    .q-btn__wrapper {
+      &:before {
+        box-shadow: none !important;
+      }
+    }
+
+    .q-btn {
+      &.q-btn--rounded {
+        border-radius: 0.25rem;
+      }
+    }
+  }
+}
+
+.table-relation {
+  box-shadow: $shadow-2;
+
+  .table-relation-header {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-top-left-radius: $generic-border-radius;
+    border-top-right-radius: $generic-border-radius;
+    padding: 0 1rem;
+    border-bottom: 1px solid #dbdbdb;
+    margin-bottom: 0.5rem;
+
+    .q-toolbar__title {
+      font-size: 1em;
+      font-weight: bold;
+    }
+
+    .q-tab__label {
+      font-size: 1.1em;
+      font-weight: inherit;
+      opacity: 0.7;
+    }
+
+    .q-tab {
+      &.q-tab--active {
+        font-weight: bold;
+
+        .q-tab__label {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  > .q-card {
+    box-shadow: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+
+.q-field {
+  &.q-select--with-input.q-select--without-chips.q-select--single {
+    > .q-field__inner {
+      > .q-field__control {
+        > .q-field__control-container {
+          > .q-field__native {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+
+            > span {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.q-btn {
+  &-lg {
+    &:not(.q-btn-dropdown) {
+      padding: 0.25rem 1rem;
+    }
+
+    &.q-btn-dropdown {
+      > .q-btn {
+        &:not(.q-btn-dropdown__arrow-container) {
+          padding: 0.25rem 1rem;
+        }
+      }
+    }
+  }
+}
+
+.q-table__container {
+  .q-table {
+    th {
+      font-size: 13px;
+
+      &.table-header {
+        &-action {
+          @media (min-width: $breakpoint-md-min) {
+            position: -webkit-sticky;
+            position: sticky;
+            width: 20em;
+            right: 0;
+            background-color: #fff;
+          }
+        }
+      }
+    }
+
+    tbody {
+      td {
+        font-size: 14px;
+
+        &.table-cell {
+          &-id {
+            max-width: 2em;
+          }
+
+          &-action {
+            @media (min-width: $breakpoint-md-min) {
+              position: -webkit-sticky;
+              position: sticky;
+              width: 20em;
+              right: 0;
+              background-color: #fff;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .q-table__bottom {
+    font-size: 13px;
+
+    .q-field {
+      font-size: inherit;
+    }
+  }
+}
+
+.body--dark {
+  .q-table__container {
+    .q-table {
+      th {
+        &.table-header {
+          &-action {
+            @media (min-width: $breakpoint-md-min) {
+              background-color: var(--q-color-dark);
+            }
+          }
+        }
+      }
+
+      tbody {
+        td {
+          &.table-cell {
+            &-action {
+              @media (min-width: $breakpoint-md-min) {
+                background-color: var(--q-color-dark);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.user-select-none {
+  user-select: none;
+}
+
+.overflow-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.q-field--outlined {
+  &.q-field--readonly {
+    &.keep-styling {
+      .q-field__control {
+        &:before {
+          border-style: solid;
+        }
+      }
+    }
+  }
+}
+
+.q-field--standard {
+  &.q-field--readonly {
+    &.keep-styling {
+      .q-field__control {
+        &:before {
+          border-bottom-style: solid;
+        }
+      }
+    }
+  }
+}
+
+.q-field {
+  &.readonly {
+    input {
+      pointer-events: none;
+    }
+  }
+}
+
+.tg-backdrop {
+  z-index: 9999;
+}
+
+.tg-dialog {
+  z-index: 10000 !important;
+}
