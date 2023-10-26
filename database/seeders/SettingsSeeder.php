@@ -56,15 +56,15 @@ class SettingsSeeder extends Seeder
                 'value' => 'Head Finance & Administrasi',
             ],
             [
-                'key' => SettingKey::TransferBankName->value,
+                'key' => SettingKey::BankTransferName->value,
                 'value' => 'BANK CENTRAL ASIA - KCU KALIMALANG JAKARTA',
             ],
             [
-                'key' => SettingKey::TransferBankAccountNumber->value,
+                'key' => SettingKey::BankTransferAccountNumber->value,
                 'value' => '2306079899',
             ],
             [
-                'key' => SettingKey::TransferBankAccountName->value,
+                'key' => SettingKey::BankTransferAccountName->value,
                 'value' => 'PT.ARTACOMINDO JEJARING NUSA',
             ],
         ];

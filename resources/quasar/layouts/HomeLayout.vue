@@ -16,7 +16,7 @@
           </q-tooltip>
         </q-btn>
       </div>
-  </div>
+    </div>
 
     <topbar v-if="$auth.authType === 'u'" />
 
@@ -34,6 +34,19 @@ import MainLayout from './MainLayout'
 export default {
   name: 'HomeLayout',
   extends: MainLayout,
+  async preFetch({ redirect, store, currentRoute }) {
+    if (!store.getters['auth/check']) {
+      return redirect('/login')
+    }
+
+    const permissions = store.getters['auth/permissions']
+
+    if (permissions && permissions.length && !permissions.includes('access.dashboard') && currentRoute.name !== 'unauthorized-access') {
+      return redirect('/unauthorized-access')
+    }
+
+    await store.dispatch('datatable/initStore')
+  },
   methods: {
     async onLogoutClick() {
       this.$q.dialog({
@@ -56,7 +69,6 @@ export default {
 
 <style lang="scss">
 .customer-layout {
-
  &-header {
     padding: 1.5rem 0 0.5rem;
     // margin-bottom: 2rem;
@@ -91,6 +103,12 @@ export default {
     }
     @media (min-width: 1200px) {
       max-width: 1040px;
+    }
+  }
+
+  .page-cust {
+    > .page-cust-header {
+      padding: 1rem 0;
     }
   }
 }

@@ -9,6 +9,8 @@ class Encrypter {
     this.resultSuffix = ':(rst)==';
 
     this.key += 'h5WfA'
+
+    window.lala = this
   }
 
   static instance() {

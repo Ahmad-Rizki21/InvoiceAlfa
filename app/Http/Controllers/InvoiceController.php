@@ -374,6 +374,7 @@ class InvoiceController extends Controller
             'note' => Settings::getValue(SettingKey::InvoiceNote),
             'signatory_name' => Settings::getValue(SettingKey::SignatoryName),
             'signatory_position' => Settings::getValue(SettingKey::SignatoryPosition),
+            'status' => InvoiceStatus::Draft->value,
         ]);
 
         $service = new InvoiceService();
@@ -508,6 +509,8 @@ class InvoiceController extends Controller
 
             'signatory_name' => Settings::getValue(SettingKey::SignatoryName),
             'signatory_position' => Settings::getValue(SettingKey::SignatoryPosition),
+
+            'status' => InvoiceStatus::Draft->value,
         ]);
 
         foreach ($services as $service) {

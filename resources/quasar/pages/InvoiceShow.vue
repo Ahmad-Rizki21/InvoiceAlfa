@@ -664,6 +664,11 @@ export default {
     justify-content: center;
   }
 
+  .page-header {
+    position: relative;
+    z-index: 2;
+  }
+
   .page-action {
     display: flex;
     align-items: center;

@@ -170,7 +170,11 @@ module.exports = function (ctx) {
       https: false,
       port: env.APP_DEV_SERVER_PORT || 8080,
       public: `localhost:${env.APP_DEV_SERVER_PORT || 8080}`,
-      open: false // opens browser window automatically
+      open: false,
+      headers: {
+        'access-control-allow-origin': '*',
+        'access-control-allow-methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      }
     },
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
