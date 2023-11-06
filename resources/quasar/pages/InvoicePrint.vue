@@ -2,6 +2,7 @@
   <form-print-preview
     :invoice="invoice"
     :receipt="receipt"
+    :stores="stores"
     :template-settings="templateSettings"
   />
 </template>
@@ -40,6 +41,7 @@ export default {
       receipt: {
         receipt_no: null
       },
+      stores: [],
       formInvoiceUpdated: {},
       templateSettings: {}
     }
@@ -68,6 +70,7 @@ export default {
         if (data.status === 'success') {
           this.invoice = data.data.invoice
           this.receipt = data.data.invoice
+          this.requestStores()
         }
       } catch (err) {
         this.$q.notify(err)
@@ -88,6 +91,25 @@ export default {
             }
           }, 100);
         })
+      }
+    },
+    async requestStores() {
+      if (!this.invoice.distribution_center_id) {
+        return
+      }
+
+      const params = {
+        distribution_center_id: this.invoice.distribution_center_id
+      }
+
+      try {
+        const { data } = await this.$api.get(`/v1/stores`, { params })
+
+        if (data.status === 'success') {
+          this.stores = data.data.stores
+        }
+      } catch (err) {
+        this.$q.notify(err)
       }
     },
     async requestSettings() {

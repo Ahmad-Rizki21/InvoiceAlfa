@@ -21,6 +21,7 @@
   "Delete {entity}": "Hapus {entity}",
   "Export {entity}": "Ekspor {entity}",
   "Upload {entity}": "Unggah {entity}",
+  "Import {entity}": "Impor {entity}",
   "View {entity}": "Lihat {entity}",
   "Select {entity}": "Pilih {entity}",
   "Manage {entity}": "Kelola {entity}",
@@ -363,6 +364,9 @@
   "Create ticket to start the clock timer.": "Buat tiket terlebih dahulu untuk memulai clock timer.",
   "Please select customer first.": "Pilih customer terlebih dahulu.",
 
+  "The selected file is unsupported. Supported files: {entity}": "Format foto yang dipilih tidak didukung. Format yang diperbolehkan: {entity}",
+  "File size exceeds maximum limit: {max}": "Ukuran file melebihi batas maksimum: {max}",
+  "Image resolution must be greater than {resolution}": "Resolusi gambar harus lebih dari {resolution}",
 
   "This is a short guide to get you know how to use this system. Press arrow right on your keyboard to continue.": "Ini adalah panduan singkat untuk membantu Anda memahami cara menggunakan sistem ini. Tekan tombol panah kanan pada keyboard Anda untuk melanjutkan.",
   "The Menu": "Menu",

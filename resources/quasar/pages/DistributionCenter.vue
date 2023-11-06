@@ -28,6 +28,16 @@
 
       <q-btn
         v-if="$auth.can('create.distribution_center')"
+        color="default"
+        class="q-btn-lg btn-page-distribution-centers-import q-mr-sm"
+        icon="cloud_upload"
+        @click="onFormImport"
+      >
+        <span class="q-ml-xs">{{ $t('Import') }}</span>
+      </q-btn>
+
+      <q-btn
+        v-if="$auth.can('create.distribution_center')"
         color="primary"
         class="q-btn-lg btn-page-distribution-centers-create"
         icon="add"
@@ -133,7 +143,8 @@
                 size="sm"
                 padding="xs"
                 icon="lock_open"
-                class="q-ml-xs btn-datatable-update-password-distribution-center"
+                class="q-ml-xs btn-datatabl
+      isFormImportVisible: false,e-update-password-distribution-center"
                 @click.prevent="onEditPassword(row)"
               >
                 <q-tooltip>
@@ -245,6 +256,18 @@
         @cancel="onFormPasswordCancel"
       />
     </q-dialog>
+
+    <dialog-import
+      v-model="isFormImportVisible"
+      :status="currentImportStatus"
+      :import-path="currentImportPath"
+      :import-type="$constant.import_type.DistributionCenter"
+      :template-url="$q.lang.isoName === 'id' ? '/templates/template-distribution-center.xlsx' : '/templates/distribution-center-template.xlsx'"
+      :processing-page="currentImportProcessingPage"
+      :has-error="currentImportHasError"
+      @update:status="onFormImportUpdateStatus"
+      @success="onRequest"
+    />
   </q-page>
 </template>
 
@@ -253,6 +276,7 @@ import { date } from 'quasar'
 import FormEntry from './DistributionCenter/FormEntry'
 import FormPassword from './DistributionCenter/FormPassword'
 import datatableMixins from 'src/mixins/datatable'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PageDistributionCenter',
@@ -349,6 +373,7 @@ export default {
       isLoading: false,
       isAdvancedSearchVisible: false,
       isFormEntryVisible: false,
+      isFormImportVisible: false,
       isFormEntryReadonly: false,
       isFormPasswordVisible: false,
       formEntry: {},
@@ -364,9 +389,31 @@ export default {
       advancedSearch: search
     }
   },
+  computed: {
+    ...mapGetters({
+      'currentImportStatus': 'imports/status',
+      'currentImportPath': 'imports/importPath',
+      'currentImportProcessingPage': 'imports/processingPage',
+      'currentImportHasError': 'imports/hasError',
+    })
+  },
+  watch: {
+    currentImportStatus: {
+      immediate: true,
+      handler(n, o) {
+        if (n !== o) {
+          if (n) {
+            this.onFormImport()
+          }
+        }
+      }
+    }
+  },
   async mounted() {
     await this.onRequest()
     await this.$nextTick()
+
+
 
     // if (!this.$store.getters['tourGuide/finishedGroups'].distribution_centers) {
     //   this.$tourGuide.open('distribution_centers')
@@ -430,6 +477,24 @@ export default {
     onFormEntryCancel() {
       this.isFormEntryReadonly = false
       this.isFormEntryVisible = false
+    },
+    onFormImport() {
+      this.isFormEntryVisible = false
+      this.isFormImportVisible = true
+    },
+    onFormImportUpdateStatus({ status, importPath, processingPage, hasError }) {
+      this.$store.dispatch('imports/setStatus', status)
+      this.$store.dispatch('imports/setImportPath', importPath)
+
+      if (processingPage) {
+        this.$store.dispatch('imports/setProcessingPage', processingPage)
+      }
+
+      if (typeof hasError !== 'undefined') {
+        this.$store.dispatch('imports/setHasError', hasError)
+      }
+
+      this.$store.dispatch('imports/sync')
     },
     onFormPasswordSuccess() {
       this.isFormPasswordVisible = false

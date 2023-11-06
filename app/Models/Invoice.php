@@ -25,7 +25,8 @@ class Invoice extends Model
         'sub_total', 'ppn_percentage', 'ppn_total', 'stamp_duty', 'total',
         'due_at', 'published_at', 'note', 'receipt_remark',
         'signatory_name', 'signatory_position',
-        'status',
+        'status', 'unpaid_updated_at', 'pending_review_updated_at', 'paid_at',
+        'rejected_at', 'reject_reason'
     ];
 
     /**
@@ -40,6 +41,10 @@ class Invoice extends Model
         'approval_date' => 'date',
         'fo_approval_date' => 'date',
         'published_at' => 'date',
+        'unpaid_updated_at' => 'datetime',
+        'pending_review_updated_at' => 'datetime',
+        'paid_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
 
     public function distributionCenter()
@@ -50,6 +55,11 @@ class Invoice extends Model
     public function invoiceServices()
     {
         return $this->hasMany(InvoiceService::class, 'invoice_id', 'id');
+    }
+
+    public function invoicePaymentProofs()
+    {
+        return $this->hasMany(InvoicePaymentProof::class, 'invoice_id', 'id');
     }
 
     public function statusDescription(): Attribute

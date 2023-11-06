@@ -274,6 +274,11 @@
                 @delete="onFormServiceDelete"
               />
             </template>
+            <form-invoice-service
+              :index="null"
+              :id="$utils.generateId()"
+              :editable="false"
+            />
 
 
             <div v-if="isEditable" class="invoice-table-row">

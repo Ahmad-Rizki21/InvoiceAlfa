@@ -19,4 +19,6 @@ Route::group(['middleware' => 'printing'], function() {
     Route::get('/print/receipt/{id}', [InvoiceController::class, 'printReceipt'])->name('print.receipt');
 });
 
+Route::get('/debug-ws', [ConsoleController::class, 'debugWs'])->name('debug.ws');
+
 Route::get('/{any?}', [ConsoleController::class, 'index'])->where('any', '^(?!api).*$')->name('home');

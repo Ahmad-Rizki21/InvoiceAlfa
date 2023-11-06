@@ -5,19 +5,25 @@ namespace App\Http\Controllers;
 use App\Enums\InvoiceStatus;
 use App\Enums\SettingKey;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InvoicePaymentProofResource;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Http\Resources\InvoiceResource;
 use App\Models\DistributionCenter;
 use App\Models\Franchise;
+use App\Models\InvoicePaymentProof;
 use App\Models\InvoiceService;
 use App\Models\Settings;
 use App\Rules\UniqueEmailRule;
 use App\Rules\UniqueUsernameRule;
 use App\Rules\ValidUsernameRule;
+use App\Services\Encrypter\Hashids;
+use App\Services\FileUpload\UploadedFile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class InvoiceController extends Controller
 {
@@ -83,7 +89,7 @@ class InvoiceController extends Controller
         }
 
         $request->merge([
-            'status' => 'in:' . implode(',', [
+            'status' => 'in:' . implode('|', [
                 InvoiceStatus::Unpaid->value,
                 InvoiceStatus::PendingReview->value,
                 InvoiceStatus::Rejected->value,
@@ -120,7 +126,7 @@ class InvoiceController extends Controller
         $limit = $urlQuery->limit();
         $page = $urlQuery->page();
 
-        return $this->getQuery($request)->paginate($limit, ['*'], 'page', $page);
+        return $this->getQuery($request)->paginate($limit ?: 99999999999999, ['*'], 'page', $page);
     }
 
     /**
@@ -232,6 +238,10 @@ class InvoiceController extends Controller
      */
     public function show(Request $request, $id)
     {
+        if (! is_numeric($id)) {
+            $id = Hashids::decodeInvoiceId($id);
+        }
+
         $entry = $this->getQuery($request)->findOrFail($id);
 
         if ($request->edit) {
@@ -562,6 +572,8 @@ class InvoiceController extends Controller
             'due_at' => ['sometimes', 'nullable', 'date'],
             'note' => ['sometimes', 'nullable'],
             'receipt_remark' => ['sometimes', 'nullable'],
+            'reject_reason' => ['sometimes', 'nullable'],
+            'status' => ['sometimes', 'nullable', new Enum(InvoiceStatus::class)],
         ]);
 
         $entry->fill([
@@ -579,7 +591,38 @@ class InvoiceController extends Controller
             'note' => $request->has('note') ? $request->note : $entry->note,
             'receipt_remark' => $request->filled('receipt_remark') ? $request->receipt_remark : $entry->receipt_remark,
             'ppn_percentage' => $request->filled('ppn_percentage') ? $request->ppn_percentage : $entry->ppn_percentage,
+            'reject_reason' => $request->has('reject_reason') ? $request->reject_reason : $entry->reject_reason,
         ]);
+
+        if ($request->status) {
+            if ($request->status == InvoiceStatus::Unpaid->value) {
+                $entry->unpaid_updated_at = Carbon::now();
+            } else if ($request->status == InvoiceStatus::PendingReview->value) {
+                if ($entry->status == InvoiceStatus::Paid->value) {
+                    $entry->paid_at = null;
+                } else if ($entry->status == InvoiceStatus::Rejected->value) {
+                    $entry->rejected_at  = null;
+                    $entry->reject_reason = null;
+                }
+
+                $entry->pending_review_updated_at  = Carbon::now();
+            } else if ($request->status == InvoiceStatus::Paid->value) {
+                if ($entry->status == InvoiceStatus::Rejected->value) {
+                    $entry->rejected_at  = null;
+                    $entry->reject_reason = null;
+                }
+
+                $entry->paid_at = Carbon::now();
+            } else if ($request->status == InvoiceStatus::Rejected->value) {
+                if ($entry->status == InvoiceStatus::Paid->value) {
+                    $entry->paid_at = null;
+                }
+
+                $entry->rejected_at = Carbon::now();
+            }
+
+            $entry->status = $request->status;
+        }
 
         $services = [];
         $subTotal = 0;
@@ -626,6 +669,103 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function uploadPaymentProofs(Request $request)
+    {
+        $request->validate([
+            'payment_proof' => ['bail', 'required', 'file', 'mimes:jpg,jpeg,png,svg,heic', 'max:' . (1024 * 1024 * 10)],
+        ]);
+
+        $entry = Invoice::find($request->id);
+
+        if (!$entry) {
+            return abort(404, __(':entity not found', ['entity' => __('Invoice')]));
+        }
+
+        $uploadedFile = UploadedFile::from($request->file('payment_proof'));
+
+        $disk = 'public';
+        $basePath = 'payment-proofs/' . $entry->id;
+
+        $paymentProof = InvoicePaymentProof::create([
+            'invoice_id' => $entry->id,
+            'name' => $uploadedFile->getClientOriginalName(),
+            'mime_type' => $uploadedFile->getMimeType(),
+            'size' => $uploadedFile->getSize(),
+            'path' => $uploadedFile->disk('public')->store($basePath),
+            'disk' => $disk,
+        ]);
+
+        if ($entry->status == InvoiceStatus::Unpaid->value) {
+            $entry->status = InvoiceStatus::PendingReview->value;
+            $entry->pending_review_updated_at = Carbon::now();
+            $entry->save();
+        }
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __(':entity successfully uploaded', ['entity' => __('Payment proof')]),
+            'data' => [
+                'invoice_payment_proof' => new InvoicePaymentProofResource($paymentProof),
+            ],
+        ]);
+    }
+
+    public function getPaymentProofs(Request $request)
+    {
+        $invoiceIds = $request->invoice_id;
+
+        if (! is_array($invoiceIds)) {
+            $invoiceIds = [$invoiceIds];
+        }
+
+        $entries = Invoice::with('invoicePaymentProofs')->whereIn('id', $invoiceIds)->get();
+
+        $paymentProofs = [];
+
+        foreach ($entries as $entry) {
+            foreach ($entry->invoicePaymentProofs as $i => $paymentProof) {
+                if ($i < 5) {
+                    $paymentProofs[] = $paymentProof;
+                }
+            }
+        }
+
+        $paymentProofs = collect(array_values($paymentProofs));
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __(':entity successfully uploaded', ['entity' => __('Payment proof')]),
+            'data' => [
+                'invoice_payment_proofs' => InvoicePaymentProofResource::collection($paymentProofs),
+            ],
+        ]);
+    }
+
+    public function destroyPaymentProofs(Request $request)
+    {
+        // $this->authorize('delete.invoice');
+
+        $ids = $request->id;
+
+        if (! is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        foreach (InvoicePaymentProof::whereIn('id', $ids)->get() as $paymentProof) {
+            if (Storage::disk($paymentProof->disk)->exists($paymentProof->path)) {
+                Storage::disk($paymentProof->disk)->delete($paymentProof->path);
+            }
+
+            $paymentProof->delete();
+        }
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __(':entity successfully deleted', ['entity' => __('Payment proof')]),
+            'data' => new \stdClass(),
+        ]);
+    }
+
     public function destroy($id)
     {
         // $this->authorize('delete.invoice');
@@ -636,7 +776,21 @@ class InvoiceController extends Controller
             return abort(404, __(':entity not found', ['entity' => __('Invoice')]));
         }
 
-        $entry->delete();
+        if ($entry->status == InvoiceStatus::Draft->value) {
+            $entry->delete();
+        } else {
+            $entry->invoiceServices()->delete();
+
+            foreach ($entry->invoicePaymentProofs()->get() as $paymentProof) {
+                if (Storage::disk($paymentProof->disk)->exists($paymentProof->path)) {
+                    Storage::disk($paymentProof->disk)->delete($paymentProof->path);
+                }
+
+                $paymentProof->delete();
+            }
+
+            $entry->forceDelete();
+        }
 
         return $this->json([
             'status' => 'success',

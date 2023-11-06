@@ -97,11 +97,16 @@ export default {
     @media (min-width: 768px) {
       max-width: 706px;
     }
-
     @media (min-width: 992px) {
       max-width: 906px;
     }
     @media (min-width: 1200px) {
+      max-width: 906px;
+    }
+    @media (min-width: 1360px) {
+      max-width: 906px;
+    }
+    @media (min-width: 1600px) {
       max-width: 1040px;
     }
   }
@@ -109,13 +114,23 @@ export default {
   .page-cust {
     > .page-cust-header {
       padding: 1rem 0;
+      display: flex;
+      align-items: center;
+
+      .q-toolbar__title {
+        font-weight: 900;
+        font-size: 1.5em;
+      }
     }
   }
 }
 
 .body--light {
+
   .customer-layout {
+    color: #333;
     background-image: linear-gradient(to right top, #f5f5f8, #f2f3f8, #f0f0f8, #edeef8, #ebebf8);
+    // background-image: linear-gradient(to right top, #ffffff, #f2f3f8, #ffffff, #edeef8, #ebebf8);
 
     .q-page-container {
       background-color: transparent;

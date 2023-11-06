@@ -40,6 +40,10 @@ class InvoiceResource extends JsonResource
                 return InvoiceServiceResource::collection($this->invoiceServices);
             }),
 
+            'invoice_payment_proofs' => $this->whenLoaded('invoicePaymentProofs', function () {
+                return InvoicePaymentProofResource::collection($this->invoicePaymentProofs);
+            }),
+
             'customer_name' => $this->nullableString($this->customer_name),
             'customer_address' => $this->nullableString($this->customer_address),
 
@@ -57,6 +61,13 @@ class InvoiceResource extends JsonResource
 
             'signatory_name' => (string) $this->signatory_name,
             'signatory_position' => (string) $this->signatory_position,
+
+            'unpaid_updated_at' => $this->formatDateTime($this->unpaid_updated_at),
+            'pending_review_updated_at' => $this->formatDateTime($this->pending_review_updated_at),
+            'paid_at' => $this->formatDateTime($this->paid_at),
+            'rejected_at' => $this->formatDateTime($this->rejected_at),
+            'reject_reason' => $this->nullableString($this->reject_reason),
+
             'created_at' => $this->formatDateTime($this->created_at),
             'updated_at' => $this->formatDateTime($this->updated_at),
         ];

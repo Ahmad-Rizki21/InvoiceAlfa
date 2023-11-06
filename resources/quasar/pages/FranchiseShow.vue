@@ -1,5 +1,5 @@
 <template>
-  <q-page class="page-distribution-centers page-distribution-center-single page-distribution-center-show">
+  <q-page class="page-franchises page-franchise-single page-franchise-show">
     <portal to="app-breadcrumbs">
       <breadcrumbs />
     </portal>
@@ -7,7 +7,7 @@
     <portal to="app-toolbar">
       <q-btn flat round dense icon="arrow_back" @click="onGoBack" />
       <q-toolbar-title>
-        {{ $t('Distribution Center') }}
+        {{ $t('Franchise') }}
       </q-toolbar-title>
 
       <div class="sep" />
@@ -24,7 +24,7 @@
     <div class="page-header">
       <q-btn flat round dense icon="arrow_back" @click="onGoBack" />
       <q-toolbar-title>
-        {{ $t('Distribution Center') }}
+        {{ $t('Franchise') }}
       </q-toolbar-title>
 
       <div class="sep" />
@@ -43,22 +43,22 @@
 </template>
 
 <script>
-import FormPage from './DistributionCenter/FormPage'
+import FormPage from './Franchise/FormPage'
 
 export default {
-  name: 'PageDistributionCenterShow',
+  name: 'PageFranchiseShow',
   components: {
     FormPage
   },
   meta() {
     return {
-      title: this.$t('Distribution Center') + ' - ' + this.$t('Web Console')
+      title: this.$t('Franchise') + ' - ' + this.$t('Web Console')
     }
   },
   breadcrumbs() {
     const breadcrumbs = [
       'home',
-      { text: this.$t('Distribution Centers'), to: '/distribution-centers' },
+      { text: this.$t('Franchises'), to: '/franchises' },
     ]
 
     if (this.isEditable) {
@@ -107,10 +107,10 @@ export default {
       }
 
       try {
-        const { data } = await this.$api.get(`/v1/distribution-centers/${props.id}`, { params })
+        const { data } = await this.$api.get(`/v1/franchises/${props.id}`, { params })
 
         if (data.status === 'success') {
-          this.entry = data.data.distribution_center
+          this.entry = data.data.franchise
         }
       } catch (err) {
         this.$q.notify(err)
@@ -123,10 +123,12 @@ export default {
       this.entry = { ...entry }
     },
     onDeleted() {
-      this.$router.replace('/distribution-centers')
+      this.$router.replace('/franchises')
     },
     onGoBack() {
-      if (this.$route.query.customer_id) {
+      if (this.$route.query.distribution_center_id) {
+        this.$router.push(`/distribution-centers/${this.$route.query.distribution_center_id}`)
+      } else if (this.$route.query.customer_id) {
         this.$router.push(`/customers/${this.$route.query.customer_id}`)
       } else {
         this.$router.back()
@@ -137,7 +139,7 @@ export default {
 </script>
 
 <style lang="scss">
-.page-distribution-center-show {
+.page-franchise-show {
   padding-bottom: 3rem;
 }
 </style>

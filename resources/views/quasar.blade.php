@@ -23,12 +23,17 @@
     <script type="text/javascript">var _APP_DATA = '{!! http_encrypt(json_encode([
       'url' => [
         'api' => url('/api'),
+        'adapter_download' => config('services.invoice_printer_adapter.app_download_url'),
       ],
       'locale' => app()->getLocale(),
       'timezone' => config('app.timezone'),
       'debug' => config('app.debug'),
       'constants' => \App\Models\Constant::all(),
       'no' => csp_nonce(),
+      'ws' => [
+        'url' => config('services.websocket.url'),
+        'src' => config('services.websocket.app_source'),
+      ]
     ])) !!}';</script>
     <script type="text/javascript" src="{{ quasar_asset('/js/vendor.js') }}"></script>
     <script type="text/javascript" src="{{ quasar_asset('/js/app.js') }}"></script>

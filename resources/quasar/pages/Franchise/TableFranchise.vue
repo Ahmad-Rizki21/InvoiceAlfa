@@ -385,7 +385,7 @@ export default {
       this.formEntry = {}
     },
     onView(row) {
-      if (this.franchise.id) {
+      if (this.franchise && this.franchise.id) {
         this.$router.push({
           path: `/franchises/${row.id}`,
           query: {

@@ -221,7 +221,13 @@ export default {
     },
     formattedPublishedAt() {
       if (this.invoice.published_at) {
-        return date.formatDate(date.extractDate(this.invoice.published_at, 'DD/MM/YYYY'), 'DD-MMMM-YYYY')
+        let format = 'DD/MM/YYYY'
+
+        if (this.invoice.published_at.includes('-')) {
+          format = 'YYYY-MM-DD'
+        }
+
+        return date.formatDate(date.extractDate(this.invoice.published_at, format), 'DD-MMMM-YYYY')
       }
     },
     formattedGrandTotalTerbilang() {

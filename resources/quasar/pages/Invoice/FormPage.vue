@@ -1,173 +1,129 @@
 <template>
-  <div class="form-page q-pa-sm q-gutter-md">
-    <q-card class="q-pa-sm">
+  <div class="form-page form-invoice-page q-pa-sm q-gutter-md">
+    <q-card class="q-pa-sm" flat>
       <q-form ref="form" class="form-entry" greedy :class="{ readonly }" @submit.prevent="onSubmit">
         <q-card-section>
           <div class="row">
             <div :class="{ 'col-xs-12': !readonly, 'col-xs-11': readonly }">
 
-              <div class="q-mb-md text-subtitle text-weight-bold">{{ $t('Details') }}</div>
-
-              <div class="row q-col-gutter-x-sm q-mb-md">
-                <div class="col-xs-12 col-sm-6 col-md-6">
+              <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
+                <div class="col-xs-12 col-sm-8 col-md-4 col-lg-3">
                   <q-skeleton v-if="fetching" type="rect" />
-                  <autocomplete-customer
+                  <q-select
                     v-show="!fetching"
-                    v-model="formEntry.customer_id"
-                    :label="$t('Customer')"
+                    v-model="formEntry.status"
+                    :label="$t('Status') + '*'"
                     :filled="!readonly"
                     :borderless="readonly"
                     :readonly="readonly"
-                    :disable="!readonly && !!$route.query.customer_id"
                     stack-label
                     :placeholder="readonly ? '-' : ''"
-                    name="customer_id"
+                    name="status"
                     autocomplete="off"
+                    :options="statusOptions"
+                    option-label="label"
+                    :option-disable="statusOptionDisable"
+                    emit-value
+                    :display-value="selectedStatus"
                     :dense="!readonly"
-                    :rules="rules.customer_id"
-                    :error="!!errors.customer_id"
-                    :error-message="errors.customer_id"
+                    :rules="rules.status"
+                    :error="!!errors.status"
+                    :error-message="errors.status"
                   />
                 </div>
               </div>
-              <div class="row q-col-gutter-x-sm q-mb-md">
-                <div class="col-xs-12 col-sm-6 col-md-3">
-                  <q-skeleton v-if="fetching" type="rect" />
-                  <q-input
-                    v-show="!fetching"
-                    v-model="formEntry.code"
-                    :label="$t('Code')"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="code"
-                    autocomplete="off"
-                    :dense="!readonly"
-                    :rules="rules.code"
-                    :error="!!errors.code"
-                    :error-message="errors.code"
-                  />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-5">
-                  <q-skeleton v-if="fetching" type="rect" />
-                  <q-input
-                    v-show="!fetching"
-                    v-model="formEntry.name"
-                    :label="$t('Name') + '*'"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="name"
-                    autocomplete="off"
-                    :dense="!readonly"
-                    :rules="rules.name"
-                    :error="!!errors.name"
-                    :error-message="errors.name"
-                  />
-                </div>
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                  <q-skeleton v-if="fetching" type="rect" />
-                  <q-input
-                    v-if="readonly"
-                    v-show="!fetching"
-                    :value="formEntry.location"
-                    :label="$t('Location')"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="location"
-                    autocomplete="off"
-                    :dense="!readonly"
-                  />
-                  <q-input
-                    v-else
-                    v-show="!fetching"
-                    v-model="formEntry.location"
-                    :label="$t('Location')"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="location"
-                    autocomplete="off"
-                    :dense="!readonly"
-                    :rules="rules.location"
-                    :error="!!errors.location"
-                    :error-message="errors.location"
-                  />
-                </div>
+
+              <div v-if="formEntry.status == $constant.invoice_status.Rejected" class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
                 <div class="col-xs-12">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
-                    v-if="readonly"
                     v-show="!fetching"
-                    :value="formEntry.address"
-                    :label="$t('Full Address')"
+                    v-model="formEntry.reject_reason"
+                    :label="$t('Reject Reason')"
                     :filled="!readonly"
                     :borderless="readonly"
                     :readonly="readonly"
-                    type="textarea"
-                    autogrow
                     stack-label
                     :placeholder="readonly ? '-' : ''"
-                    name="address"
+                    name="reject_reason"
                     autocomplete="off"
                     :dense="!readonly"
-                  />
-                  <q-input
-                    v-else
-                    v-show="!fetching"
-                    v-model="formEntry.address"
-                    :label="$t('Full Address')"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    type="textarea"
-                    rows="2"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="address"
-                    autocomplete="off"
-                    :dense="!readonly"
-                    :rules="rules.address"
-                    :error="!!errors.address"
-                    :error-message="errors.address"
+                    :rules="rules.reject_reason"
+                    :error="!!errors.reject_reason"
+                    :error-message="errors.reject_reason"
                   />
                 </div>
-
-                <div class="col-xs-12 col-sm-6 col-md-4">
-                  <q-input
-                    v-show="!fetching"
-                    v-model="formEntry.phone_number"
-                    :label="$t('PIC Phone Number')"
-                    :filled="!readonly"
-                    name="phone_number"
-                    autocomplete="off"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    :dense="!readonly"
-                    :rules="rules.phone_number"
-                    :error="!!errors.phone_number"
-                    :error-message="errors.phone_number"
-                    @keypress="$globalListeners.onKeypressOnlyUnsignedNumber($event)"
-                  />
-                </div>
-
               </div>
 
+              <div
+                v-if="(formEntry.invoice_payment_proofs && formEntry.invoice_payment_proofs.length) || editable"
+                class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md"
+              >
+                <div class="col-xs-12">
+                  <q-field
+                    :label="$t('Payment Proof')"
+                    borderless
+                    readonly
+                    stack-label
+                  >
+                    <card-payment-proof
+                      ref="cardPaymentProof"
+                      :invoice="formEntry"
+                      :uploadable="false"
+                      :editable="editable"
+                      flat
+                      :addable="editable"
+                      @updated="onPaymentProofUpdated"
+                    />
+                  </q-field>
+                </div>
+              </div>
 
               <template v-if="readonly">
                 <div class="row">
-                  <div class="col-xs-12 col-md-4">
+                  <div class="col-xs-12 col-md-3">
+                    <q-input
+                      v-show="!fetching && formEntry.unpaid_updated_at"
+                      :value="formEntry.unpaid_updated_at"
+                      :label="$t('Published At')"
+                      borderless
+                      readonly
+                      :dense="!readonly"
+                    />
+                  </div>
+                  <div class="col-xs-12 col-md-3">
+                    <q-input
+                      v-show="!fetching && formEntry.pending_review_updated_at"
+                      :value="formEntry.pending_review_updated_at"
+                      :label="$t('Pending Review At')"
+                      borderless
+                      readonly
+                      :dense="!readonly"
+                    />
+                  </div>
+                  <div class="col-xs-12 col-md-3">
+                    <q-input
+                      v-show="!fetching && formEntry.paid_at"
+                      :value="formEntry.paid_at"
+                      :label="$t('Paid At')"
+                      borderless
+                      readonly
+                      :dense="!readonly"
+                    />
+                  </div>
+                  <div class="col-xs-12 col-md-3">
+                    <q-input
+                      v-show="!fetching && formEntry.rejected_at"
+                      :value="formEntry.rejected_at"
+                      :label="$t('Rejected At')"
+                      borderless
+                      readonly
+                      :dense="!readonly"
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-12 col-md-3">
                     <q-input
                       v-show="!fetching"
                       :value="formEntry.created_at"
@@ -190,60 +146,34 @@
                 </div>
               </template>
             </div>
-            <div v-if="$auth.can(['edit.customer', 'delete.customer'])" v-show="readonly" class="col-xs-1 text-right">
-              <q-btn icon="more_vert" padding="xs" size="md" flat>
-                <q-menu auto-close anchor="bottom right" self="top right">
-                  <q-list style="min-width: 100px">
-                    <q-item v-if="$auth.can('edit.customer')" clickable @click="onEdit">
-                      <q-item-section>{{ $t('Edit') }}</q-item-section>
-                    </q-item>
-                    <q-item v-if="$auth.can('delete.customer')" clickable @click="onDelete">
-                      <q-item-section>{{ $t('Delete') }}</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </div>
           </div>
         </q-card-section>
-
-        <q-card-actions v-if="$auth.can(['create.customer', 'edit.customer']) && !readonly" align="right">
-          <q-btn
-            v-if="!isCreate || $route.query.customer_id"
-            :label="$t('Cancel')"
-            flat
-            :disable="loading || isLoading"
-            @click="cancel"
-          />
-          <q-btn
-            type="submit"
-            :label="$t(`${isCreate ? 'Create' : 'Save'}`)"
-            :color="isCreate ? 'positive' : 'primary'"
-            :loading="loading || isLoading"
-            unelevated
-            class="q-px-lg"
-          />
-        </q-card-actions>
       </q-form>
     </q-card>
-
-    <!-- <q-separator /> -->
   </div>
 </template>
 
 <script>
 import { date } from 'quasar'
+import CardPaymentProof from '../CustPay/CardPaymentProof'
 
 const DEFAULT_FORM_ENTRY = {
-  name: null,
-  phone_number: null,
-  customer_id: null,
-  address: null,
-  location: null
+  id: null,
+  invoice_no: null,
+  receipt_no: null,
+  created_at: null,
+  updated_at: null,
+  invoice_services: [],
+  invoice_payment_proofs: [],
+  status: null,
+  reject_reason: null
 }
 
 export default {
   name: 'FormPage',
+  components: {
+    CardPaymentProof
+  },
   props: {
     entry: {
       type: Object,
@@ -268,7 +198,9 @@ export default {
           v => !!v || this.$t('{field} is required', { field: this.$t('Name') })
         ],
         username: [
-          v => !v || (!!v && /^[a-zA-Z0-9_\.]+$/.test(v)) || this.$t('{field} can only contain alphanumeric characters, underscores, and periods', { field: this.$t('Username') })
+          v => !v || (!!v && v.length > 3) || this.$t('{field} must be at least {length} characters', { field: this.$t('Username'), length: 3 }),
+          v => !v || (!!v && /^[a-zA-Z0-9_\.]+$/.test(v)) || this.$t('{field} can only contain alphanumeric characters, underscores, and periods', { field: this.$t('Username') }),
+          v => !v || (!!v && /^[^0-9][a-zA-Z0-9_\.]+$/.test(v)) || this.$t('{field} must be starts with letter', { field: this.$t('Username') })
         ],
         email: [
           v => !!v || this.$t('{field} is required', { field: this.$t('Email') }),
@@ -287,7 +219,8 @@ export default {
       },
       errors: DEFAULT_FORM_ENTRY,
       isEditable: false,
-      defaultFormEntry: DEFAULT_FORM_ENTRY
+      defaultFormEntry: DEFAULT_FORM_ENTRY,
+      childTab: 'franchise'
     }
   },
   computed: {
@@ -300,11 +233,85 @@ export default {
       }
 
       return !this.isCreate
+    },
+    formattedApprovalDate() {
+      if (this.readonly && this.formEntry.approval_date) {
+        return date.formatDate(date.extractDate(this.formEntry.approval_date, 'DD/MM/YYYY'), 'DD MMM YYYY')
+      }
+    },
+    formattedFoApprovalDate() {
+      if (this.readonly && this.formEntry.fo_approval_date) {
+        return date.formatDate(date.extractDate(this.formEntry.fo_approval_date, 'DD/MM/YYYY'), 'DD MMM YYYY')
+      }
+    },
+    selectedStatus() {
+      const selected = this.statusOptions.find(v => v.value == this.formEntry.status)
+
+      if (selected) {
+        return selected.label
+      }
+
+      return ''
+    },
+    statusOptions() {
+      const constant = this.$constant.invoice_status
+
+      const options = [
+        {
+          value: constant.Draft,
+          label: this.$t('Draft')
+        },
+        {
+          value: constant.Unpaid,
+          label: this.$t('Publish') + ' (' + this.$t('Unpaid') + ')'
+        },
+        {
+          value: constant.PendingReview,
+          label: this.$t('Pending Review')
+        },
+        {
+          value: constant.Paid,
+          label: this.$t('Paid')
+        },
+        {
+          value: constant.Rejected,
+          label: this.$t('Rejected')
+        },
+      ]
+
+      if (this.readonly) {
+        return options
+      }
+
+      const status = this.entry.status
+
+      if (status == constant.Draft) {
+        return options.filter(v => [constant.Draft, constant.Unpaid].includes(v.value))
+      }
+
+      if (status == constant.Unpaid) {
+        return options.filter(v => [constant.Draft, constant.Unpaid, constant.PendingReview].includes(v.value))
+      }
+
+      if (status == constant.PendingReview) {
+        return options.filter(v => [constant.PendingReview, constant.Paid, constant.Rejected].includes(v.value))
+      }
+
+      if (status == constant.Paid) {
+        return options.filter(v => [constant.Paid, constant.Rejected].includes(v.value))
+      }
+
+      if (status == constant.Rejected) {
+        return options.filter(v => [constant.Rejected, constant.Paid, constant.PendingReview].includes(v.value))
+      }
+
+      return options
     }
   },
   watch: {
     entry: {
       immediate: true,
+      deep: true,
       handler(n) {
         this.$nextTick(() => {
           this.fill(n)
@@ -316,45 +323,94 @@ export default {
       handler(n, o) {
         if (n !== o && n !== this.isEditable) {
           this.isEditable = n
+
+          this.formEntry = {
+            ...this.defaultFormEntry,
+            invoice_payment_proofs: (this.defaultFormEntry.invoice_payment_proofs || []).map(v => {
+              v.file = null
+              return { ...v }
+            })
+          }
+
+          if (this.$refs.form) {
+            this.$refs.form.resetValidation();
+          }
         }
       }
     },
     isEditable(n, o) {
       if (n !== o && n !== this.editable) {
         this.$emit('update:editable', n)
+
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.$forceUpdate()
+          }, 100)
+        })
       }
     }
   },
   methods: {
     fill(form) {
-      form = { ...DEFAULT_FORM_ENTRY, ...form };
-
-      if (form.sla) {
-        form.sla = parseFloat(form.sla, 10)
-      }
+      form = { ...DEFAULT_FORM_ENTRY, ...form }
 
       if (form.created_at) {
         form.created_at = date.formatDate(form.created_at, 'DD MMM YYYY HH:mm')
         form.updated_at = date.formatDate(form.updated_at, 'DD MMM YYYY HH:mm')
-      } else {
-        const defaultFormEntry = {}
 
-        for (const key in DEFAULT_FORM_ENTRY) {
+        if (form.approval_date) {
+          form.approval_date = date.formatDate(form.approval_date, 'DD/MM/YYYY')
+        }
+        if (form.fo_approval_date) {
+          form.fo_approval_date = date.formatDate(form.fo_approval_date, 'DD/MM/YYYY')
+        }
+      }
+
+      form.unpaid_updated_at = form.unpaid_updated_at ? date.formatDate(form.unpaid_updated_at, 'DD MMM YYYY HH:mm') : null
+      form.pending_review_updated_at = form.pending_review_updated_at ? date.formatDate(form.pending_review_updated_at, 'DD MMM YYYY HH:mm') : null
+      form.paid_at = form.paid_at ? date.formatDate(form.paid_at, 'DD MMM YYYY HH:mm') : null
+      form.rejected_at = form.rejected_at ? date.formatDate(form.rejected_at, 'DD MMM YYYY HH:mm') : null
+
+      if (form.invoice_payment_proofs) {
+        form.invoice_payment_proofs = (form.invoice_payment_proofs || []).map(v => {
+          v.file = null
+          return { ...v }
+        })
+      }
+
+      const defaultFormEntry = {}
+
+      for (const key in DEFAULT_FORM_ENTRY) {
+        if (key === 'invoice_payment_proofs') {
+          defaultFormEntry[key] = (form[key] || []).map(v => {
+            v.file = null
+            return { ...v }
+          })
+        } else {
           defaultFormEntry[key] = form[key]
         }
-
-        this.defaultFormEntry = defaultFormEntry
       }
 
-      if (this.$route.query.customer_id) {
-        form.customer_id = this.$route.query.customer_id
-        this.defaultFormEntry.customer_id = this.$route.query.customer_id
-      }
+      this.defaultFormEntry = defaultFormEntry
 
       this.formEntry = form;
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
+    },
+    async uploadPaymentProofs() {
+      await this.$refs.cardPaymentProof.onUpload(true)
+    },
+    onPaymentProofUpdated(paymentProofs) {
+      this.formEntry.invoice_payment_proofs = paymentProofs
+      this.formEntry.invoice_payment_proof_dirty = true
+    },
+    statusOptionDisable(item) {
+      if (this.readonly) {
+        return item
+      }
+
+      return item
     },
     isDirty() {
       return this.$utils.isDirty(this.defaultFormEntry, this.formEntry)
@@ -376,19 +432,25 @@ export default {
 
       const entry = { ...this.formEntry }
 
-      entry.type = this.$constant.customer.TYPE_DISTRIBUTION_CENTER;
+      if (entry.approval_date) {
+        entry.approval_date = date.formatDate(date.extractDate(entry.approval_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
+      }
+
+      if (entry.fo_approval_date) {
+        entry.fo_approval_date = date.formatDate(date.extractDate(entry.fo_approval_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
+      }
 
       this.isLoading = true;
 
       try {
-        const endpoint = entry.id ? `/v1/distribution-centers/${entry.id}` : '/v1/distribution-centers';
+        const endpoint = entry.id ? `/v1/invoices/${entry.id}` : '/v1/invoices';
         const method = entry.id ? 'patch' : 'post';
 
         let { data } = await this.$api[method](endpoint, entry);
 
         if (data.status === 'success') {
           this.defaultFormEntry = { ...this.formEntry }
-          this.$emit('success', data.data.distribution_center);
+          this.$emit('success', data.data.invoice);
           this.isEditable = false
         }
 
@@ -396,9 +458,9 @@ export default {
           this.$q.notify({ message: data.message })
         } else {
           if (data.status === 'success') {
-            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Distribution center') }) })
+            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Invoice') }) })
           } else {
-            this.$t('Failed to save {entity}', { entity: this.$t('distribution center') })
+            this.$t('Failed to save {entity}', { entity: this.$t('invoice') })
           }
         }
       } catch (err) {
@@ -419,12 +481,6 @@ export default {
     cancel() {
       if (this.loading || this.isLoading) {
         return;
-      }
-
-      if (this.$route.query.customer_id) {
-        this.$router.push(`/customers/${this.$route.query.customer_id}`)
-
-        return
       }
 
       this.isEditable = false
@@ -475,13 +531,29 @@ export default {
       }).onCancel(() => {
         this.isLoading = false
       })
+    },
+    onTableRelationFranchiseCreate() {
+      this.$router.push({
+        path: `/franchises/create`,
+        query: {
+          distribution_center_id: this.entry.id
+        }
+      })
+    },
+    onTableRelationStoreCreate() {
+      this.$router.push({
+        path: `/stores/create`,
+        query: {
+          distribution_center_id: this.entry.id
+        }
+      })
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.form-entry {
+<style lang="scss">
+.form-invoice-page {
   @media (min-width: $breakpoint-sm-min) {
     // max-width: 400px !important;
   }
@@ -489,6 +561,19 @@ export default {
   &.readonly {
     .q-field.q-textarea.q-field--readonly {
       line-height: 1.4;
+    }
+  }
+
+  .card-payment-proof {
+    > .q-card__section {
+      // padding: 0;
+      padding-top: 0.5rem;
+      margin-left: -1rem;
+    }
+
+    .label-header,
+    .label-meta {
+      display: none;
     }
   }
 }

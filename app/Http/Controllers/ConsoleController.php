@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Models\TicketTimer;
 use App\Models\User;
+use App\Services\Websocket\Ws;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -213,5 +214,10 @@ class ConsoleController extends Controller
     public function testDownload()
     {
         return response()->download(storage_path('testfile'));
+    }
+
+    public function debugWs(Ws $ws)
+    {
+        return $ws->debugServer();
     }
 }

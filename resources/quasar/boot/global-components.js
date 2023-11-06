@@ -13,4 +13,5 @@ export default ({ Vue }) => {
   Vue.component('AutocompleteRole', () => import('../components/AutocompleteRole.vue'))
   Vue.component('SelectTicketStatus', () => import('../components/SelectTicketStatus.vue'))
   Vue.component('SelectTicketDownTime', () => import('../components/SelectTicketDownTime.vue'))
+  Vue.component('DialogImport', () => import('../components/DialogImport.vue'))
 }

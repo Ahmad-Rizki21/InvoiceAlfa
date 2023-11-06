@@ -45,7 +45,14 @@ class UrlQuery
      */
     public function limit(): int
     {
-        return (int) ($this->request->query('limit') ?: $this->request->query('itemsPerPage') ?: 9999999999999);
+        $limit = $this->request->query('limit') ?: $this->request->query('itemsPerPage');
+
+        if (is_numeric($limit)) {
+            return (int) $limit;
+        }
+
+        return 0;
+        // return (int) ($this->request->query('limit') ?: $this->request->query('itemsPerPage') ?: 9999999999999);
     }
 
     /**

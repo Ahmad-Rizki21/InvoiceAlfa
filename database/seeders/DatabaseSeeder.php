@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Filesystem\Filesystem;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,7 +20,6 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-
         $this->call(SettingsSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(PermissionSeeder::class);
@@ -27,5 +27,12 @@ class DatabaseSeeder extends Seeder
         $this->call(DistributionCenterSeeder::class);
         $this->call(StoreSeeder::class);
         $this->call(FranchiseSeeder::class);
+
+        $fs = new Filesystem();
+        foreach ($fs->allFiles(storage_path('app/public/payment-proofs')) as $file) {
+            $fs->delete($file->getPath());
+        }
+
+        $fs->deleteDirectory(storage_path('app/public/payment-proofs'));
     }
 }

@@ -1,7 +1,7 @@
 <template>
   <q-card
     class="card-active-invoice"
-    :class="{ 'empty-invoice': emptyInvoice}"
+    :class="{ 'empty-invoice': emptyInvoice, 'multiple': entries.length > 1}"
     :flat="emptyInvoice"
     :outline="emptyInvoice"
   >
@@ -52,11 +52,12 @@
       <template v-else-if="entries.length">
         <div v-for="entry in entries" class="bill-item" :key="entry.id">
           <div class="date">
-            <span>{{ $t('Month') }}</span>
+            <span class="span">{{ $t('Month') }}</span>
+            <span class="span-invoice">{{ entry.invoice_no }}</span>
             <div>{{ formatMonth(entry) }}</div>
           </div>
           <div class="invoice">
-            <span>
+            <span class="span">
               Invoice
 
               <router-link :to="`/c/invoice/${entry.invoice_no}`">
@@ -68,21 +69,47 @@
             <div>{{ entry.invoice_no }}</div>
           </div>
           <div class="status">
-            <span>{{ $t('Status') }}</span>
-            <div>{{ entry.status_description }}</div>
+            <span class="span">{{ $t('Status') }}</span>
+            <div>
+              {{ entry.status_description }}
+              <q-icon v-if="entry.status == $constant.invoice_status.Rejected && entry.reject_reason" name="info" size="xs">
+                <q-tooltip>{{ entry.reject_reason }}</q-tooltip>
+              </q-icon>
+            </div>
           </div>
           <div class="due-at">
-            <span>{{ $t('Due') }}</span>
+            <span class="span">{{ $t('Due') }}</span>
             <div>{{ formatDueAt(entry) }}</div>
           </div>
           <div class="total-bill">
-            <span class="total-bill-label">
+            <span class="span total-bill-label">
               {{ $t('Total Bill') }}
             </span>
             <div class="total-bill-amount">
-              Rp {{ formatTotal(entry) }}
+              {{ formatTotal(entry) }}
             </div>
           </div>
+          <div v-if="entries.length > 1" class="pay">
+            <q-btn
+              v-if="[$constant.invoice_status.Paid, $constant.invoice_status.Rejected, $constant.invoice_status.PendingReview].includes(entry.status)"
+              color="primary"
+              outline
+              class="q-px-md"
+              :to="`/c/pay/${entry.uid}`"
+            >
+              Lihat
+            </q-btn>
+            <q-btn
+              v-else
+              color="primary"
+              class="q-px-md"
+              :to="`/c/pay/${entry.uid}`"
+            >
+              Bayar
+            </q-btn>
+          </div>
+
+
         </div>
       </template>
       <div
@@ -106,6 +133,7 @@
         flat
         class="q-btn-lg"
         :to="`/c/invoice/${firstInvoice.uid}`"
+        target="_blank"
       >
         Lihat Invoice & Kwitansi
       </q-btn>
@@ -115,14 +143,25 @@
         type="QBtn"
         class="q-btn-lg q-ml-sm"
       />
-      <q-btn
-        v-else
-        color="primary"
-        class="q-btn-lg q-ml-sm"
-        to="/c/pay"
-      >
-        Bayar Sekarang
-      </q-btn>
+      <template v-else-if="entries.length === 1">
+        <q-btn
+          v-if="[$constant.invoice_status.Paid, $constant.invoice_status.Rejected, $constant.invoice_status.PendingReview].includes(firstInvoice.status)"
+          color="primary"
+          outline
+          class="q-btn-lg q-ml-sm"
+          :to="`/c/pay/${firstInvoice.uid}`"
+        >
+          Lihat
+        </q-btn>
+        <q-btn
+          v-else
+          color="primary"
+          class="q-btn-lg q-ml-sm"
+          :to="`/c/pay/${firstInvoice.uid}`"
+        >
+          Bayar Sekarang
+        </q-btn>
+      </template>
     </q-card-actions>
   </q-card>
 </template>
@@ -194,6 +233,7 @@ export default {
       return this.$utils.currency(entry.total, {
         decimal: '.',
         thousand: ',',
+        symbol: 'Rp. '
       }) || '-'
     }
   }
@@ -279,10 +319,18 @@ export default {
       padding-left: 1.25rem;
       padding-right: 1.25rem;
 
-      > span {
+      > .span,
+      > .span-invoice {
         color: rgba(49, 53, 60, 0.6);
-        font-size: 0.9em;
+        font-size: 0.75em;
         line-height: 1;
+
+        @media (min-width: 786px) {
+          font-size: 0.9em;
+        }
+      }
+      > .span {
+        display: none;
       }
       > div {
         font-weight: 600;
@@ -294,23 +342,39 @@ export default {
     .date {
       // width: 9%;
       padding-left: 0;
+      flex: 1;
     }
 
     .invoice {
-      // width: 28%;
+      width: 34%;
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
     }
 
     .status {
-      // width: 16%;
+      width: 13%;
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
     }
 
     .due-at {
       flex: 1;
+      display: none;
+
+      @media (min-width: 768px) {
+        display: block;
+      }
     }
 
     .total-bill {
       // text-align: right;
-      // flex: 1;
+      flex: 1;
 
       &-label {
         color: rgba(49, 53, 60, 0.6);
@@ -318,8 +382,12 @@ export default {
 
       &-amount {
         font-weight: 900;
-        font-size: 1.72em;
         line-height: 1;
+        font-size: 1em;
+
+        @media (min-width: 768px) {
+          font-size: 1.72em;
+        }
       }
     }
 
@@ -350,6 +418,86 @@ export default {
       font-style: italic;
       color: rgba(49, 53, 60, 0.6);
     }
+  }
+
+  &.multiple {
+    font-size: 0.85em;
+
+    .bill-item {
+      padding-bottom: 1.5rem;
+
+      > div {
+        padding-left: 0;
+        padding-right: 0;
+
+        > div {
+          font-weight: 500;
+        }
+      }
+
+      .date {
+        width: 10%;
+      }
+
+      .invoice {
+        width: 30%;
+      }
+
+      .status {
+        width: 15%;
+      }
+
+      .due-at {
+        flex: none;
+        width: 15%;
+      }
+
+      .total-bill {
+        // text-align: right;
+        // flex: 1;
+
+        &-label {
+          color: rgba(49, 53, 60, 0.6);
+        }
+
+        &-amount {
+          font-weight: 900;
+          font-size: 1.1em;
+          line-height: 1;
+        }
+      }
+
+      .pay {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        .q-btn {
+          .q-btn__wrapper {
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: 2rem;
+          }
+        }
+      }
+
+      &.fetching {
+        .date {
+          width: 9%;
+        }
+        .invoice {
+          width: 28%;
+        }
+        .status {
+          width: 16%;
+        }
+        .total-bill {
+          width: 28%;
+        }
+      }
+    }
+
   }
 }
 </style>

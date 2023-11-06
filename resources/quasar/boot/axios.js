@@ -135,7 +135,8 @@ export default ({ Vue }) => {
       response.data.pagination = {
         rowsPerPage: meta.limit,
         page: meta.page,
-        rowsNumber: parseInt(meta.total, 10) || 0
+        rowsNumber: parseInt(meta.total, 10) || 0,
+        hasMorePage: meta.has_more_page
       }
 
       if (sorts) {

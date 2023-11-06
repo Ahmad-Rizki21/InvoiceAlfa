@@ -9,18 +9,26 @@
       :invoice="invoiceUpdated.invoice_no ? invoiceUpdated : invoice"
       :template-settings="templateSettings"
     />
+    <form-store
+      v-if="stores.length"
+      :entries="stores"
+      :invoice="invoiceUpdated.invoice_no ? invoiceUpdated : invoice"
+      :template-settings="templateSettings"
+    />
   </div>
 </template>
 
 <script>
 import FormInvoice from './FormInvoice'
 import FormReceipt from './FormReceipt'
+import FormStore from './FormStore'
 
 export default {
   name: 'FormPrintPreview',
   components: {
     FormInvoice,
-    FormReceipt
+    FormReceipt,
+    FormStore
   },
   props: {
     invoice: {
@@ -39,6 +47,12 @@ export default {
       type: Object,
       default() {
         return {}
+      }
+    },
+    stores: {
+      type: Array,
+      default() {
+        return []
       }
     },
     templateSettings: {

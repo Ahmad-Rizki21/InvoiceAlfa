@@ -6,33 +6,31 @@
 
     <q-card flat class="card-invoice-history">
       <q-card-section>
-        <div class="bill-item" v-for="i in 18" :key="i">
+        <router-link :to="`/c/bill/${entry.uid}`" class="bill-item" v-for="entry in entries" :key="entry.id">
           <div class="date">
             <span>{{ $t('Month') }}</span>
-            <div>Oktober 2023</div>
+            <div>{{ formatMonth(entry) }}</div>
           </div>
           <div class="invoice">
             <span>
               Invoice
 
-              <router-link to="/invoice/1">
-                <q-icon
-                  name="chevron_right"
-                />
-              </router-link>
+              <q-icon
+                name="chevron_right"
+              />
             </span>
-            <div>00001/INV-AJNusa/10/2023</div>
+            <div>{{ entry.invoice_no }}</div>
           </div>
           <div class="status">
             <span>Tanggal Bayar</span>
-            <div>21 Okt 2023</div>
+            <div>{{ formatDate(entry.paid_at) }}</div>
           </div>
           <div class="total-bill">
             <span class="total-bill-label">
               Total Tagihan
             </span>
             <div class="total-bill-amount">
-              Rp. 150.000.000
+              {{ formatMoney(entry.total) }}
             </div>
           </div>
           <div class="action">
@@ -40,24 +38,85 @@
               name="chevron_right"
             />
           </div>
-        </div>
+        </router-link>
       </q-card-section>
     </q-card>
   </div>
 </template>
 
 <script>
+import { date } from 'quasar'
+
 export default {
   name: 'CardInvoiceHistory',
   data() {
     return {
-      invoices: [],
-      isLoading: true
+      entries: [],
+      isLoading: false,
+      isFetching: true
     }
   },
   computed: {
-    invoice() {
-      return this.invoices[0]
+    emptyInvoice() {
+      return !this.isFetching && !this.entries.length
+    },
+    firstInvoice() {
+      return this.entries[0]
+    }
+  },
+  mounted() {
+    this.onRequest()
+  },
+  methods: {
+    async onRequest(props) {
+      if (this.isLoading) {
+        return
+      }
+
+      if (!props) {
+        props = { pagination: 999999999 }
+      }
+
+      this.isFetching = true
+      this.isLoading = true
+
+
+      const params = {
+        table_pagination: { ...(props.pagination || {}) },
+        status: `in:${[
+          this.$constant.invoice_status.Paid
+        ].join('|')}`
+      }
+
+      try {
+        const { data } = await this.$api.get('/v1/invoices', { params })
+
+        if (data.status === 'success') {
+          this.entries = data.data.invoices
+        }
+      } catch (err) {
+        this.$q.notify(err)
+      }
+
+      this.isFetching = false
+      this.isLoading = false
+    },
+    formatMonth(entry) {
+      const d = date.extractDate(entry.due_at || entry.published_at, 'YYYY-MM-DD')
+
+      return date.formatDate(d, 'MMMM YYYY')
+    },
+    formatDate(payload) {
+      const d = date.extractDate(payload, 'YYYY-MM-DD HH:mm:ss')
+
+      return date.formatDate(d, 'DD MMM YYYY')
+    },
+    formatMoney(payload) {
+      return this.$utils.currency(payload, {
+        decimal: '.',
+        thousand: ',',
+        symbol: 'Rp. '
+      }) || '-'
     }
   }
 }
@@ -104,6 +163,9 @@ export default {
       align-items: center;
       width: 100%;
       padding-bottom: 1.75rem;
+      text-decoration: none;
+      color: #1d1d1d;
+      color: var(--q-text-color-default);
 
       .date,
       .invoice,
@@ -118,7 +180,7 @@ export default {
           line-height: 1;
         }
         > div {
-          font-weight: 600;
+          font-weight: 400;
           font-size: 1.1em;
           line-height: 1;
         }
@@ -158,7 +220,7 @@ export default {
         padding-right: 2rem;
 
         > div {
-          font-weight: 500;
+          font-weight: 400;
         }
       }
 
@@ -176,13 +238,14 @@ export default {
       }
 
       .action {
-        width: 7%;
+        width: 5%;
         text-align: right;
       }
 
       .total-bill {
         // text-align: right;
         // flex: 1;
+        min-width: 20%;
 
         &-label {
           color: rgba(49, 53, 60, 0.6);

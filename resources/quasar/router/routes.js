@@ -5,7 +5,8 @@ const routes = [
     component: () => import('layouts/HomeLayout.vue'),
     children: [
       { path: '', name: 'index', component: () => import('pages/Index.vue') },
-      { path: 'c/pay', name: 'cust.pay', component: () => import('pages/CustPay.vue') },
+      { path: 'c/pay/:id([a-zA-Z0-9]+)', name: 'cust.pay', component: () => import('pages/CustPay.vue') },
+      { path: 'c/bill/:id([a-zA-Z0-9]+)', name: 'cust.bill', component: () => import('pages/CustBill.vue') },
     ]
   },
   {
@@ -39,6 +40,7 @@ const routes = [
     component: () => import('layouts/BlankLayout.vue'),
     children: [
       { path: 'invoices/:id([0-9]+)/print', name: 'invoices.print', component: () => import('pages/InvoicePrint.vue') },
+      { path: 'c/invoice/:id([a-zA-Z0-9]+)', name: 'cust.invoice', component: () => import('pages/CustInvoice.vue') },
     ]
   },
   {

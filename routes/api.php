@@ -59,6 +59,12 @@ Route::group(['prefix' => '/users', 'middleware' => 'auth:api', 'as' => 'users.'
 
 Route::group(['prefix' => '/distribution-centers', 'middleware' => 'auth:api', 'as' => 'distribution-center.'], function () {
     Route::get('/', [DistributionCenterController::class, 'index'])->name('index');
+    Route::post('/import/upload', [DistributionCenterController::class, 'importUpload'])->name('import.upload');
+    Route::post('/import/cache', [DistributionCenterController::class, 'importCache'])->name('import.cache');
+    Route::post('/import/process', [DistributionCenterController::class, 'importProcess'])->name('import.process');
+    Route::post('/import/fix', [DistributionCenterController::class, 'importFix'])->name('import.fix');
+    Route::get('/import/errors', [DistributionCenterController::class, 'importErrors'])->name('import.errors');
+    Route::delete('/import/row/{id}', [DistributionCenterController::class, 'importRowDelete'])->name('import.row.delete');
     Route::get('/{id}', [DistributionCenterController::class, 'show'])->name('show');
     Route::post('/', [DistributionCenterController::class, 'store'])->name('store');
     Route::patch('/{id}', [DistributionCenterController::class, 'update'])->name('update');
@@ -75,6 +81,12 @@ Route::group(['prefix' => '/franchises', 'middleware' => 'auth:api', 'as' => 'fr
 
 Route::group(['prefix' => '/stores', 'middleware' => 'auth:api', 'as' => 'store.'], function () {
     Route::get('/', [StoreController::class, 'index'])->name('index');
+    Route::post('/import/upload', [StoreController::class, 'importUpload'])->name('import.upload');
+    Route::post('/import/cache', [StoreController::class, 'importCache'])->name('import.cache');
+    Route::post('/import/process', [StoreController::class, 'importProcess'])->name('import.process');
+    Route::post('/import/fix', [StoreController::class, 'importFix'])->name('import.fix');
+    Route::get('/import/errors', [StoreController::class, 'importErrors'])->name('import.errors');
+    Route::delete('/import/row/{id}', [StoreController::class, 'importRowDelete'])->name('import.row.delete');
     Route::get('/{id}', [StoreController::class, 'show'])->name('show');
     Route::post('/', [StoreController::class, 'store'])->name('store');
     Route::patch('/{id}', [StoreController::class, 'update'])->name('update');
@@ -90,6 +102,9 @@ Route::group(['prefix' => '/invoices', 'middleware' => 'auth:api', 'as' => 'invo
     Route::get('/', [InvoiceController::class, 'index'])->name('index');
     Route::get('/active', [InvoiceController::class, 'active'])->name('active');
     Route::get('/template', [InvoiceController::class, 'template'])->name('template');
+    Route::post('/payment-proofs', [InvoiceController::class, 'uploadPaymentProofs'])->name('payment-proof');
+    Route::get('/payment-proofs', [InvoiceController::class, 'getPaymentProofs']);
+    Route::post('/payment-proofs/delete', [InvoiceController::class, 'destroyPaymentProofs'])->name('payment-proof.destroy');
     Route::get('/{id}', [InvoiceController::class, 'show'])->name('show');
     Route::post('/', [InvoiceController::class, 'store'])->name('store');
     Route::patch('/{id}', [InvoiceController::class, 'update'])->name('update');

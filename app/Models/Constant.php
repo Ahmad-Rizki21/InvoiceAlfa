@@ -15,6 +15,8 @@ class Constant
         \App\Models\Role::class,
         \App\Models\UserAccessToken::class,
         \App\Enums\SettingKey::class,
+        \App\Enums\InvoiceStatus::class,
+        \App\Enums\ImportType::class,
     ];
 
     public static function all()

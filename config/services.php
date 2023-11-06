@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'invoice_printer_adapter' => [
+        'app_download_url' => 'https://www.dropbox.com/scl/fi/ny84hfsi5k9rfy6zs8e1x/Invoice-Printer-Adapter.zip?rlkey=3yq0y8ay2hs8gxbvx16j3j8qu&dl=1',
+    ],
+
+    'websocket' => [
+        'url' => env('WEBSOCKET_URL'),
+        'http_url' => env('WEBSOCKET_HTTP_URL'),
+        'app_source' => env('WEBSOCKET_APP_SOURCE'),
+    ],
 ];

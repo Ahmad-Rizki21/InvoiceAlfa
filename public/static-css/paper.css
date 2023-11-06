@@ -141,7 +141,8 @@ wrapper {
 
 .page-template .print-paper,
 .form-invoice .print-paper,
-.form-receipt .print-paper {
+.form-receipt .print-paper,
+.form-store-printable .print-paper {
   padding-top: 10mm;
   padding-left: 10mm;
   padding-right: 10mm;
@@ -149,7 +150,8 @@ wrapper {
 
 .page-template .paper-content,
 .form-invoice .paper-content,
-.form-receipt .paper-content {
+.form-receipt .paper-content,
+.form-store-printable .paper-content {
   border: 1px solid #000;
 }
 
@@ -160,7 +162,8 @@ wrapper {
 @media print {
 
   .form-print-preview .form-invoice,
-  .form-print-preview .form-receipt {
+  .form-print-preview .form-receipt,
+  .form-print-preview .form-store-printable {
     margin: 0 !important;
     margin-bottom: 0 !important;
     padding: 0 !important;
@@ -169,8 +172,10 @@ wrapper {
 
   .form-print-preview .form-invoice .print-paper-wrapper,
   .form-print-preview .form-receipt .print-paper-wrapper,
+  .form-print-preview .form-store-printable .print-paper-wrapper,
   .form-print-preview .form-invoice .print-paper,
-  .form-print-preview .form-receipt .print-paper {
+  .form-print-preview .form-receipt .print-paper,
+  .form-print-preview .form-store-printable .print-paper {
     margin: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -179,7 +184,8 @@ wrapper {
   }
 
   .form-print-preview .form-invoice .print-paper,
-  .form-print-preview .form-receipt .print-paper {
+  .form-print-preview .form-receipt .print-paper,
+  .form-print-preview .form-store-printable .print-paper {
     page-break-after: auto;
   }
 }
@@ -358,6 +364,25 @@ wrapper {
 
 .form-invoice .invoice-table-row.last-row .invoice-table-sub-total {
   padding-bottom: 45px;
+}
+.form-invoice .invoice-table-row.shrink .invoice-table-no {
+  padding-bottom: 5px;
+}
+
+.form-invoice .invoice-table-row.shrink .invoice-table-description {
+  padding-bottom: 5px;
+}
+
+.form-invoice .invoice-table-row.shrink .invoice-table-qty {
+  padding-bottom: 5px;
+}
+
+.form-invoice .invoice-table-row.shrink .invoice-table-unit-price {
+  padding-bottom: 5px;
+}
+
+.form-invoice .invoice-table-row.shrink .invoice-table-sub-total {
+  padding-bottom: 5px;
 }
 
 .form-invoice .invoice-table-left {

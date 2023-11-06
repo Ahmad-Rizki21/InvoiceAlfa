@@ -94,21 +94,58 @@
         </q-toolbar>
 
         <q-table
+          ref="table"
           :data="entries"
           :columns="columns"
           :visible-columns="visibleColumns"
           :loading="isLoading"
           :pagination.sync="pagination"
+          selection="multiple"
+          :selected.sync="selectedEntries"
           binary-state-sort
           row-key="id"
           @request="onRequest"
+          @selection="onSelection"
         >
+          <template #top>
+            <q-btn
+              unelevated
+              color="primary"
+              icon="print"
+              :disable="!selectedEntries.length"
+              @click="isAdapterPrinterVisible = true"
+            >
+              <span class="q-ml-sm">{{ $t('Print') }}</span>
+            </q-btn>
+            <q-btn
+              class="q-ml-sm"
+              unelevated
+              color="default"
+              icon="delete"
+              padding="sm"
+              :disable="!selectedEntries.length"
+            >
+            </q-btn>
+
+            <span class="q-px-md q-py-sm" :class="{ 'text-default': !selectedEntries.length }">
+              {{ $q.lang.table.selectedRecords(selectedEntries.length) }}
+            </span>
+          </template>
+
+          <template #header-selection="scope">
+            <q-checkbox v-model="scope.selected" />
+          </template>
+
+          <template #body-selection="scope">
+            <q-checkbox :value="scope.selected" @input="(val, evt) => { Object.getOwnPropertyDescriptor(scope, 'selected').set(val, evt) }" />
+          </template>
+
           <template #body-cell-id="{ rowIndex }">
             <q-td>{{ rowIndex + 1 }}</q-td>
           </template>
           <template #body-cell-status="{ row }">
             <q-td class="text-center">
-              <q-icon :name="row.status ? 'check' : 'close'" class="q-mr-lg" />
+              <invoice-status-chip :invoice="row" dense />
             </q-td>
           </template>
           <template #body-cell-action="{ row }">
@@ -231,6 +268,19 @@
         @cancel="onFormPasswordCancel"
       />
     </q-dialog>
+
+    <q-dialog
+      v-model="isAdapterPrinterVisible"
+      persistent
+    >
+      <adapter-printer
+        :visible="isAdapterPrinterVisible"
+        :entries="selectedEntries"
+        :loading="isLoading"
+        @success="onAdapterPrinterSuccess"
+        @cancel="onAdapterPrinterCancel"
+      />
+    </q-dialog>
   </q-page>
 </template>
 
@@ -238,13 +288,17 @@
 import { date } from 'quasar'
 import FormEntry from './Invoice/FormEntry'
 import FormPassword from './Invoice/FormPassword'
+import InvoiceStatusChip from './Invoice/InvoiceStatusChip'
+import AdapterPrinter from './Invoice/AdapterPrinter'
 import datatableMixins from 'src/mixins/datatable'
 
 export default {
   name: 'PageInvoice',
   components: {
     FormEntry,
-    FormPassword
+    FormPassword,
+    InvoiceStatusChip,
+    AdapterPrinter
   },
   meta() {
     return {
@@ -267,6 +321,7 @@ export default {
 
     return {
       entries: [],
+      selectedEntries: [],
       columns: [
         {
           name: 'id',
@@ -303,6 +358,15 @@ export default {
           label: this.$t('Receipt No'),
           headerClasses: 'table-header-receipt_no',
           classes: 'table-cell-receipt_no',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'status',
+          field: 'status',
+          label: this.$t('Status'),
+          headerClasses: 'table-header-status',
+          classes: 'table-cell-status',
           align: 'left',
           sortable: true
         },
@@ -401,7 +465,8 @@ export default {
         'id',
         'customer_name',
         'invoice_no',
-        'receipt_no',
+        // 'receipt_no',
+        'status',
         'ppn_total',
         'stamp_duty',
         'sub_total',
@@ -415,6 +480,7 @@ export default {
       isFormEntryVisible: false,
       isFormEntryReadonly: false,
       isFormPasswordVisible: false,
+      isAdapterPrinterVisible: false,
       formEntry: {},
       formPassword: {},
       pagination: {
@@ -431,7 +497,6 @@ export default {
   async mounted() {
     await this.onRequest()
     await this.$nextTick()
-
     // if (!this.$store.getters['tourGuide/finishedGroups'].invoices) {
     //   this.$tourGuide.open('invoices')
     // }
@@ -501,6 +566,12 @@ export default {
     onFormPasswordCancel() {
       this.isFormPasswordVisible = false
     },
+    onAdapterPrinterSuccess() {
+      this.isAdapterPrinterVisible = false
+    },
+    onAdapterPrinterCancel() {
+      this.isAdapterPrinterVisible = false
+    },
     onView(row) {
       this.$router.push(`/invoices/${row.id}`)
       this.formEntry = { ...row }
@@ -515,6 +586,43 @@ export default {
     onEditPassword(row) {
       this.formPassword = { ...row }
       this.isFormPasswordVisible = true
+    },
+
+    onSelection({ rows, added, evt }) {
+      // ignore selection change from header of not from a direct click event
+      if (rows.length !== 1 || evt === void 0) {
+        return
+      }
+
+      const { oldSelectedRow } = this
+      const [newSelectedRow] = rows
+      const { ctrlKey, shiftKey } = evt
+
+      if (shiftKey !== true) {
+        this.oldSelectedRow = newSelectedRow
+      }
+
+      this.$nextTick(() => {
+        if (shiftKey === true) {
+          const tableRows = this.$refs.table.filteredSortedRows
+          let firstIndex = tableRows.indexOf(oldSelectedRow)
+          let lastIndex = tableRows.indexOf(newSelectedRow)
+
+          if (firstIndex < 0) {
+            firstIndex = 0
+          }
+
+          if (firstIndex > lastIndex) {
+            [firstIndex, lastIndex] = [lastIndex, firstIndex]
+          }
+
+          const rangeRows = tableRows.slice(firstIndex, lastIndex + 1)
+
+          this.selectedEntries = added === true
+            ? this.selectedEntries.concat(rangeRows.filter(row => this.selectedEntries.includes(row) === false))
+            : this.selectedEntries.filter(row => rangeRows.includes(row) === false)
+        }
+      })
     },
     onDelete(row) {
       if (this.isLoading) {
@@ -567,5 +675,26 @@ export default {
 <style lang="scss">
 .page-invoices {
   padding-bottom: 3rem;
+
+  .page-body > .q-card > .q-toolbar {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .q-table__top {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 13px;
+
+    .visibility-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .q-btn {
+      &.disabled {
+        opacity: 0.3 !important;
+      }
+    }
+  }
 }
 </style>

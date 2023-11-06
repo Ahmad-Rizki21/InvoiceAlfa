@@ -9,29 +9,6 @@
               <div class="q-mb-md text-subtitle text-weight-bold">{{ $t('Details') }}</div>
 
               <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
-                <div class="col-xs-12 col-sm-8 col-md-6 col-lg-6">
-                  <q-skeleton v-if="fetching" type="rect" />
-                  <autocomplete-distribution-center
-                    v-show="!fetching"
-                    v-model="formEntry.distribution_center_id"
-                    :label="$t('Distribution Center') + '*'"
-                    :filled="!readonly"
-                    :borderless="readonly"
-                    :readonly="readonly"
-                    stack-label
-                    :placeholder="readonly ? '-' : ''"
-                    name="distribution_center_id"
-                    autocomplete="off"
-                    :disable="!!parentDistributionCenterId"
-                    :dense="!readonly"
-                    :rules="rules.distribution_center_id"
-                    :error="!!errors.distribution_center_id"
-                    :error-message="errors.distribution_center_id"
-                  />
-                </div>
-              </div>
-
-              <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
                 <div class="col-xs-12 col-sm-8 col-md-10 col-lg-8">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
@@ -377,166 +354,155 @@
                     :error-message="errors.fo_issuance_number"
                   />
                 </div>
-                <div v-if="isCreate && !readonly" class="col-xs-12">
-                  <q-checkbox v-model="loginAccessToggle" :label="$t('Set login credentials')" />
+              </div>
+
+              <div v-if="!readonly || formEntry.has_password" class="q-mb-md text-subtitle text-weight-bold">{{ $t('Login Credentials') }}</div>
+
+              <div v-if="!readonly || formEntry.has_password" class="row q-col-gutter-x-sm q-mb-md">
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.email"
+                    :label="$t('Email') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="email"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.email"
+                    :label="$t('Email') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="email"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.email"
+                    :error="!!errors.email"
+                    :error-message="errors.email"
+                  />
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.username"
+                    :label="$t('Username')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="username"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.username"
+                    :label="$t('Username')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="username"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.username"
+                    :error="!!errors.username"
+                    :error-message="errors.username"
+                  />
                 </div>
               </div>
 
-              <transition
-                appear
-                enter-active-class="animated fadeInDown"
-                leave-active-class="animated fadeOutDown"
-              >
-                <div v-if="loginAccessToggle">
-                  <div v-if="!isCreate" class="q-mb-md text-subtitle text-weight-bold">{{ $t('Login Credentials') }}</div>
-
-                  <div class="row q-col-gutter-x-sm q-mb-md">
-                    <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
-                      <q-skeleton v-if="fetching" type="rect" />
-                      <q-input
-                        v-if="readonly"
-                        v-show="!fetching"
-                        :value="formEntry.email"
-                        :label="$t('Email') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="email"
-                        autocomplete="off"
-                        :dense="!readonly"
-                      />
-                      <q-input
-                        v-else
-                        v-show="!fetching"
-                        v-model="formEntry.email"
-                        :label="$t('Email') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="email"
-                        autocomplete="off"
-                        :dense="!readonly"
-                        :rules="rules.email"
-                        :error="!!errors.email"
-                        :error-message="errors.email"
-                      />
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
-                      <q-skeleton v-if="fetching" type="rect" />
-                      <q-input
-                        v-if="readonly"
-                        v-show="!fetching"
-                        :value="formEntry.username"
-                        :label="$t('Username')"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="username"
-                        autocomplete="off"
-                        :dense="!readonly"
-                      />
-                      <q-input
-                        v-else
-                        v-show="!fetching"
-                        v-model="formEntry.username"
-                        :label="$t('Username')"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="username"
-                        autocomplete="off"
-                        :dense="!readonly"
-                        :rules="rules.username"
-                        :error="!!errors.username"
-                        :error-message="errors.username"
-                      />
-                    </div>
-                  </div>
-
-                  <div v-if="isCreate" class="row q-col-gutter-x-sm q-mb-md">
-                    <div class="col-xs-12 col-sm-6 col-md-5 co-lg-3">
-                      <q-skeleton v-if="fetching" type="rect" />
-                      <q-input
-                        v-if="readonly"
-                        v-show="!fetching"
-                        :value="formEntry.password"
-                        :label="$t('Password') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        type="password"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="password"
-                        autocomplete="off"
-                        :dense="!readonly"
-                      />
-                      <q-input
-                        v-else
-                        v-show="!fetching"
-                        v-model="formEntry.password"
-                        :label="$t('Password') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        type="password"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="password"
-                        autocomplete="off"
-                        :dense="!readonly"
-                        :rules="rules.password"
-                        :error="!!errors.password"
-                        :error-message="errors.password"
-                      />
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
-                      <q-skeleton v-if="fetching" type="rect" />
-                      <q-input
-                        v-if="readonly"
-                        v-show="!fetching"
-                        :value="formEntry.password_confirmation"
-                        :label="$t('Confirm Password') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        type="password"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="password_confirmation"
-                        autocomplete="off"
-                        :dense="!readonly"
-                      />
-                      <q-input
-                        v-else
-                        v-show="!fetching"
-                        v-model="formEntry.password_confirmation"
-                        :label="$t('Confirm Password') + '*'"
-                        :filled="!readonly"
-                        :borderless="readonly"
-                        :readonly="readonly"
-                        type="password"
-                        stack-label
-                        :placeholder="readonly ? '-' : ''"
-                        name="password_confirmation"
-                        autocomplete="off"
-                        :dense="!readonly"
-                        :rules="rules.password_confirmation"
-                        :error="!!errors.password_confirmation"
-                        :error-message="errors.password_confirmation"
-                      />
-                    </div>
-                  </div>
+              <div v-if="isCreate" class="row q-col-gutter-x-sm q-mb-md">
+                <div class="col-xs-12 col-sm-6 col-md-5 co-lg-3">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.password"
+                    :label="$t('Password') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    type="password"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="password"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.password"
+                    :label="$t('Password') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    type="password"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="password"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.password"
+                    :error="!!errors.password"
+                    :error-message="errors.password"
+                  />
                 </div>
-              </transition>
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.password_confirmation"
+                    :label="$t('Confirm Password') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    type="password"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="password_confirmation"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.password_confirmation"
+                    :label="$t('Confirm Password') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    type="password"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="password_confirmation"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.password_confirmation"
+                    :error="!!errors.password_confirmation"
+                    :error-message="errors.password_confirmation"
+                  />
+                </div>
+              </div>
 
               <template v-if="readonly">
                 <div class="row">
@@ -599,6 +565,31 @@
         </q-card-actions>
       </q-form>
     </q-card>
+
+    <!-- <q-separator /> -->
+
+    <div v-if="!isCreate" class="table-relation">
+
+      <template v-if="entry && entry.id">
+        <transition
+          appear
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+        >
+          <table-franchise
+            v-if="childTab === 'franchise'"
+            :distribution-center="entry"
+            as-relation
+            key="franchise"
+          />
+          <table-store
+            v-else-if="childTab === 'store'"
+            :customer="entry"
+            key="store"
+          />
+        </transition>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -606,7 +597,6 @@
 import { date } from 'quasar'
 
 const DEFAULT_FORM_ENTRY = {
-  distribution_center_id: null,
   code: null,
   name: null,
   email: null,
@@ -671,8 +661,7 @@ export default {
       errors: DEFAULT_FORM_ENTRY,
       isEditable: false,
       defaultFormEntry: DEFAULT_FORM_ENTRY,
-      childTab: 'franchise',
-      loginAccessToggle: false
+      childTab: 'franchise'
     }
   },
   computed: {
@@ -685,9 +674,6 @@ export default {
       }
 
       return !this.isCreate
-    },
-    parentDistributionCenterId() {
-      return parseInt(this.$route.query.distribution_center_id, 10) || null
     },
     formattedApprovalDate() {
       if (this.readonly && this.formEntry.approval_date) {
@@ -727,7 +713,7 @@ export default {
           }, 100)
         })
       }
-    }
+    },
   },
   methods: {
     fill(form) {
@@ -755,11 +741,6 @@ export default {
         }
 
         this.defaultFormEntry = defaultFormEntry
-      }
-
-      if (this.parentDistributionCenterId) {
-        form.distribution_center_id = this.parentDistributionCenterId
-        this.defaultFormEntry.distribution_center_id = this.parentDistributionCenterId
       }
 
       this.formEntry = form;
@@ -798,14 +779,14 @@ export default {
       this.isLoading = true;
 
       try {
-        const endpoint = entry.id ? `/v1/franchises/${entry.id}` : '/v1/franchises';
+        const endpoint = entry.id ? `/v1/distribution-centers/${entry.id}` : '/v1/distribution-centers';
         const method = entry.id ? 'patch' : 'post';
 
         let { data } = await this.$api[method](endpoint, entry);
 
         if (data.status === 'success') {
           this.defaultFormEntry = { ...this.formEntry }
-          this.$emit('success', data.data.franchise);
+          this.$emit('success', data.data.distribution_center);
           this.isEditable = false
         }
 
@@ -813,9 +794,9 @@ export default {
           this.$q.notify({ message: data.message })
         } else {
           if (data.status === 'success') {
-            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Franchise') }) })
+            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Distribution center') }) })
           } else {
-            this.$t('Failed to save {entity}', { entity: this.$t('franchise') })
+            this.$t('Failed to save {entity}', { entity: this.$t('distribution center') })
           }
         }
       } catch (err) {
@@ -850,7 +831,7 @@ export default {
 
       this.$q.dialog({
         title: this.$t('Confirm'),
-        message: this.$t('Are you sure want to delete this {entity}?', { entity: this.$t('franchise') }),
+        message: this.$t('Are you sure want to delete this {entity}?', { entity: this.$t('distribution center') }),
         cancel: {
           label: this.$t('Cancel'),
           color: 'dark',
@@ -866,17 +847,17 @@ export default {
         persistent: true
       }).onOk(async () => {
         try {
-          let { data } = await this.$api.delete(`/v1/franchises/${this.entry.id}`);
+          let { data } = await this.$api.delete(`/v1/distribution-centers/${this.entry.id}`);
 
           if (data.message) {
             this.$q.notify({ message: data.message })
             this.$emit('deleted', data)
           } else {
             if (data.status === 'success') {
-              this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Franchise') }) })
+              this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Distribution center') }) })
               this.$emit('deleted', data)
             } else {
-              this.$t('Failed to delete {entity}', { entity: this.$t('franchise') })
+              this.$t('Failed to delete {entity}', { entity: this.$t('distribution center') })
             }
           }
         } catch (err) {
@@ -885,6 +866,22 @@ export default {
 
       }).onCancel(() => {
         this.isLoading = false
+      })
+    },
+    onTableRelationFranchiseCreate() {
+      this.$router.push({
+        path: `/franchises/create`,
+        query: {
+          distribution_center_id: this.entry.id
+        }
+      })
+    },
+    onTableRelationStoreCreate() {
+      this.$router.push({
+        path: `/stores/create`,
+        query: {
+          distribution_center_id: this.entry.id
+        }
       })
     }
   }

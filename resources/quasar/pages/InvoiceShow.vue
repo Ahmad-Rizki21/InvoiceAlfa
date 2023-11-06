@@ -40,11 +40,17 @@
       <div class="sep" />
 
 
+      <invoice-status-chip
+        v-if="formInvoice.invoice_no"
+        class="q-btn-lg q-mr-md chip-page-invoices-single-invoice-status"
+        :invoice="formInvoice"
+      />
+
       <q-btn
         v-if="isCreate && formInvoice.invoice_no"
         flat
         padding="sm"
-        class="q-btn-lg btn-page-invoices-single-settings"
+        class="q-btn-lg q-ml-sm btn-page-invoices-single-settings"
         icon="settings"
         :disable="isLoading"
         @click="isFormTemplateSettingsVisible = true"
@@ -129,19 +135,51 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn
+        <q-btn-dropdown
           v-else
+          split
           color="secondary"
           class="q-btn-lg q-ml-sm btn-page-invoices-single-edit"
           icon="edit"
           :disable="isLoading || isSyncing"
           @click="isEditable = true"
         >
-          <span class="q-ml-xs">{{ $t('Edit') }}</span>
-          {{ isSyncing ? '...' : '' }}
-        </q-btn>
+          <template #label>
+            <span class="q-ml-xs">{{ $t('Edit') }}</span>
+            {{ isSyncing ? '...' : '' }}
+          </template>
+
+          <q-list>
+            <q-item
+              clickable
+              v-close-popup
+              class="justify-center items-center"
+              :disable="isSyncing"
+              @click="onDelete"
+            >
+              {{ $t('Delete') }}
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
 
       </template>
+    </div>
+
+
+    <div v-if="!isCreate" class="page-body page-body-form-page">
+      <div class="row">
+        <div class="col-xs-12">
+          <form-page
+            :entry="formInvoice"
+            :fetching="isFetching"
+            :editable.sync="isEditable"
+            :readonly="!isEditable"
+            ref="formPage"
+            @success="onSuccess"
+            @deleted="onDeleted"
+          />
+        </div>
+      </div>
     </div>
 
     <div class="page-body">
@@ -217,6 +255,18 @@
                 @updated="onFormReceiptUpdated"
               />
             </div>
+            <div v-if="customerToFind === 'distribution_center'">
+              <form-store
+                ref="formStores"
+                :entries="formStores"
+                :is-create="isCreate"
+                :loading.sync="isLoading"
+                :syncing.sync="isSyncing"
+                :invoice="formInvoiceUpdated"
+                :editable="isEditable"
+                :template-settings="formTemplateSettings"
+              />
+            </div>
 
           </div>
           <div v-else class="empty-distribution-center">
@@ -254,6 +304,7 @@
       <form-print-preview
         :invoice="formInvoice"
         :invoice-updated="formInvoiceUpdated"
+        :stores="formStores"
         :receipt="formReceipt"
         :template-settings="formTemplateSettings"
         @close="isFormPrintPreviewVisible = false"
@@ -268,16 +319,22 @@
 import { date } from 'quasar'
 import FormInvoice from './Invoice/FormInvoice'
 import FormReceipt from './Invoice/FormReceipt'
+import FormStore from './Invoice/FormStore'
 import FormTemplateSettings from './Invoice/FormTemplateSettings'
 import FormPrintPreview from './Invoice/FormPrintPreview'
+import InvoiceStatusChip from './Invoice/InvoiceStatusChip'
+import FormPage from './Invoice/FormPage'
 
 export default {
   name: 'PageInvoiceShow',
   components: {
     FormInvoice,
     FormReceipt,
+    FormStore,
     FormTemplateSettings,
-    FormPrintPreview
+    FormPrintPreview,
+    InvoiceStatusChip,
+    FormPage
   },
   meta() {
     let title = this.$t('Create New {entity}', { entity: this.$t('Invoice') })
@@ -308,6 +365,7 @@ export default {
     return {
       isSyncing: false,
       isLoading: false,
+      isFetching: false,
       isFormTemplateSettingsVisible: false,
       isFormPrintPreviewVisible: false,
       entry: {
@@ -322,6 +380,7 @@ export default {
       },
       formInvoiceUpdated: {},
       formTemplateSettings: {},
+      formStores: [],
       customerToFind: 'distribution_center',
       isEditable: true,
       printUrl: null
@@ -333,9 +392,13 @@ export default {
     }
   },
   watch: {
-    'entry.distribution_center_id'(n, o) {
+    async 'entry.distribution_center_id'(n, o) {
       if (n !== o) {
-        this.rebuildInvoice()
+        await this.rebuildInvoice()
+
+        if (n) {
+          this.requestStores()
+        }
       }
     },
     'entry.franchise_id'(n, o) {
@@ -377,15 +440,16 @@ export default {
   // },
   methods: {
     async requestInvoice() {
-      if (this.isLoading) {
+      if (this.isLoading || this.isFetching) {
         return
       }
 
       this.isLoading = true
+      this.isFetching = true
 
       const params = {
         edit: 1,
-        includes: 'invoiceServices'
+        includes: 'invoiceServices|invoicePaymentProofs'
       }
 
       try {
@@ -394,11 +458,14 @@ export default {
         if (data.status === 'success') {
           this.formInvoice = data.data.invoice
           this.formReceipt = data.data.invoice
+          this.requestStores()
         }
       } catch (err) {
         this.$q.notify(err)
       }
 
+      this.isFetching = false
+      this.isFetching = false
       this.isLoading = false
     },
     async requestSettings() {
@@ -407,6 +474,20 @@ export default {
 
         if (data.status === 'success') {
           this.formTemplateSettings = data.data.settings
+        }
+      } catch (err) {
+        this.$q.notify(err)
+      }
+    },
+    async requestStores() {
+      const params = {
+        distribution_center_id: this.entry.distribution_center_id
+      }
+      try {
+        const { data } = await this.$api.get(`/v1/stores`, { params })
+
+        if (data.status === 'success') {
+          this.formStores = data.data.stores
         }
       } catch (err) {
         this.$q.notify(err)
@@ -438,6 +519,55 @@ export default {
       if (this.isCreate) {
         this.$router.push(`/invoices/${entry.id}`)
       }
+    },
+    onDelete() {
+      if (this.isLoading || this.isSyncing) {
+        return;
+      }
+
+      this.$q.dialog({
+        title: this.$t('Confirm'),
+        message: this.$t('Are you sure want to delete this {entity}?', { entity: this.$t('invoice') }),
+        cancel: {
+          label: this.$t('Cancel'),
+          color: 'dark',
+          flat: true
+        },
+        ok: {
+          label: this.$t('Yes'),
+          color: 'primary',
+          unelevated: true,
+          flat: true,
+          class: 'text-weight-bold'
+        },
+        persistent: true
+      }).onOk(async () => {
+        try {
+          let { data } = await this.$api.delete(`/v1/invoices/${this.formInvoice.id}`);
+
+          if (data.message) {
+            this.$q.notify({ message: data.message })
+            this.$emit('deleted', data)
+            this.onDeleted()
+          } else {
+            if (data.status === 'success') {
+              this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Invoice') }) })
+              this.$emit('deleted', data)
+              this.onDeleted()
+            } else {
+              this.$t('Failed to delete {entity}', { entity: this.$t('invoice') })
+            }
+          }
+        } catch (err) {
+          this.$q.notify(err);
+        }
+
+      }).onCancel(() => {
+        this.isLoading = false
+      })
+    },
+    onDeleted() {
+      this.$router.replace('/invoices')
     },
     onPrint() {
       this.isFormPrintPreviewVisible = false
@@ -537,8 +667,31 @@ export default {
         customer_name: formInvoice.customer_name,
         customer_address: formInvoice.customer_address,
         receipt_remark: this.formReceipt.receipt_remark,
-        invoice_services: formInvoice.services || []
+        invoice_services: formInvoice.services || [],
       }
+
+      const $formPage = this.$refs.formPage
+
+      if ($formPage) {
+        const formPageFormEntry = $formPage.formEntry || {}
+
+        entry.status = formPageFormEntry.status
+
+        if (entry.status == this.$constant.invoice_status.Rejected) {
+          entry.reject_reason = formPageFormEntry.reject_reason
+        } else {
+          entry.reject_reason = null
+        }
+
+        if (formPageFormEntry.invoice_payment_proof_dirty) {
+          try {
+            await $formPage.uploadPaymentProofs()
+          } catch (err) {
+            return
+          }
+        }
+      }
+
 
       const params = {}
 
@@ -653,6 +806,12 @@ export default {
 <style lang="scss">
 .page-invoice-single {
   padding-bottom: 3rem;
+
+  .page-body-form-page {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 0 !important;
+  }
 
   .empty-distribution-center {
     font-style: italic;

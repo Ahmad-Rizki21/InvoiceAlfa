@@ -78,7 +78,8 @@ export default {
       isLoading: false,
       isFetching: false,
       isEditable: false,
-      entry: {}
+      entry: {},
+      scrollToBottom: false
     }
   },
   computed: {
@@ -88,6 +89,26 @@ export default {
   },
   mounted() {
     this.onRequest()
+  },
+  beforeRouteEnter(to, from, next) {
+    if (from.name && (from.name.includes('stores.') || from.name.includes('franchises.'))) {
+      next(vm => {
+        vm.$nextTick(() => {
+          vm.scrollToBottom = true
+        })
+      })
+
+      return
+    }
+    next()
+  },
+  scrollBehavior(to, from, savedPosition) {
+    console.log({to, from, savedPosition})
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
   },
   methods: {
     async onRequest(props) {
@@ -118,6 +139,15 @@ export default {
 
       this.isLoading = false
       this.isFetching = false
+
+      if (this.scrollToBottom) {
+        this.$nextTick(() => {
+          setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight)
+          }, 300)
+        })
+        this.scrollToBottom = false
+      }
     },
     onSuccess(entry) {
       this.entry = { ...entry }

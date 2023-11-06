@@ -1,8 +1,8 @@
 <template>
-  <div class="invoice-table-row form-invoice-service">
+  <div class="invoice-table-row form-invoice-service" :class="{ shrink: index === null }">
     <div class="invoice-table-left">
       <div class="invoice-table-no">
-        {{ index + 1 }}
+        {{ index === null ? '' : index + 1 }}
       </div>
       <div class="invoice-table-description">
         <template v-if="!editable">
@@ -115,7 +115,7 @@ export default {
       return ((parseFloat(this.inputQty, 10) || 0) * (parseFloat(this.inputUnitPrice, 10) || 0)) || 0
     },
     formattedSubTotal() {
-      return this.formatCurrency(this.subTotal)
+      return this.index === null ? null : this.formatCurrency(this.subTotal)
     }
   },
   watch: {

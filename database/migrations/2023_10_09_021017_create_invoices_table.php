@@ -37,6 +37,11 @@ return new class extends Migration
             $table->string('signatory_name')->nullable();
             $table->string('signatory_position')->nullable();
             $table->unsignedTinyInteger('status')->default(1);
+            $table->timestamp('unpaid_updated_at')->nullable();
+            $table->timestamp('pending_review_updated_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
+            $table->text('reject_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

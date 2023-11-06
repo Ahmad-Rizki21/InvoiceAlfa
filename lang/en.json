@@ -18,6 +18,7 @@
   "Delete {entity}": "Delete {entity}",
   "Export {entity}": "Export {entity}",
   "Upload {entity}": "Upload {entity}",
+  "Import {entity}": "Import {entity}",
   "View {entity}": "View {entity}",
   "Select {entity}": "Select {entity}",
   "Manage {entity}": "Manage {entity}",
@@ -206,6 +207,10 @@
   "{field} is too long": "{field} is too long",
   "{field} can only contain alphanumeric characters, underscores, and periods": "{field} can only contain alphanumeric characters, underscores, and periods",
   ":entity can only contain alphanumeric characters, underscores, and periods": ":entity can only contain alphanumeric characters, underscores, and periods",
+
+  "The selected file is unsupported. Supported files: {entity}": "The selected file is unsupported. Supported files: {entity}",
+  "File size exceeds maximum limit: {max}": "File size exceeds maximum limit: {max}",
+  "Image resolution must be greater than {resolution}": "Image resolution must be greater than {resolution}",
 
   "Are you sure want to delete {entity}?": "Are you sure want to delete {entity}?",
   "Are you sure want to delete this {entity}?": "Are you sure want to delete this {entity}?",

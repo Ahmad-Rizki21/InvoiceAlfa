@@ -29,6 +29,7 @@ export default {
     }
 
     await store.dispatch('datatable/initStore')
+    await store.dispatch('imports/initStore')
 
     // if (!store.getters['tourGuide/finishedGroups'].default) {
     //   if (currentRoute.name !== 'index') {
@@ -67,6 +68,10 @@ export default {
     ).then(lang => {
       this.$q.lang.set(lang.default)
     })
+  },
+
+  beforeDestroy() {
+    this.$ws.close()
   }
 }
 </script>

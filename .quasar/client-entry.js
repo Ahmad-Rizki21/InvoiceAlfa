@@ -78,6 +78,8 @@ import qboot_Bootgloballisteners from 'boot/global-listeners'
 
 import qboot_Boottourguide from 'boot/tour-guide'
 
+import qboot_Bootws from 'boot/ws'
+
 
 
 import { addPreFetchHooks } from './client-prefetch.js'
@@ -111,7 +113,7 @@ async function start () {
   }
 
   const urlPath = window.location.href.replace(window.location.origin, '')
-  const bootFiles = [qboot_Bootconstant,qboot_Bootstorage,qboot_Bootaxios,qboot_Booti18n,qboot_Bootaddressbarcolor,qboot_Bootportalvue,qboot_Bootauth,qboot_Bootbreadcrumbs,qboot_Bootutils,qboot_Bootnotify,qboot_Bootglobalcomponents,qboot_Bootgloballisteners,qboot_Boottourguide]
+  const bootFiles = [qboot_Bootconstant,qboot_Bootstorage,qboot_Bootaxios,qboot_Booti18n,qboot_Bootaddressbarcolor,qboot_Bootportalvue,qboot_Bootauth,qboot_Bootbreadcrumbs,qboot_Bootutils,qboot_Bootnotify,qboot_Bootglobalcomponents,qboot_Bootgloballisteners,qboot_Boottourguide,qboot_Bootws]
 
   for (let i = 0; hasRedirected === false && i < bootFiles.length; i++) {
     if (typeof bootFiles[i] !== 'function') {

@@ -122,6 +122,7 @@
 import { date } from 'quasar'
 import FormEntry from './FormEntry'
 import datatableMixins from 'src/mixins/datatable'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'TableStore',
@@ -218,6 +219,7 @@ export default {
       isFormEntryReadonly: false,
       isFormPasswordVisible: false,
       isFormLoginCredentialsVisible: false,
+      isFormImportVisible: false,
       formEntry: {},
       formPassword: {},
       pagination: {
@@ -231,6 +233,14 @@ export default {
       search,
       advancedSearch: search
     }
+  },
+  computed: {
+    ...mapGetters({
+      'currentImportStatus': 'imports/status',
+      'currentImportPath': 'imports/importPath',
+      'currentImportProcessingPage': 'imports/processingPage',
+      'currentImportHasError': 'imports/hasError',
+    })
   },
   async mounted() {
     await this.onRequest()
@@ -326,7 +336,7 @@ export default {
       this.formEntry = {}
     },
     onView(row) {
-      if (this.store.id) {
+      if (this.store && this.store.id) {
         this.$router.push({
           path: `/stores/${row.id}`,
           query: {

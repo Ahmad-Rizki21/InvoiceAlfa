@@ -111,10 +111,10 @@
               <div class="invoice-table-sub-total"> Sub Total </div>
             </div>
           </div>
-          @foreach($invoice->invoiceServices as $service)
+          @foreach($invoice->invoiceServices as $i => $service)
           <div class="invoice-table-row form-invoice-service">
             <div class="invoice-table-left">
-              <div class="invoice-table-no"> 1 </div>
+              <div class="invoice-table-no">{{ $i + 1 }}</div>
               <div class="invoice-table-description">
                 <span>{{ $service->description }}&nbsp;</span>
               </div>
@@ -130,6 +130,26 @@
             </div>
           </div>
           @endforeach
+
+          @if (count($invoice->invoiceServices) < 4)
+          <div class="invoice-table-row form-invoice-service {{ in_array(count($invoice->invoiceServices), [2, 3]) ? 'shrink' : '' }}">
+            <div class="invoice-table-left">
+              <div class="invoice-table-no">&nbsp;</div>
+              <div class="invoice-table-description">
+                <span>&nbsp;</span>
+              </div>
+            </div>
+            <div class="invoice-table-right">
+              <div class="invoice-table-qty">
+                <span>&nbsp;</span>
+              </div>
+              <div class="invoice-table-unit-price">
+                <span>&nbsp;</span>
+              </div>
+              <div class="invoice-table-sub-total"> &nbsp; </div>
+            </div>
+          </div>
+          @endif
         </div>
         <div class="invoice-payment">
           <div class="invoice-payment-left">
@@ -148,7 +168,7 @@
               <div class="invoice-payment-right-value"> {{ is_null($invoice->ppn_total) ? '' : number_format((int) $invoice->ppn_total, 0) }}&nbsp; </div>
             </div>
             <div class="invoice-payment-right-row">
-              <div class="invoice-payment-right-key"> Stamp Duty </div>
+              <div class="invoice-payment-right-key"> Bea Meterai </div>
               <div class="invoice-payment-right-value">
                 <span>{{ is_null($invoice->stamp_duty) ? '' : number_format((int) $invoice->stamp_duty, 0) }}&nbsp;</span>
               </div>

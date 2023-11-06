@@ -43,7 +43,8 @@ module.exports = function (ctx) {
       'notify',
       'global-components',
       'global-listeners',
-      'tour-guide'
+      'tour-guide',
+      'ws'
       // 'smooth-picker'
     ],
 

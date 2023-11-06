@@ -582,6 +582,17 @@
         <q-space />
 
         <q-btn
+          v-if="childTab === 'store' && $auth.can('create.store')"
+          color="default"
+          class="btn-page-stores-import q-mr-sm"
+          size="sm"
+          icon="cloud_upload"
+          @click="onFormImport"
+        >
+          <span class="q-ml-xs">{{ $t('Import') }}</span>
+        </q-btn>
+
+        <q-btn
           v-if="childTab === 'franchise' && $auth.can('create.franchise')"
           color="primary"
           class="btn-page-franchise-create"
@@ -618,16 +629,30 @@
           <table-store
             v-else-if="childTab === 'store'"
             :customer="entry"
+            ref="tableStore"
             key="store"
           />
         </transition>
       </template>
     </div>
+
+    <dialog-import
+      v-model="isFormImportVisible"
+      :status="currentImportStatus"
+      :import-path="currentImportPath"
+      :import-type="$constant.import_type.Store"
+      :template-url="$q.lang.isoName === 'id' ? '/templates/template-toko.xlsx' : '/templates/store-template.xlsx'"
+      :processing-page="currentImportProcessingPage"
+      :has-error="currentImportHasError"
+      @update:status="onFormImportUpdateStatus"
+      @success="onFormImportSuccess"
+    />
   </div>
 </template>
 
 <script>
 import { date } from 'quasar'
+import { mapGetters, mapActions } from 'vuex'
 import TableFranchise from 'src/pages/Franchise/TableFranchise'
 import TableStore from 'src/pages/Store/TableStore'
 
@@ -700,10 +725,18 @@ export default {
       errors: DEFAULT_FORM_ENTRY,
       isEditable: false,
       defaultFormEntry: DEFAULT_FORM_ENTRY,
-      childTab: 'franchise'
+      childTab: 'franchise',
+      isFormImportVisible: false,
     }
   },
   computed: {
+    ...mapGetters({
+      lastInvoiceChildTab: 'datatable/lastInvoiceChildTab',
+      'currentImportStatus': 'imports/status',
+      'currentImportPath': 'imports/importPath',
+      'currentImportProcessingPage': 'imports/processingPage',
+      'currentImportHasError': 'imports/hasError',
+    }),
     isCreate() {
       return !this.entry.id
     },
@@ -752,9 +785,35 @@ export default {
           }, 100)
         })
       }
+    },
+    lastInvoiceChildTab: {
+      immediate: true,
+      handler(n, o) {
+        if (n !== o && n !== this.childTab) {
+          this.childTab = n
+        }
+      }
+    },
+    childTab(n, o) {
+      if (n !== o && n !== this.lastInvoiceChildTab) {
+        this.setLastInvoiceChildTab(n)
+      }
+    },
+    currentImportStatus: {
+      immediate: true,
+      handler(n, o) {
+        if (n !== o) {
+          if (n) {
+            this.onFormImport()
+          }
+        }
+      }
     }
   },
   methods: {
+    ...mapActions({
+      setLastInvoiceChildTab: 'datatable/setLastInvoiceChildTab'
+    }),
     fill(form) {
       form = { ...DEFAULT_FORM_ENTRY, ...form };
 
@@ -922,6 +981,29 @@ export default {
           distribution_center_id: this.entry.id
         }
       })
+    },
+    onFormImport() {
+      this.isFormEntryVisible = false
+      this.isFormImportVisible = true
+    },
+    onFormImportUpdateStatus({ status, importPath, processingPage, hasError }) {
+      this.$store.dispatch('imports/setStatus', status)
+      this.$store.dispatch('imports/setImportPath', importPath)
+
+      if (processingPage) {
+        this.$store.dispatch('imports/setProcessingPage', processingPage)
+      }
+
+      if (typeof hasError !== 'undefined') {
+        this.$store.dispatch('imports/setHasError', hasError)
+      }
+
+      this.$store.dispatch('imports/sync')
+    },
+    onFormImportSuccess() {
+      if (this.$refs.tableStore) {
+        this.$refs.tableStore.onRequest()
+      }
     }
   }
 }

@@ -6,6 +6,7 @@ import auth from './auth'
 import breadcrumbs from './breadcrumbs'
 import tourGuide from './tour-guide'
 import datatable from './datatable'
+import imports from './imports'
 
 Vue.use(Vuex)
 
@@ -25,7 +26,8 @@ export default function (/* { ssrContext } */) {
       auth,
       breadcrumbs,
       tourGuide,
-      datatable
+      datatable,
+      imports
     },
 
     // enable strict mode (adds overhead!)
