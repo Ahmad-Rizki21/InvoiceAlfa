@@ -197,8 +197,12 @@ export default {
     async connect() {
       this.isConnecting = true
       const isConnected = await this.connectWebsocket()
+      console.log({isConnected})
       if (!isConnected) {
         this.connectErrorCode = 99
+      } else {
+        this.connectErrorCode = null
+        this.streamPrinters()
       }
       this.isConnecting = false
 
@@ -225,6 +229,7 @@ export default {
               if (data.id === 'get:printer_adapter_fd:response') {
                 if (data.adapter_fds && data.adapter_fds.length) {
                   this.adapterFds = data.adapter_fds
+                  console.log('asdkjaskdjkasdjkasjdksja')
                   resolve(true)
                 } else {
                   resolve(false)
@@ -241,7 +246,32 @@ export default {
 
         timeoutId = setTimeout(() => {
           resolve(false)
-        }, 10000)
+        }, 30000)
+      })
+    },
+    async streamPrinters() {
+      this.adapterFds.forEach(v => {
+        console.log('sendingtoprinter',v)
+        this.$ws.send({
+          mode: 'get',
+          id: 'get:printers',
+          source: this.$ws.appSource,
+          adapter_fd: v
+        })
+      })
+
+      this.$ws.onMessage((e, ws) => {
+        try {
+          const data = JSON.parse(e.data)
+
+          if (data.mode === 'get') {
+            if (data.id === 'get:printers:response') {
+              //
+            }
+          }
+        } catch (err) {
+          console.error(err)
+        }
       })
     },
     onPrinterSelected(printer) {
