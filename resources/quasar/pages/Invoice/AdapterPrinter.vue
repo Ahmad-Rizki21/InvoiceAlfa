@@ -49,11 +49,11 @@
             <div
               class="printer-item"
               role="button"
-              :class="{ selected: selectedPrinter && selectedPrinter.name === i }"
+              :class="{ selected: selectedPrinter && selectedPrinter.name === printer.name }"
               :tabindex="i"
-              v-for="i in 22"
+              v-for="(printer, i) in printers"
               :key="i"
-              @click.prevent="onPrinterSelected({ name: i })"
+              @click.prevent="onPrinterSelected(printer)"
             >
               <div class="printer-item-inner">
                 <div class="printer-icon">
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="printer-name">
-                  HP Deskjet 30 Lorem Ipsum sit dolor amet {{  i*923298 }}
+                  {{ printer.name }}
                 </div>
 
                 <div
@@ -129,7 +129,7 @@
         <q-btn
           v-if="!(isConnecting || connectErrorCode)"
           type="submit"
-          :label="$t('Update')"
+          :label="$t('Print')"
           color="primary"
           :loading="loading || isLoading"
           unelevated
@@ -177,7 +177,8 @@ export default {
       selectedPrinter: null,
       isConnecting: true,
       connectErrorCode: null,
-      appDownloadUrl: this.$miscData.app_download
+      appDownloadUrl: this.$miscData.app_download,
+      streamPrinterInterval: null
     }
   },
   watch: {
@@ -185,16 +186,23 @@ export default {
       immediate: true,
       handler(n) {
         this.$nextTick(() => {
+          this.selectedPrinter = null
+          this.adapterFds = []
+          this.printers = []
+          this.$ws.reset()
           this.connect()
         })
       }
     }
   },
   async beforeDestroy() {
+    this.$ws._closeFns = []
+    clearInterval(this.streamPrinterInterval)
     await this.$ws.close()
   },
   methods: {
     async connect() {
+      this.$ws._closeFns = []
       this.isConnecting = true
       const isConnected = await this.connectWebsocket()
       console.log({isConnected})
@@ -202,6 +210,11 @@ export default {
         this.connectErrorCode = 99
       } else {
         this.connectErrorCode = null
+        this.$ws.onClose(() => {
+          this.isConnected = false
+          this.connectErrorCode = 99
+        })
+        await this.$utils.delay(1000)
         this.streamPrinters()
       }
       this.isConnecting = false
@@ -219,25 +232,40 @@ export default {
           })
         })
 
-        this.$ws.onceMessage((e, ws) => {
-          clearTimeout(timeoutId)
-
+        this.$ws.onceEvent('get', 'get:printer_adapter_fd:response', (e, ws, data) => {
+          this.adapterFds = data.adapter_fds || []
           try {
-            const data = JSON.parse(e.data)
+            if (this.adapterFds.length) {
+              this.$ws.onceEvent('get', 'get:printers', (e, ws, data) => {
+                clearTimeout(timeoutId)
+                console.log('received get:printers')
+                this.printers = (data.printers || []).map(v => {
+                  v.adapter_fd = data.adapter_fd;
 
-            if (data.mode === 'get') {
-              if (data.id === 'get:printer_adapter_fd:response') {
-                if (data.adapter_fds && data.adapter_fds.length) {
-                  this.adapterFds = data.adapter_fds
-                  console.log('asdkjaskdjkasdjkasjdksja')
+                  return v
+                })
+
+                if (this.printers.length) {
                   resolve(true)
                 } else {
                   resolve(false)
                 }
-              }
+              })
+
+              this.adapterFds.forEach(v => {
+                console.log('sending get:printers')
+                this.$ws.send({
+                  mode: 'get',
+                  id: 'get:printers',
+                  source: this.$ws.appSource,
+                  adapter_fd: v
+                })
+              })
+            } else {
+              resolve(false)
             }
-          } catch (err) {
-            console.error(err)
+          } catch (e) {
+            console.error(e)
             resolve(false)
           }
         })
@@ -246,33 +274,38 @@ export default {
 
         timeoutId = setTimeout(() => {
           resolve(false)
-        }, 30000)
+        }, 25000)
       })
     },
     async streamPrinters() {
-      this.adapterFds.forEach(v => {
-        console.log('sendingtoprinter',v)
-        this.$ws.send({
-          mode: 'get',
-          id: 'get:printers',
-          source: this.$ws.appSource,
-          adapter_fd: v
-        })
-      })
+      clearInterval(this.streamPrinterInterval)
 
-      this.$ws.onMessage((e, ws) => {
-        try {
-          const data = JSON.parse(e.data)
+      setInterval(() => {
+        if (this.adapterFds.length) {
+          this.adapterFds.forEach(v => {
+            this.$ws.send({
+              mode: 'get',
+              id: 'get:printers',
+              source: this.$ws.appSource,
+              adapter_fd: v
+            })
+          })
 
-          if (data.mode === 'get') {
-            if (data.id === 'get:printers:response') {
-              //
+          this.$ws.onceEvent('get', 'get:printers', (e, ws, data) => {
+            if (data.printers.length) {
+              this.printers = (data.printers || []).map(v => {
+                v.adapter_fd = data.adapter_fd;
+
+                return v
+              })
+
+              if (this.selectedPrinter && !this.printers.find(v => v.name == this.selectedPrinter.name)) {
+                this.selectedPrinter = null
+              }
             }
-          }
-        } catch (err) {
-          console.error(err)
+          })
         }
-      })
+      }, 20000)
     },
     onPrinterSelected(printer) {
       this.selectedPrinter = printer
@@ -282,42 +315,30 @@ export default {
         return;
       }
 
-      const isValid = await this.$refs.form.validate();
-
-      if (!isValid) {
+      if (!this.selectedPrinter) {
+        this.$q.notify({ message: this.$t('Please select printer device first') })
         return;
       }
 
-      const entry = {
-        password: this.formEntry.password,
-        password_confirmation: this.formEntry.password_confirmation
-      }
+      this.isLoading = true
 
-      this.isLoading = true;
+      this.$ws.send({
+        mode: 'action',
+        id: 'print:invoice',
+        source: this.$ws.appSource,
+        adapter_fd: this.selectedPrinter.adapter_fd,
+        printer_name: this.selectedPrinter.name,
+        invoices: this.entries.map(v => v.id)
+      })
 
-      try {
-        let { data } = await this.$api.patch(`/v1/distribution-centers/${this.formEntry.id}`, entry);
+      this.$q.notify({ message: this.$t('The print command has been sent') })
 
-        if (data.status === 'success') {
-          this.$emit('success');
-        }
-        if (data.status === 'success') {
-          this.$q.notify({ message: this.$t('{entity} updated', { entity: this.$t('Password') }) })
-        } else {
-          this.$t('Failed to update {entity}', { entity: this.$t('password') })
-        }
-      } catch (err) {
-        if (err.validation) {
-          this.errors = {
-            ...DEFAULT_FORM_ENTRY,
-            ...err.validation.errors
-          }
-        } else {
-          this.$q.notify(err);
-        }
-      }
+      await this.$utils.delay(5000)
 
       this.isLoading = false;
+
+      this.cancel()
+
     },
     cancel() {
       if (this.loading || this.isLoading) {
@@ -398,6 +419,11 @@ export default {
 
         > .printer-name {
           text-align: center;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+
         }
 
         > .icon-selected {

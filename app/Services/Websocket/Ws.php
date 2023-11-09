@@ -30,10 +30,10 @@ class Ws
         $response = Http::withQueryParameters([
             'mode' => 'debug',
         ])
-        ->withHeader('Origin', 'https://ajnusa-ws.chaynu.dev')
+        ->withHeader('Origin', 'ajnusa-ws.chaynu.dev')
         ->withOptions([
-            'debug' => true,
-        ])->get($this->url);
+            'debug' => false,
+        ])->get('https://ajnusa-ws.chaynu.dev');
 
         return $response->json();
     }

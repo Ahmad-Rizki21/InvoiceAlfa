@@ -4,15 +4,20 @@ class Ws {
   constructor() {
     this.url = null
     this.socket = null
-    this._readyFns = []
-    this._closeFns = []
-    this._messageFns = []
-    this._messageFnsOnce = []
+    this.reset()
     this._appSource = null
   }
 
   get appSource() {
     return this._appSource
+  }
+
+  reset() {
+    this._readyFns = []
+    this._closeFns = []
+    this._messageFns = {}
+    this._messageFnsOnce = []
+    this._eventFnsOnce = {}
   }
 
   connect() {
@@ -22,13 +27,37 @@ class Ws {
 
     this.socket = new WebSocket(this.url)
     this.socket.onmessage = (e) => {
-      this._messageFns.forEach(v => {
-        v(e, this)
-      })
+      for (const key in this._messageFns) {
+        this._messageFns[key](e, this)
+      }
+
       this._messageFnsOnce.forEach(v => {
         v(e, this)
       })
       this._messageFnsOnce = []
+
+
+      let eData = null
+      let eDataKey = null
+
+      try {
+        eData = JSON.parse(e.data)
+        eDataKey = eData.mode + '' + eData.id
+      } catch (e) {}
+
+      if (eData) {
+        const eventFnsOnce = this._eventFnsOnce
+
+        for (const key in eventFnsOnce) {
+          if (eDataKey == key && eventFnsOnce[key] && eventFnsOnce[key].length) {
+            eventFnsOnce[key].forEach(v => {
+              v(e, this, eData)
+            })
+
+            this._eventFnsOnce[key] = []
+          }
+        }
+      }
     }
 
     this.socket.onopen = (e) => {
@@ -52,13 +81,25 @@ class Ws {
   }
 
   onMessage(fn) {
-    this._messageFns.push(fn)
+    const id = this.$utils.generateId()
+    this._messageFns[id] = fn
 
-    return this
+    return id
   }
 
   onceMessage(fn) {
     this._messageFnsOnce.push(fn)
+
+    return this
+  }
+
+  onceEvent(mode, id, fn) {
+    const key = mode + '' + id
+    if (!this._eventFnsOnce[key]) {
+      this._eventFnsOnce[key] = []
+    }
+
+    this._eventFnsOnce[key].push(fn)
 
     return this
   }
@@ -104,7 +145,7 @@ class Ws {
 }
 
 export default ({ Vue }) => {
-  const ws = new Ws()
+  const ws = new Ws(Vue.prototype.$utils)
 
   if (process.env.CLIENT) {
     try {
