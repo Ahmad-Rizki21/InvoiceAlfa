@@ -626,12 +626,12 @@ wrapper {
 .form-receipt .receipt-number>.receipt-number-inner>.receipt-number-label {
   font-size: 23px;
   font-weight: 600;
-  letter-spacing: 1.16343mm;
+  letter-spacing: 1.46343mm;
 }
 
 @media print {
   .form-receipt .receipt-number>.receipt-number-inner>.receipt-number-label {
-    letter-spacing: 3px;
+    letter-spacing: 2px;
   }
 }
 
