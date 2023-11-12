@@ -607,23 +607,32 @@ wrapper {
 .form-receipt .receipt-header .company-logo {
   width: 100%;
 }
-
 .form-receipt .receipt-number {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
   width: 100%;
   padding-right: 2rem;
   margin-bottom: 2rem;
 }
 
-.form-receipt .receipt-number>.receipt-number-inner {
+/* .form-receipt .receipt-number>.receipt-number-inner {
   margin-left: auto;
-}
+} */
 
 .form-receipt .receipt-number>.receipt-number-inner>.receipt-number-label {
   font-size: 23px;
   font-weight: 600;
+  letter-spacing: 1.46343mm;
+}
+
+@media print {
+  .form-receipt .receipt-number>.receipt-number-inner>.receipt-number-label {
+    letter-spacing: 3px;
+  }
 }
 
 .form-receipt .receipt-number>.receipt-number-inner>.receipt-number-content {
