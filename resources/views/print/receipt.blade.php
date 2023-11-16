@@ -42,7 +42,7 @@
               <div class="receipt-detail-colon"> : </div>
             </div>
             <div class="receipt-detail-value">
-              <div class="receipt-detail-grand-total"> {{ is_null($invoice->total) ? '' : number_format((int) $invoice->total, 0) }}&nbsp; </div>
+              <div class="receipt-detail-grand-total"> {{ is_null($invoice->total) ? '' : 'Rp ' . number_format((int) $invoice->total, 0) }}&nbsp; </div>
             </div>
           </div>
           <div class="receipt-detail-row">
