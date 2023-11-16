@@ -41,11 +41,11 @@ class DistributionCenter extends BaseUser
 
     public function franchises()
     {
-        return $this->hasMany(Franchise::class, 'customer_id', 'id');
+        return $this->hasMany(Franchise::class, 'distribution_center_id', 'id');
     }
 
     public function stores()
     {
-        return $this->hasMany(Store::class, 'customer_id', 'id');
+        return $this->hasMany(Store::class, 'distribution_center_id', 'id');
     }
 }

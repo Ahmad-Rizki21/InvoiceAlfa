@@ -745,3 +745,192 @@ wrapper {
   text-decoration: underline;
   margin-bottom: 5px;
 }
+
+
+
+
+
+
+
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 10 version
+*/
+
+.form-store-printable {
+  padding-bottom: 3rem;
+  height: auto;
+  min-height: 296mm;
+}
+.form-store-printable .paper-content {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: inherit;
+}
+.form-store-printable .receipt-header .company-logo-wrapper {
+  width: 120px;
+}
+.form-store-printable .receipt-header .company-logo {
+  width: 100%;
+}
+.form-store-printable .table-store-list .store-list-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.form-store-printable .table-store-list .store-list-row.last > .store-list-no, .form-store-printable .table-store-list .store-list-row.last > .store-list-name, .form-store-printable .table-store-list .store-list-row.last > .store-list-address {
+  border-bottom: none;
+}
+.form-store-printable .table-store-list .store-list-header {
+  font-weight: 600;
+  text-align: center;
+  background-color: #ddd;
+  font-size: 14px;
+  border-top: 1px solid #000;
+}
+.form-store-printable .table-store-list .store-list-no {
+  width: 7.5%;
+  text-align: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid #000;
+}
+.form-store-printable .table-store-list .store-list-name {
+  width: 37%;
+  border-left: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 5px 10px;
+}
+.form-store-printable .table-store-list .store-list-address {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  width: 55.5%;
+  border-left: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 5px 10px;
+}
+.form-store-printable .receipt-number {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  padding-right: 2rem;
+  margin-bottom: 2rem;
+}
+.form-store-printable .receipt-number > .receipt-number-inner {
+  margin-left: auto;
+}
+.form-store-printable .receipt-number > .receipt-number-inner > .receipt-number-label {
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: 1.46343mm;
+}
+.form-store-printable .receipt-number > .receipt-number-inner > .receipt-number-content {
+  border: 1px solid #000;
+  padding: 5px 10px;
+}
+.form-store-printable .receipt-detail {
+  margin-bottom: 4rem;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 20px;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-key {
+  width: 24%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-key > .receipt-detail-label {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-key > .receipt-detail-colon {
+  margin-left: 1px;
+  margin-right: 10px;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-value {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-value .receipt-detail-recipient-company-name {
+  font-weight: 600;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-value .receipt-detail-grand-total {
+  padding: 1px 10px 5px 5px;
+  border: 1px solid #000;
+  font-weight: 600;
+  max-width: 80%;
+}
+.form-store-printable .receipt-detail > .receipt-detail-row > .receipt-detail-value .receipt-detail-grand-total-text {
+  padding: 1px 10px 5px 5px;
+  border: 1px solid #000;
+  font-style: italic;
+  max-width: 80%;
+}
+.form-store-printable .receipt-date {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 6rem;
+}
+.form-store-printable .receipt-date > .receipt-date-inner {
+  margin-left: auto;
+  text-align: center;
+  width: 50%;
+}
+.form-store-printable .receipt-footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 2rem;
+}
+.form-store-printable .receipt-footer > .receipt-owner {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.form-store-printable .receipt-footer > .receipt-owner > .receipt-owner-name {
+  font-size: 18px;
+}
+.form-store-printable .receipt-footer > .receipt-owner > .receipt-owner-address {
+  font-size: 10px;
+}
+.form-store-printable .receipt-footer > .receipt-owner > .receipt-owner-contact {
+  font-size: 10px;
+}
+.form-store-printable .receipt-footer > .receipt-signature {
+  width: 50%;
+  text-align: center;
+}
+.form-store-printable .receipt-footer > .receipt-signature > .receipt-signature-name {
+  font-weight: 900;
+  text-decoration: underline;
+  margin-bottom: 5px;
+}
+.example {
+   display: -ms-grid;
+   display: grid;
+   -webkit-transition: all .5s;
+   -o-transition: all .5s;
+   transition: all .5s;
+   -webkit-user-select: none;
+      -moz-user-select: none;
+       -ms-user-select: none;
+           user-select: none;
+   background: -webkit-gradient(linear, left top, left bottom, from(white), to(black));
+   background: -o-linear-gradient(top, white, black);
+   background: linear-gradient(to bottom, white, black);
+}

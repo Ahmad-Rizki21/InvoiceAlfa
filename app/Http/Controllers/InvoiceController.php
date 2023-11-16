@@ -14,6 +14,7 @@ use App\Models\Franchise;
 use App\Models\InvoicePaymentProof;
 use App\Models\InvoiceService;
 use App\Models\Settings;
+use App\Models\Store;
 use App\Rules\UniqueEmailRule;
 use App\Rules\UniqueUsernameRule;
 use App\Rules\ValidUsernameRule;
@@ -280,6 +281,7 @@ class InvoiceController extends Controller
         ]);
 
         $entry = $this->getQuery($request)->findOrFail($id);
+        $stores = [];
 
         if ($request->edit) {
             $customer = null;
@@ -296,6 +298,11 @@ class InvoiceController extends Controller
             }
         }
 
+        if ($entry->distribution_center_id) {
+            $stores = Store::where('distribution_center_id', $entry->distribution_center_id)->get();
+        }
+
+
         return view('print.invoice', [
             'pageTitle' => 'Invoice',
             'invoice' => $entry,
@@ -305,6 +312,7 @@ class InvoiceController extends Controller
             'ppnPercentage' => Settings::getValue(SettingKey::PpnPercentage),
             'signatoryName' => Settings::getValue(SettingKey::SignatoryName),
             'signatoryPosition' => Settings::getValue(SettingKey::SignatoryPosition),
+            'stores' => $stores,
         ]);
     }
 
