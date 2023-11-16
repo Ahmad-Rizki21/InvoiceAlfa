@@ -318,11 +318,38 @@ export default {
           sortable: true
         },
         {
+          name: 'code',
+          field: 'code',
+          label: this.$t('Code'),
+          headerClasses: 'table-header-code',
+          classes: 'table-cell-code',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'name',
           field: 'name',
           label: this.$t('Name'),
           headerClasses: 'table-header-name',
           classes: 'table-cell-name',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'location',
+          field: 'location',
+          label: this.$t('Location'),
+          headerClasses: 'table-header-location',
+          classes: 'table-cell-location',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'address',
+          field: 'address',
+          label: this.$t('Address'),
+          headerClasses: 'table-header-address',
+          classes: 'table-cell-address',
           align: 'left',
           sortable: true
         },
@@ -365,7 +392,9 @@ export default {
       ],
       visibleColumns: [
         'id',
+        'code',
         'name',
+        'location',
         'email',
         'username',
         'created_at'

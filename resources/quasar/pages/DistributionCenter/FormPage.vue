@@ -591,6 +591,16 @@
         >
           <span class="q-ml-xs">{{ $t('Import') }}</span>
         </q-btn>
+        <q-btn
+          v-if="childTab === 'franchise' && $auth.can('create.franchise')"
+          color="default"
+          class="btn-page-franchises-import q-mr-sm"
+          size="sm"
+          icon="cloud_upload"
+          @click="onFormImport"
+        >
+          <span class="q-ml-xs">{{ $t('Import') }}</span>
+        </q-btn>
 
         <q-btn
           v-if="childTab === 'franchise' && $auth.can('create.franchise')"

@@ -356,9 +356,14 @@
                 </div>
               </div>
 
-              <div v-if="!readonly || formEntry.has_password" class="q-mb-md text-subtitle text-weight-bold">{{ $t('Login Credentials') }}</div>
+              <div v-if="isCreate|| formEntry.has_password" class="q-mb-md text-subtitle text-weight-bold">{{ $t('Login Credentials') }}</div>
 
-              <div v-if="!readonly || formEntry.has_password" class="row q-col-gutter-x-sm q-mb-md">
+              <div v-if="isCreate" class="row q-col-gutter-x-sm q-mb-md">
+                <q-checkbox v-model="createAccessLogin">
+                  {{ $t('Create {entity}', { entity: $t('Login Credentials') }) }}
+                </q-checkbox>
+              </div>
+              <div v-if="(isCreate && createAccessLogin) || (!isCreate && !readonly) || formEntry.has_password" class="row q-col-gutter-x-sm q-mb-md">
                 <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
@@ -379,7 +384,7 @@
                     v-else
                     v-show="!fetching"
                     v-model="formEntry.email"
-                    :label="$t('Email') + '*'"
+                    :label="$t('Email')"
                     :filled="!readonly"
                     :borderless="readonly"
                     :readonly="readonly"
@@ -429,8 +434,8 @@
                 </div>
               </div>
 
-              <div v-if="isCreate" class="row q-col-gutter-x-sm q-mb-md">
-                <div class="col-xs-12 col-sm-6 col-md-5 co-lg-3">
+              <div v-if="isCreate && createAccessLogin" class="row q-col-gutter-x-sm q-mb-md">
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
                     v-if="readonly"
@@ -466,7 +471,7 @@
                     :error-message="errors.password"
                   />
                 </div>
-                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-3">
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
                     v-if="readonly"
@@ -644,13 +649,13 @@ export default {
           v => !v || (!!v && /^[^0-9][a-zA-Z0-9_\.]+$/.test(v)) || this.$t('{field} must be starts with letter', { field: this.$t('Username') })
         ],
         email: [
-          v => !!v || this.$t('{field} is required', { field: this.$t('Email') }),
+          v => !this.createAccessLogin || !!v || this.$t('{field} is required', { field: this.$t('Email') }),
           (v) =>
             (!!v && this.$utils.isEmail(v)) ||
             this.$t('{field} is invalid', { field: this.$t('Email') }),
         ],
         password: [
-          v => !!v || this.$t('{field} is required', { field: this.$t('Password') }),
+          v => !this.createAccessLogin || !!v || this.$t('{field} is required', { field: this.$t('Password') }),
           v => v && v.length >= 6 || this.$t('{field} must be at least {length} characters', { field: this.$t('Password'), length: 6 })
         ],
         password_confirmation: [
@@ -661,7 +666,8 @@ export default {
       errors: DEFAULT_FORM_ENTRY,
       isEditable: false,
       defaultFormEntry: DEFAULT_FORM_ENTRY,
-      childTab: 'franchise'
+      childTab: 'franchise',
+      createAccessLogin: false
     }
   },
   computed: {
@@ -776,17 +782,19 @@ export default {
         entry.fo_approval_date = date.formatDate(date.extractDate(entry.fo_approval_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
       }
 
+      entry.distribution_center_id = entry.distribution_center_id || this.$route.query.distribution_center_id;
+
       this.isLoading = true;
 
       try {
-        const endpoint = entry.id ? `/v1/distribution-centers/${entry.id}` : '/v1/distribution-centers';
+        const endpoint = entry.id ? `/v1/franchises/${entry.id}` : '/v1/franchises';
         const method = entry.id ? 'patch' : 'post';
 
         let { data } = await this.$api[method](endpoint, entry);
 
         if (data.status === 'success') {
           this.defaultFormEntry = { ...this.formEntry }
-          this.$emit('success', data.data.distribution_center);
+          this.$emit('success', data.data.franchise);
           this.isEditable = false
         }
 
@@ -794,9 +802,9 @@ export default {
           this.$q.notify({ message: data.message })
         } else {
           if (data.status === 'success') {
-            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Distribution center') }) })
+            this.$q.notify({ message: this.$t('{entity} saved', { entity: this.$t('Franchise') }) })
           } else {
-            this.$t('Failed to save {entity}', { entity: this.$t('distribution center') })
+            this.$t('Failed to save {entity}', { entity: this.$t('franchise') })
           }
         }
       } catch (err) {
@@ -831,7 +839,7 @@ export default {
 
       this.$q.dialog({
         title: this.$t('Confirm'),
-        message: this.$t('Are you sure want to delete this {entity}?', { entity: this.$t('distribution center') }),
+        message: this.$t('Are you sure want to delete this {entity}?', { entity: this.$t('franchise') }),
         cancel: {
           label: this.$t('Cancel'),
           color: 'dark',
@@ -847,17 +855,17 @@ export default {
         persistent: true
       }).onOk(async () => {
         try {
-          let { data } = await this.$api.delete(`/v1/distribution-centers/${this.entry.id}`);
+          let { data } = await this.$api.delete(`/v1/franchises/${this.entry.id}`);
 
           if (data.message) {
             this.$q.notify({ message: data.message })
             this.$emit('deleted', data)
           } else {
             if (data.status === 'success') {
-              this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Distribution center') }) })
+              this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Franchise') }) })
               this.$emit('deleted', data)
             } else {
-              this.$t('Failed to delete {entity}', { entity: this.$t('distribution center') })
+              this.$t('Failed to delete {entity}', { entity: this.$t('franchise') })
             }
           }
         } catch (err) {

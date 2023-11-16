@@ -72,7 +72,7 @@
             <span class="span">{{ $t('Status') }}</span>
             <div>
               {{ entry.status_description }}
-              <q-icon v-if="entry.status == $constant.invoice_status.Rejected && entry.reject_reason" name="info" size="xs">
+              <q-icon v-if="entry.status == $constant.invoice_status.Rejected && entry.reject_reason" name="info" size="xs" style="position: relative; top: -2px">
                 <q-tooltip>{{ entry.reject_reason }}</q-tooltip>
               </q-icon>
             </div>
@@ -331,6 +331,15 @@ export default {
       }
       > .span {
         display: none;
+
+        @media (min-width: 786px) {
+          display: block;
+        }
+      }
+      > .span-invoice {
+        @media (min-width: 786px) {
+          display: none;
+        }
       }
       > div {
         font-weight: 600;
@@ -375,6 +384,10 @@ export default {
     .total-bill {
       // text-align: right;
       flex: 1;
+
+      @media (min-width: 768px) {
+        min-width: 22%;
+      }
 
       &-label {
         color: rgba(49, 53, 60, 0.6);
@@ -436,7 +449,7 @@ export default {
       }
 
       .date {
-        width: 10%;
+        min-width: 10%;
       }
 
       .invoice {

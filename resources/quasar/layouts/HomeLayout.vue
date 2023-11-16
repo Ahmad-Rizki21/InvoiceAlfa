@@ -54,7 +54,7 @@ export default {
         message: this.$t('Are you sure want to logout?'),
         cancel: true,
         ok: this.$t('Yes'),
-        cancel: this.$t('No')
+        cancel: this.$t('Nope')
       }).onOk(async () => {
         await this.$store.dispatch('auth/logout');
 

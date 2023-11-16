@@ -420,8 +420,10 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
+      vm.requestSettings()
       if (!vm.isCreate) {
         vm.isEditable = false
+        vm.requestInvoice()
       }
     })
   },
@@ -833,9 +835,9 @@ export default {
     align-items: center;
     position: relative;
 
-    @media (min-width: $breakpoint-lg-min) {
-      margin-top: calc(-50px + -2rem);
-    }
+    // @media (min-width: $breakpoint-lg-min) {
+    //   margin-top: calc(-50px + -2rem);
+    // }
 
     .page-action-customer {
       width: 210mm;
