@@ -67,6 +67,16 @@
           <q-skeleton v-if="fetching" type="rect" />
           <template v-else>
             {{ formatMoney(invoice.total) }}
+
+            <q-btn
+              size="sm"
+              flat
+              rounded
+              padding="sm"
+              icon="content_copy"
+              class="btn-copy"
+              @click="onTotalCopy(invoice.total)"
+            />
           </template>
         </div>
       </div>
@@ -74,7 +84,7 @@
         <div class="key">
           <q-skeleton v-if="fetching" type="text" />
           <template v-else>
-            {{ $t('Due') }}
+            {{ $t('Due date') }}
           </template>
         </div>
         <div class="value font-weight-bold">
@@ -92,7 +102,7 @@
             {{ $t('status') }}
           </template>
         </div>
-        <div class="value">
+        <div class="value" :class="{ [`status-color-${invoice.status}`]: true }">
           <template v-if="!fetching">
             {{ invoice.status_description }}
           </template>
@@ -139,6 +149,10 @@ export default {
         decimal: '.',
         thousand: ',',
       }) || '-'
+    },
+    onTotalCopy(num) {
+      this.$utils.copyToClipboard(num)
+      this.$q.notify({ message: this.$t('{entity} copied to clipboard', { entity: this.$t('Payment amount') }) })
     }
   }
 }
@@ -181,12 +195,12 @@ export default {
         margin-bottom: 0;
       }
 
-      &.invoice-no {
-        > .value {
-          // font-weight: 500;
-          // color: var(--q-text-color-default);
-        }
-      }
+      // &.invoice-no {
+      //   > .value {
+      //     // font-weight: 500;
+      //     // color: var(--q-text-color-default);
+      //   }
+      // }
 
       &.status {
         position: absolute;
@@ -210,9 +224,11 @@ export default {
 
         &.invoice-status {
           &-1 > .value {
+            color: #808080;
             border-bottom-color: #cfd8dc;
           }
           &-2 > .value  {
+            color: $warning;
             border-bottom-color: #fffde7;
           }
           &-3 > .value  {
@@ -220,14 +236,22 @@ export default {
             border-bottom-color: var(--q-color-warning);
           }
           &-4 > .value  {
+            color: $positive;
             border-bottom-color: #21ba45;
             border-bottom-color: var(--q-color-positive);
           }
           &-5 > .value  {
+            color: $negative;
             border-bottom-color: #c10015;
             border-bottom-color: var(--q-color-negative);
           }
         }
+      }
+    }
+
+    .btn-copy {
+      .q-icon {
+        color: #5d5d5d;
       }
     }
   }

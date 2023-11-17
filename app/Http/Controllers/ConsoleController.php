@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvoiceStatus;
+use App\Models\Invoice;
 use App\Models\Ticket;
 use App\Models\TicketTimer;
 use App\Models\User;
@@ -22,49 +24,86 @@ class ConsoleController extends Controller
         return view('quasar');
     }
 
-    public function dataTotalTicketOpen(Request $request)
+    public function dataTotalUnpaidAmount(Request $request)
     {
         $now = Carbon::now();
 
-        $entry = Ticket::where('status', Ticket::STATUS_OPEN)
+        $unpaid = Invoice::where('status', InvoiceStatus::Unpaid->value)
                         ->whereMonth('created_at', $now->month)
-                        ->whereYear('created_at', $now->year);
+                        ->whereYear('created_at', $now->year)
+                        ->sum('total');
 
-        if (! $this->isSuperAdmin()) {
-            $entry->where('created_by_id', $request->user()->id);
-        }
+        $total = Invoice::where('status', '!=', InvoiceStatus::Draft->value)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year)
+                        ->sum('total');
 
-        $entry = $entry->count();
+        $unpaid = $total - $unpaid;
 
         return $this->json([
             'status' => 'success',
             'message' => __('Ok'),
             'data' => [
-                'total' => $entry,
+                'unpaid' => $unpaid,
+                'total' => $total,
             ],
         ]);
     }
 
-    public function dataTotalTicket(Request $request)
+    public function dataTotalUnpaidCustomer(Request $request)
     {
+        $type = $request->type;
         $now = Carbon::now();
 
-        if ($this->isSuperAdmin()) {
-            $entry = Ticket::whereMonth('created_at', $now->month)
-                        ->whereYear('created_at', $now->year)
-                        ->count();
-        } else {
-            $entry = Ticket::where('created_by_id', $request->user()->id)
-                            ->whereMonth('created_at', $now->month)
-                            ->whereYear('created_at', $now->year)
-                            ->count();
+        $unpaid = [];
+        $unpaidEntries = Invoice::where('status', InvoiceStatus::Unpaid->value)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year);
+
+        if ($type === 'dc') {
+            $unpaidEntries->whereNull('franchise_id');
+        } else if ($type === 'fr') {
+            $unpaidEntries->whereNull('distribution_center_id');
+        }
+
+        $unpaidEntries = $unpaidEntries->get(['distribution_center_id', 'franchise_id']);
+
+
+        foreach ($unpaidEntries as $entry) {
+            $customer = $entry->distribution_center_id ?? $entry->franchise_id;
+
+            if (! in_array($customer, $unpaid)) {
+                $unpaid[] = $customer;
+            }
+        }
+
+        $total = [];
+        $totalEntries = Invoice::where('status', '!=', InvoiceStatus::Draft->value)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year);
+
+        if ($type === 'dc') {
+            $totalEntries->whereNull('franchise_id');
+        } else if ($type === 'fr') {
+            $totalEntries->whereNull('distribution_center_id');
+        }
+
+        $totalEntries = $totalEntries->get(['distribution_center_id', 'franchise_id']);
+
+        foreach ($totalEntries as $entry) {
+            $customer = $entry->distribution_center_id ?? $entry->franchise_id;
+
+            if (! in_array($customer, $total)) {
+                $total[] = $customer;
+            }
         }
 
         return $this->json([
             'status' => 'success',
             'message' => __('Ok'),
             'data' => [
-                'total' => $entry,
+                'unpaid' => count(array_unique($unpaid)),
+                'total' => count(array_unique($total)),
             ],
         ]);
     }
@@ -112,6 +151,42 @@ class ConsoleController extends Controller
             'message' => __('Ok'),
             'data' => [
                 'total' => $entry,
+            ],
+        ]);
+    }
+
+    public function dataTotalPendingReview()
+    {
+        $now = Carbon::now();
+
+        $total = Invoice::where('status', InvoiceStatus::PendingReview->value)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year)
+                        ->count(['id']);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Ok'),
+            'data' => [
+                'total' => $total,
+            ],
+        ]);
+    }
+
+    public function dataTotalRejected()
+    {
+        $now = Carbon::now();
+
+        $total = Invoice::where('status', InvoiceStatus::Rejected->value)
+                        ->whereMonth('created_at', $now->month)
+                        ->whereYear('created_at', $now->year)
+                        ->count(['id']);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Ok'),
+            'data' => [
+                'total' => $total,
             ],
         ]);
     }

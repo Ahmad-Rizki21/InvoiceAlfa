@@ -8,6 +8,65 @@
     @dragleave="onDragLeave"
     @drop="onDrop"
   >
+    <q-card-section v-if="showPaymentDate">
+      <p class="label-header label-actual-payment">
+        {{ $t('Actual Payment Date') }}
+      </p>
+
+      <div class="row q-col-gutter-sm">
+        <div class="col col-md-6 col-lg-5 col-xl-4">
+          <q-skeleton v-if="fetching" type="rect" />
+          <q-input
+            v-if="readonly"
+            v-show="!isFetching"
+            :value="formattedFoApprovalDate"
+            :label="$t('Payment Date')"
+            :filled="!readonly"
+            :borderless="readonly"
+            :readonly="readonly"
+            stack-label
+            :placeholder="readonly ? '-' : ''"
+            name="actual_payment_date"
+            autocomplete="off"
+            :dense="!readonly"
+          />
+          <q-input
+            v-else
+            v-show="!fetching"
+            v-model="actualPaymentDate"
+            :label="$t('Paid at')"
+            :filled="!readonly"
+            :borderless="readonly"
+            :readonly="readonly"
+            stack-label
+            :placeholder="readonly ? '-' : ''"
+            name="actual_payment_date"
+            autocomplete="off"
+            :dense="!readonly"
+            :rules="rules.actual_payment_date"
+            :error="!!errors.actual_payment_date"
+            :error-message="errors.actual_payment_date"
+            mask="##/##/####"
+            :hint="$utils.isDateValid(actualPaymentDate) ? undefined : $t('Valid format: DD/MM/YYYY')"
+          >
+            <template v-slot:append>
+              <q-icon v-if="!readonly" name="event" class="cursor-pointer">
+                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                  <q-date v-model="actualPaymentDate" minimal mask="DD/MM/YYYY">
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-date>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+        </div>
+
+
+      </div>
+
+    </q-card-section>
     <q-card-section>
       <p class="label-header">
         {{ $t('Payment Proof') }}
@@ -56,11 +115,11 @@
         v-show="canUpload"
         class="q-px-xl"
         color="primary"
-        icon="upload"
+        icon="send"
         :loading="isUploading"
         @click="onUpload"
       >
-        <span class="q-ml-xs">{{ $t('Upload') }}</span>
+        <span class="q-ml-sm">{{ $t('Submit') }}</span>
       </q-btn>
     </q-card-actions>
   </q-card>
@@ -92,6 +151,10 @@ export default {
     addable: {
       type: Boolean,
       default: true
+    },
+    showPaymentDate: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -106,17 +169,32 @@ export default {
       deletePaymentProofs: [],
       paymentProofRemark: '',
       canUpload: true,
+      actualPaymentDate: null,
       attachmentRules: {
         maxFileSize: 1024 * 1024 * 10,
         minDimension: 300,
         accept: 'image/png, image/jpeg, image/jpg, image/svg+xml, image/heic, image/heif'
-      }
+      },
+      rules: {
+        actual_payment_date: [
+          v => !v || (!!v && this.$utils.isDateValid(v)) || this.$t('{field} is invalid', { field: this.$t('Date') })
+        ],
+      },
+      errors: {}
     }
   },
   computed: {
     constant() {
       return this.$constant.setting_key
-    }
+    },
+    readonly() {
+      return !(this.uploadable || this.editable || this.addable)
+    },
+    formattedActualPaymentDate() {
+      if (this.readonly && this.actualPaymentDate) {
+        return date.formatDate(date.extractDate(this.actualPaymentDate, 'DD/MM/YYYY'), 'DD MMM YYYY')
+      }
+    },
   },
   watch: {
     invoice: {
@@ -125,6 +203,12 @@ export default {
       handler(n) {
         this.$nextTick(() => {
           if (n && n.id) {
+            if (n.actual_payment_date) {
+              this.actualPaymentDate = date.formatDate(n.actual_payment_date, 'DD/MM/YYYY')
+            } else {
+              this.actualPaymentDate = null
+            }
+
             this.canUpload = true
 
             if (this.editable) {
@@ -132,6 +216,8 @@ export default {
             } else {
               this.onRequest()
             }
+          } else {
+            this.actualPaymentDate = null
           }
         })
       }
@@ -184,10 +270,41 @@ export default {
       this.isFetching = false
       this.isLoading = false
     },
-    async onUpload(throws = false) {
-      const uploadingFile = this.paymentProofs.filter(v => !!v.file)
+    async onSubmit() {
+      const formEntry = {
+        actual_payment_date: null
+      }
 
-      if (!uploadingFile.length && !this.deletePaymentProofs.length) {
+      if (this.actualPaymentDate) {
+        formEntry.actual_payment_date = date.formatDate(date.extractDate(this.actualPaymentDate, 'DD/MM/YYYY'), 'YYYY-MM-DD')
+      } else {}
+
+      try {
+        const { data } = await this.$api.patch(`/v1/invoices/${this.invoice.id}`, formEntry);
+
+        if (data.status === 'success') {
+          return true
+        }
+      } catch (err) {
+        this.$q.notify(err);
+      }
+
+      return false
+    },
+    async onUpload(throws = false) {
+      const formEntry = {}
+
+      if (this.actualPaymentDate) {
+        formEntry.actual_payment_date = date.formatDate(date.extractDate(this.actualPaymentDate, 'DD/MM/YYYY'), 'YYYY-MM-DD')
+      }
+
+      const uploadingFile = this.paymentProofs.filter(v => !!v.file)
+      const alreadyHasPaymentProofs = this.paymentProofs.filter((v) => {
+
+        return !!v.id
+      }).length > 0
+
+      if (!uploadingFile.length && !this.deletePaymentProofs.length && !alreadyHasPaymentProofs) {
         this.$q.notify({
           type: 'negative',
           message: this.$t('Please add at least 1 photo to upload')
@@ -202,6 +319,12 @@ export default {
 
       if (this.isUploading) {
         return
+      }
+
+      const isSubmitted = await this.onSubmit()
+
+      if (!isSubmitted) {
+        return false
       }
 
       this.uploadingPaymentProofs = {}
@@ -225,7 +348,7 @@ export default {
         const hasUploaded = await this.onUploadItemIndex(-1)
 
         if (hasUploaded >= 0) {
-          this.$q.notify({ message: this.$t('Payment proofs successfully uploaded') })
+          this.$q.notify({ message: this.$t('Payment proofs successfully sent') })
         } else if (hasDeleted) {
           this.$q.notify({ message: this.$t('Payment proofs successfully updated') })
         }
@@ -434,6 +557,10 @@ export default {
       font-size: 0.9em;
       font-weight: 500;
       margin-bottom: 0;
+
+      &.label-actual-payment {
+        margin-bottom: 0.5rem;
+      }
     }
 
     .label-meta {

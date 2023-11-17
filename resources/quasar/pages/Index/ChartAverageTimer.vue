@@ -3,7 +3,7 @@
     class="chart-average-time-taken"
   >
     <div class="chart-header">
-      <div class="chart-title">{{ $t('Total Timer') }}</div>
+      <div class="chart-title">{{ $t('Paid Amount') }}</div>
       <div class="chart-description">{{ $t('Last {entity} days', { entity: 7 }) }}</div>
     </div>
     <div ref="chart" class="chart-wrapper" />

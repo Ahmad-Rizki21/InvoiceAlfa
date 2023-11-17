@@ -20,6 +20,8 @@ class Franchise extends BaseUser
         'password', 'locale', 'approval_date', 'fo_approval_date',
         'offering_letter_reference_number', 'fo_offering_letter_reference_number',
         'issuance_number', 'fo_issuance_number', 'status',
+        'transfer_to_virtual_account_bank_name', 'transfer_to_virtual_account_number',
+        'npwp',
     ];
 
     /**

@@ -16,6 +16,7 @@ const routes = [
       // { path: '', name: 'index', component: () => import('pages/Index.vue') },
       { path: 'users', name: 'users', component: () => import('pages/Users.vue') },
       { path: 'reports', name: 'reports', component: () => import('pages/Report.vue') },
+      { path: 'settings', name: 'settings', component: () => import('pages/Settings.vue') },
       { path: 'invoices', name: 'invoices', component: () => import('pages/Invoice.vue') },
       { path: 'invoices/create', name: 'invoices.create', component: () => import('pages/InvoiceShow.vue') },
       { path: 'invoices/:id([0-9]+)', name: 'invoices.show', component: () => import('pages/InvoiceShow.vue') },

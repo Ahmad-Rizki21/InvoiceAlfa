@@ -40,6 +40,29 @@
             <div class="invoice-recipient-row">
               <div class="invoice-recipient-key">
                 <div class="invoice-recipient-label">
+                  NPWP
+                </div>
+                <div class="invoice-recipient-colon">:</div>
+              </div>
+              <div class="invoice-recipient-value">
+                <template v-if="!isEditable">
+                  <span v-if="formEntry.customer_npwp">{{ formEntry.customer_npwp }}</span>
+                  <span v-else v-html="'&nbsp;'"></span>
+                </template>
+                <q-input
+                  v-else
+                  v-model="formEntry.customer_npwp"
+                  filled
+                  borderless
+                  name="customer_npwp"
+                  autocomplete="off"
+                  dense
+                />
+              </div>
+            </div>
+            <div class="invoice-recipient-row">
+              <div class="invoice-recipient-key">
+                <div class="invoice-recipient-label">
                   Nomor Invoice/Invoice Number
                 </div>
                 <div class="invoice-recipient-colon">:</div>
@@ -318,10 +341,39 @@
 
           <div class="invoice-payment">
             <div class="invoice-payment-left">
-              Pembayaran dapat ditransfer ke rekening:<br>
-              {{ templateSettings[$constant.setting_key.BankTransferName] }}<br>
-              A/C {{ templateSettings[$constant.setting_key.BankTransferAccountNumber] }}<br>
-              A/N {{ templateSettings[$constant.setting_key.BankTransferAccountName] }}
+              <q-btn-dropdown
+                v-if="isEditable"
+                class="btn-edit"
+                size="sm"
+                icon="edit"
+                flat
+                dense
+                color="primary"
+                rounded
+              >
+                <q-list>
+                  <q-item clickable v-close-popup @click="onTransferToTypeChange($constant.transfer_to_type.VirtualAccount)">
+                    {{ $t('Virtual Account') }}
+                  </q-item>
+                  <q-item clickable v-close-popup @click="onTransferToTypeChange($constant.transfer_to_type.BankTransfer)">
+                    {{ $t('Bank Transfer') }}
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+
+              <template v-if="formEntry.transfer_to_type == $constant.transfer_to_type.BankTransfer">
+                Pembayaran dapat ditransfer ke rekening:<br>
+                {{ templateSettings[$constant.setting_key.BankTransferName] }}<br>
+                A/C {{ templateSettings[$constant.setting_key.BankTransferAccountNumber] }}<br>
+                A/N {{ templateSettings[$constant.setting_key.BankTransferAccountName] }}
+              </template>
+              <template v-else-if="formEntry.transfer_to_type == $constant.transfer_to_type.VirtualAccount">
+                Pembayaran dapat ditransfer ke:<br>
+                <div class="virtual-account-detail">
+                  {{ customer.transfer_to_virtual_account_bank_name }} Virtual Account<br>
+                  {{ customer.transfer_to_virtual_account_number }}
+                </div>
+              </template>
             </div>
             <div class="invoice-payment-right">
               <div class="invoice-payment-right-row">
@@ -382,7 +434,7 @@
             <div class="invoice-note-row bold">
               <div class="invoice-note-row-split">
                 <div class="invoice-note-row-split-left">
-                  Term Of Payment
+                  {{ $t('Due date') }}
                 </div>
                 <div class="invoice-note-row-split-right">
                   <div class="invoice-due-at-wrapper">
@@ -449,8 +501,14 @@
 
           <div class="invoice-signature">
             <div class="invoice-signature-inner">
-              <div class="invoice-signature-date">
+              <div class="invoice-signature-date" :class="{ expand: !templateSettings[$constant.setting_key.SignatureImage] }">
                 Jakarta, {{ formattedPublishedAt }}
+              </div>
+              <div v-if="templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
+                <img :src="templateSettings[$constant.setting_key.SignatureImage]" class="signature">
+              </div>
+              <div v-if="templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
+                <img :src="templateSettings[$constant.setting_key.StampImage]" class="signature">
               </div>
               <div class="invoice-signature-person">
                 <div class="invoice-signature-person-name">
@@ -536,6 +594,12 @@ export default {
     },
     templateSettings: {
       type: [Object, Array],
+      default() {
+        return {}
+      }
+    },
+    customer: {
+      type: Object,
       default() {
         return {}
       }
@@ -784,6 +848,12 @@ export default {
         form.published_at = date.formatDate(form.published_at, 'DD/MM/YYYY')
       }
 
+
+
+      if (!form.transfer_to_type) {
+        form.transfer_to_type = this.$constant.transfer_to_type.BankTransfer
+      }
+
       if (this.parentDistributionCenterId) {
         form.distribution_center_id = this.parentDistributionCenterId
         this.defaultFormEntry.distribution_center_id = this.parentDistributionCenterId
@@ -986,6 +1056,9 @@ export default {
       }).onCancel(() => {
         this.isLoading = false
       })
+    },
+    onTransferToTypeChange(to) {
+      this.formEntry.transfer_to_type = to
     }
   }
 }

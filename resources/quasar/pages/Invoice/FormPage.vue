@@ -55,6 +55,18 @@
                 </div>
               </div>
 
+              <div class="row">
+                <div class="col-xs-12 col-md-3">
+                  <q-input
+                    v-show="!fetching && formEntry.actual_payment_date"
+                    :value="formEntry.actual_payment_date"
+                    :label="$t('Actual Payment Date')"
+                    borderless
+                    readonly
+                    :dense="!readonly"
+                  />
+                </div>
+              </div>
               <div
                 v-if="(formEntry.invoice_payment_proofs && formEntry.invoice_payment_proofs.length) || editable"
                 class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md"
@@ -370,6 +382,7 @@ export default {
       form.pending_review_updated_at = form.pending_review_updated_at ? date.formatDate(form.pending_review_updated_at, 'DD MMM YYYY HH:mm') : null
       form.paid_at = form.paid_at ? date.formatDate(form.paid_at, 'DD MMM YYYY HH:mm') : null
       form.rejected_at = form.rejected_at ? date.formatDate(form.rejected_at, 'DD MMM YYYY HH:mm') : null
+      form.actual_payment_date = form.actual_payment_date ? date.formatDate(form.actual_payment_date, 'DD MMM YYYY') : null
 
       if (form.invoice_payment_proofs) {
         form.invoice_payment_proofs = (form.invoice_payment_proofs || []).map(v => {

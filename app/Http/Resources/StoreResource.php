@@ -17,6 +17,8 @@ class StoreResource extends JsonResource
         return [
             'id' => (int) $this->id,
             'code' => (string) $this->code,
+            'npwp' => (string) $this->npwp,
+            'npwp_raw' => preg_replace('~[^\\d]~', '', (string) $this->npwp),
             'name' => (string) $this->name,
             'location' => $this->nullableString($this->location),
             'address' => $this->nullableString($this->address),

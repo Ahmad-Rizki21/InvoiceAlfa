@@ -46,6 +46,7 @@
   "closed": "closed",
   "CLOSED": "CLOSED",
   "Nope": "No",
+  "Unpaid {customer}": "Unpaid {customer}",
 
 
   "Edit": "Edit",

@@ -45,6 +45,7 @@
   "closed": "closed",
   "CLOSED": "CLOSED",
   "Nope": "Tidak",
+  "Unpaid {customer}": "Unpaid {customer}",
 
   "sla": "SLA",
   "Edit": "Edit",

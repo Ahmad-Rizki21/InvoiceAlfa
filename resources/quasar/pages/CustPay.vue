@@ -49,6 +49,7 @@
         <card-payment-detail
           v-if="entry.status != $constant.invoice_status.Paid"
           :invoice="entry"
+          :customer="customer"
         />
 
         <card-payment-proof
@@ -56,7 +57,8 @@
           :editable="isPaymentProofsEditable"
           :addable="entry.status != $constant.invoice_status.Paid"
           :uploadable="entry.status != $constant.invoice_status.Paid"
-          @uploaded="onRequest()"
+          show-payment-date
+          @uploaded="onPaymentProofUploaded"
         />
       </div>
 
@@ -98,6 +100,7 @@ export default {
   data() {
     return {
       entry: {},
+      customer: {},
       isFetching: true,
       isLoading: false,
       pageErrorCode: null
@@ -139,13 +142,18 @@ export default {
 
       const params = {
         table_pagination: { ...(props.pagination || {}) },
-        includes: 'invoiceServices|invoicePaymentProofs'
+        includes: 'invoiceServices|invoicePaymentProofs|distributionCenter|franchise'
       }
 
       try {
         const { data } = await this.$api.get(`/v1/invoices/${this.$route.params.id}`, { params })
 
         if (data.status === 'success') {
+          this.customer = data.data.invoice.distribution_center || data.data.invoice.franchise
+
+          data.data.invoice.distribution_center = null
+          data.data.invoice.franchise = null
+
           this.entry = data.data.invoice
 
           if (!this.entry) {
@@ -184,6 +192,9 @@ export default {
     },
     onGoBack() {
       this.$router.push('/')
+    },
+    onPaymentProofUploaded() {
+      this.onRequest()
     }
   }
 }

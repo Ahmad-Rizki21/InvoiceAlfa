@@ -3,6 +3,7 @@ const state = {
   sidebar: undefined,
   sidebarMiniVariant: false,
   dashboardCardMiniSummaryTimeTakenType: 'avg',
+  dashboardCardMiniSummaryUnpaidCustomer: null,
   storedSearches: {},
 };
 

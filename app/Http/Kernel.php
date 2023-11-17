@@ -66,5 +66,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'printing' => \App\Http\Middleware\Printing::class,
+        'log.http' => \App\Http\Middleware\CaptureHttp::class,
+        'log.query' => \App\Http\Middleware\CaptureQuery::class,
+        'export' => \App\Http\Middleware\AuthenticateExport::class,
     ];
 }

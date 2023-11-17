@@ -3,15 +3,36 @@
     class="card-payment-detail"
   >
     <q-card-section>
-      <p class="notice">
+      <p v-if="isTransferToVa" class="notice">
+        {{ $t('Payment can be transferred to following virtual account:') }}
+      </p>
+      <p v-else class="notice">
         {{ $t('Payment can be transferred to the following bank account:') }}
         <!-- {{ $t('Please make your payment promptly through the following account:') }} -->
       </p>
 
-      <div class="bank-detail">
-        <span>{{ settings[constant.BankTransferName] }}</span><br />
-        <span>A/C {{ settings[constant.BankTransferAccountNumber] }}</span><br />
-        <span>A/N {{ settings[constant.BankTransferAccountName] }}</span>
+      <div class="bank-detail" :class="{ 'va-detail': isTransferToVa }">
+        <template v-if="isTransferToVa">
+          <span class="bank-name">{{ customer.transfer_to_virtual_account_bank_name }} Virtual Account</span><br />
+          <span class="account-number">
+            {{ customer.transfer_to_virtual_account_number }}
+
+            <q-btn
+              size="sm"
+              flat
+              rounded
+              padding="sm"
+              icon="content_copy"
+              class="btn-copy"
+              @click="onAccountNumberCopy(customer.transfer_to_virtual_account_number)"
+            />
+          </span><br />
+        </template>
+        <template v-else>
+          <span>{{ settings[constant.BankTransferName] }}</span><br />
+          <span>A/C {{ settings[constant.BankTransferAccountNumber] }}</span><br />
+          <span>A/N {{ settings[constant.BankTransferAccountName] }}</span>
+        </template>
       </div>
     </q-card-section>
   </q-card>
@@ -29,7 +50,13 @@ export default {
         return {}
       }
     },
-    fetching: Boolean
+    fetching: Boolean,
+    customer: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
   },
   data() {
     return {
@@ -41,6 +68,10 @@ export default {
   computed: {
     constant() {
       return this.$constant.setting_key
+    },
+    isTransferToVa() {
+      return this.invoice.transfer_to_type == this.$constant.transfer_to_type.VirtualAccount &&
+        this.customer.transfer_to_virtual_account_bank_name && this.customer.transfer_to_virtual_account_number
     }
   },
   mounted() {
@@ -90,6 +121,10 @@ export default {
         decimal: '.',
         thousand: ',',
       }) || '-'
+    },
+    onAccountNumberCopy(num) {
+      this.$utils.copyToClipboard(num)
+      this.$q.notify({ message: this.$t('{entity} copied to clipboard', { entity: this.$t('Account number') }) })
     }
   }
 }
@@ -109,6 +144,30 @@ export default {
 
       span {
         line-height: 1.8;
+      }
+
+      &.va-detail {
+        text-align: center;
+        padding: 1rem;
+        border: 1px solid #ebebeb;
+        box-shadow: 0px 0px 8px rgba(148, 139, 139, 0.16);
+        border-radius: 0.3rem;
+
+        .bank-name {
+          color: #5d5d5d;
+        }
+
+        .account-number {
+          font-size: 1.5em;
+        }
+
+        .btn-copy {
+          margin-right: -2.5rem;
+
+          .q-icon {
+            color: #5d5d5d;
+          }
+        }
       }
     }
   }

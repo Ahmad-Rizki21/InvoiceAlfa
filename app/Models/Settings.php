@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\SettingKey;
 use App\Services\Database\Eloquent\Model;
 use Illuminate\Config\Repository;
+use Illuminate\Support\Facades\Storage;
 
 class Settings extends Model
 {
@@ -73,6 +74,13 @@ class Settings extends Model
             $data = new Repository();
 
             foreach (static::data() as $key => $value) {
+                if ($value && in_array($key, [
+                    SettingKey::SignatureImage->value,
+                    SettingKey::StampImage->value,
+                ])) {
+                    $value = Storage::disk('public')->url($value);
+                }
+
                 $data->set($key, $value);
             }
 

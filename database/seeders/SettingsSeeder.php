@@ -67,6 +67,14 @@ class SettingsSeeder extends Seeder
                 'key' => SettingKey::BankTransferAccountName->value,
                 'value' => 'PT.ARTACOMINDO JEJARING NUSA',
             ],
+            [
+                'key' => SettingKey::SignatureImage->value,
+                'value' => '',
+            ],
+            [
+                'key' => SettingKey::StampImage->value,
+                'value' => '',
+            ],
         ];
 
         foreach ($data as $value) {

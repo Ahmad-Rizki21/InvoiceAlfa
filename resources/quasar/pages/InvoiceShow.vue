@@ -237,6 +237,7 @@
                 :syncing.sync="isSyncing"
                 :editable="isEditable"
                 :template-settings="formTemplateSettings"
+                :customer="selectedCustomer"
                 @success="onSuccess"
                 @updated="onFormInvoiceUpdated"
               />
@@ -383,7 +384,8 @@ export default {
       formStores: [],
       customerToFind: 'distribution_center',
       isEditable: true,
-      printUrl: null
+      printUrl: null,
+      selectedCustomer: {}
     }
   },
   computed: {
@@ -451,15 +453,22 @@ export default {
 
       const params = {
         edit: 1,
-        includes: 'invoiceServices|invoicePaymentProofs'
+        includes: 'invoiceServices|invoicePaymentProofs|distributionCenter|franchise'
       }
 
       try {
         const { data } = await this.$api.get(`/v1/invoices/${this.$route.params.id}`, { params })
 
         if (data.status === 'success') {
+          const distributionCenter = data.data.invoice.distribution_center
+          const franchise = data.data.invoice.franchise
+
+          data.data.invoice.distribution_center = null
+          data.data.invoice.franchise = null
+
           this.formInvoice = data.data.invoice
           this.formReceipt = data.data.invoice
+          this.selectedCustomer = distributionCenter || franchise
           this.requestStores()
         }
       } catch (err) {
@@ -669,8 +678,11 @@ export default {
         customer_name: formInvoice.customer_name,
         customer_address: formInvoice.customer_address,
         receipt_remark: this.formReceipt.receipt_remark,
+        transfer_to_type: formInvoice.transfer_to_type,
         invoice_services: formInvoice.services || [],
       }
+
+      console.log(entry)
 
       const $formPage = this.$refs.formPage
 

@@ -28,8 +28,19 @@
 
       <q-btn
         v-if="$auth.can('create.invoice')"
+        color="secondary"
+        class="q-ml-sm q-btn-lg btn-page-invoices-export"
+        :loading="isExporting"
+        icon="system_update_alt"
+        @click="onFormEntryExport"
+      >
+        <span class="q-ml-sm">{{ $t('Export') }}</span>
+      </q-btn>
+
+      <q-btn
+        v-if="$auth.can('create.invoice')"
         color="primary"
-        class="q-btn-lg btn-page-invoices-create"
+        class="q-btn-lg btn-page-invoices-create q-ml-md"
         icon="add"
         @click="onFormEntryCreate"
       >
@@ -281,6 +292,8 @@
         @cancel="onAdapterPrinterCancel"
       />
     </q-dialog>
+
+    <a v-if="exportUrl" :href="exportUrl" download ref="exportHiddenLink" style="display: none;"> </a>
   </q-page>
 </template>
 
@@ -476,6 +489,7 @@ export default {
         'created_at'
       ],
       isLoading: false,
+      isExporting: false,
       isAdvancedSearchVisible: false,
       isFormEntryVisible: false,
       isFormEntryReadonly: false,
@@ -491,7 +505,8 @@ export default {
         rowsNumber: 0
       },
       search,
-      advancedSearch: search
+      advancedSearch: search,
+      exportUrl: null,
     }
   },
   async mounted() {
@@ -667,6 +682,98 @@ export default {
       }).onCancel(() => {
         this.isLoading = false
       })
+    },
+    async onFormEntryExport(props) {
+
+      if (this.isLoading || this.isExporting) {
+        return false;
+      }
+
+      if (!props) {
+        props = { pagination: this.pagination }
+      }
+
+      this.isLoading = true
+      this.isExporting = true
+
+      const params = {
+        table_pagination: { ...(props.pagination || {}) },
+        table_search: { ...this.search },
+        ext: props.ext || 'xlsx'
+      }
+
+      // if (params.table_search.created_at_range.value && params.table_search.created_at_range.value.to) {
+      //   params.table_search = {
+      //     ...params.table_search,
+      //     created_at_range: {
+      //       value: this.search.created_at_range.formattedValue
+      //     }
+      //   }
+      // }
+
+      // if (params.table_search.applicable_month.value) {
+      //   params.table_search.applicable_month = {
+      //     value: date.formatDate(params.table_search.applicable_month.value, 'YYYY-MM-15')
+      //   }
+      // }
+
+
+
+      // if (params.table_search.applicable_month.value) {
+      //   params.table_search.applicable_month = {
+      //     value: date.formatDate(params.table_search.applicable_month.value, 'YYYY-MM-15')
+      //   }
+      // }
+
+
+      const requestExport = async (i = 0) => {
+        const { data } = await this.$api.post('/v1/invoices/export', this.$api.defaults.paramsTransformer(params))
+
+        if (data.status === 'success') {
+          this.exportUrl = data.data.url
+          console.log(this.exportUrl)
+
+          await this.$utils.delay(100)
+
+          this.$refs.exportHiddenLink.click()
+
+          await this.$utils.delay(3000)
+        } else if (data.data.wait) {
+          await this.$utils.delay(15000)
+
+          return requestExport(i + 1)
+        }
+      }
+
+      try {
+        await requestExport()
+      } catch (err) {
+        this.$q.notify(err)
+      }
+
+
+      // const { access_token } = await this.$store.dispatch('auth/getToken')
+
+      // params.api_token = access_token
+
+      // this.$cookies.set('api_token', access_token, { expires: 1 })
+      // this.exportUrl = this.$api.getUri({
+      //   url: '/v1/export/tickets',
+      //   params: this.$api.defaults.paramsTransformer(params),
+      // })
+
+      // console.log(this.exportUrl)
+
+      // await this.$utils.delay(100)
+
+      // this.$refs.exportHiddenLink.click()
+
+      // await this.$utils.delay(2000)
+
+      this.isLoading = false;
+      this.isExporting = false;
+
+      this.exportUrl = null
     }
   }
 }

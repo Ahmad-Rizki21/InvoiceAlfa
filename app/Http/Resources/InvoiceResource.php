@@ -46,6 +46,9 @@ class InvoiceResource extends JsonResource
 
             'customer_name' => $this->nullableString($this->customer_name),
             'customer_address' => $this->nullableString($this->customer_address),
+            'customer_npwp' => $this->nullableString($this->customer_npwp),
+
+            'transfer_to_type' => (int) $this->transfer_to_type,
 
             'sub_total' => $this->nullableFloat($this->sub_total),
             'ppn_percentage' => (int) $this->ppn_percentage,
@@ -65,6 +68,7 @@ class InvoiceResource extends JsonResource
             'unpaid_updated_at' => $this->formatDateTime($this->unpaid_updated_at),
             'pending_review_updated_at' => $this->formatDateTime($this->pending_review_updated_at),
             'paid_at' => $this->formatDateTime($this->paid_at),
+            'actual_payment_date' => $this->formatDate($this->actual_payment_date),
             'rejected_at' => $this->formatDateTime($this->rejected_at),
             'reject_reason' => $this->nullableString($this->reject_reason),
 

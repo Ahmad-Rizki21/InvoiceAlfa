@@ -84,6 +84,10 @@ export default {
   }
 }
 
+.font-weight-bold {
+  font-weight: bold;
+}
+
 .main-layout {
   .q-page-container {
     box-sizing: border-box;

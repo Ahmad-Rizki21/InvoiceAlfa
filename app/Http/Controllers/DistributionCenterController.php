@@ -212,6 +212,9 @@ class DistributionCenterController extends Controller
             'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
             'issuance_number' => ['sometimes', 'nullable'],
             'fo_issuance_number' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_bank_name' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_number' => ['sometimes', 'nullable'],
+            'npwp' => ['sometimes', 'nullable'],
         ]);
 
         $input['password'] = bcrypt($input['password']);
@@ -238,7 +241,7 @@ class DistributionCenterController extends Controller
         }
 
         $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,' . $id . ',deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,' . $id . ',id,deleted_at,NULL'],
             'name' => ['sometimes', 'nullable', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule($entry)],
             'username' => ['sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule($entry)],
@@ -252,6 +255,9 @@ class DistributionCenterController extends Controller
             'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
             'issuance_number' => ['sometimes', 'nullable'],
             'fo_issuance_number' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_bank_name' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_number' => ['sometimes', 'nullable'],
+            'npwp' => ['sometimes', 'nullable'],
         ]);
 
         if ($request->password) {
@@ -277,6 +283,9 @@ class DistributionCenterController extends Controller
             'fo_offering_letter_reference_number' => $request->has('fo_offering_letter_reference_number') ? $request->fo_offering_letter_reference_number : $entry->fo_offering_letter_reference_number,
             'issuance_number' => $request->has('issuance_number') ? $request->issuance_number : $entry->issuance_number,
             'fo_issuance_number' => $request->has('fo_issuance_number') ? $request->fo_issuance_number : $entry->fo_issuance_number,
+            'transfer_to_virtual_account_bank_name' => $request->has('transfer_to_virtual_account_bank_name') ? $request->transfer_to_virtual_account_bank_name : $entry->transfer_to_virtual_account_bank_name,
+            'transfer_to_virtual_account_number' => $request->has('transfer_to_virtual_account_number') ? $request->transfer_to_virtual_account_number : $entry->transfer_to_virtual_account_number,
+            'npwp' => $request->has('npwp') ? $request->npwp : $entry->npwp,
         ]);
 
         $entry->save();

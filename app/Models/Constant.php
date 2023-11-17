@@ -17,6 +17,7 @@ class Constant
         \App\Enums\SettingKey::class,
         \App\Enums\InvoiceStatus::class,
         \App\Enums\ImportType::class,
+        \App\Enums\TransferToType::class,
     ];
 
     public static function all()

@@ -17,6 +17,8 @@ class DistributionCenterResource extends JsonResource
         return [
             'id' => (int) $this->id,
             'code' => (string) $this->code,
+            'npwp' => (string) $this->npwp,
+            'npwp_raw' => preg_replace('~[^\\d]~', '', (string) $this->npwp),
             'name' => (string) $this->name,
             'location' => $this->nullableString($this->location),
             'address' => $this->nullableString($this->address),
@@ -34,6 +36,8 @@ class DistributionCenterResource extends JsonResource
             'fo_offering_letter_reference_number' => $this->nullableString($this->fo_offering_letter_reference_number),
             'issuance_number' => $this->nullableString($this->issuance_number),
             'fo_issuance_number' => $this->nullableString($this->fo_issuance_number),
+            'transfer_to_virtual_account_bank_name' => $this->nullableString($this->transfer_to_virtual_account_bank_name),
+            'transfer_to_virtual_account_number' => $this->nullableString($this->transfer_to_virtual_account_number),
             'auth_type' => DistributionCenterAccessToken::tokenPrefix(),
             'created_at' => $this->formatDateTime($this->created_at),
             'updated_at' => $this->formatDateTime($this->updated_at),

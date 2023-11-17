@@ -453,7 +453,7 @@ export default {
       }
 
       .invoice {
-        width: 30%;
+        width: 27%;
       }
 
       .status {
@@ -476,7 +476,7 @@ export default {
         &-amount {
           font-weight: 900;
           font-size: 1.1em;
-          line-height: 1;
+          line-height: 1.5;
         }
       }
 

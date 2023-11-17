@@ -188,6 +188,7 @@ export default {
 
       .date {
         // width: 9%;
+        width: 17%;
         padding-left: 0;
       }
 

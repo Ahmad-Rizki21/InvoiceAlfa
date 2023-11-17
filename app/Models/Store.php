@@ -17,7 +17,7 @@ class Store extends Model
         'landline_number', 'phone_number', 'location', 'address',
         'approval_date', 'fo_approval_date', 'offering_letter_reference_number',
         'fo_offering_letter_reference_number', 'issuance_number', 'fo_issuance_number',
-        'status',
+        'status', 'npwp',
     ];
 
     protected $casts = [

@@ -134,6 +134,12 @@
               <div class="receipt-signature-name">
                 ({{ invoice.signatory_name }})
               </div>
+              <div v-if="templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
+                <img :src="templateSettings[$constant.setting_key.SignatureImage]" class="signature">
+              </div>
+              <div v-if="templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
+                <img :src="templateSettings[$constant.setting_key.StampImage]" class="signature">
+              </div>
               <div class="receipt-signature-role">
                 {{ invoice.signatory_position }}
               </div>

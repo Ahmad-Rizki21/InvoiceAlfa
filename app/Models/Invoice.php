@@ -26,7 +26,8 @@ class Invoice extends Model
         'due_at', 'published_at', 'note', 'receipt_remark',
         'signatory_name', 'signatory_position',
         'status', 'unpaid_updated_at', 'pending_review_updated_at', 'paid_at',
-        'rejected_at', 'reject_reason'
+        'rejected_at', 'reject_reason', 'transfer_to_type', 'customer_npwp',
+        'actual_payment_date',
     ];
 
     /**
@@ -36,6 +37,7 @@ class Invoice extends Model
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'actual_payment_date' => 'date',
         'due_at' => 'date',
         'password' => 'hashed',
         'approval_date' => 'date',
@@ -50,6 +52,11 @@ class Invoice extends Model
     public function distributionCenter()
     {
         return $this->belongsTo(DistributionCenter::class, 'distribution_center_id', 'id', 'distributionCenter');
+    }
+
+    public function franchise()
+    {
+        return $this->belongsTo(Franchise::class, 'franchise_id', 'id', 'franchise');
     }
 
     public function invoiceServices()

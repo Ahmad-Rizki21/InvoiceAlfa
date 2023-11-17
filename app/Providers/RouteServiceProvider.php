@@ -29,6 +29,10 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->routes(function () {
+            Route::prefix('/api/v1')
+                ->middleware(['export', 'log.query'])
+                ->group(base_path('routes/export.php'));
+
             Route::middleware('api')
                 ->prefix('/api/v1')
                 ->as('api.')

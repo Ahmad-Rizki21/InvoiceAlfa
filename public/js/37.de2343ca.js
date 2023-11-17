@@ -1,1 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([[37],{f0e9:function(n,e,t){"use strict";t.r(e);var u=function(){var n=this,e=n._self._c;return e("div",[e("router-view")],1)},a=[],l={name:"BlankLayout"},o=l,r=t("2877"),i=Object(r["a"])(o,u,a,!1,null,null,null);e["default"]=i.exports}}]);

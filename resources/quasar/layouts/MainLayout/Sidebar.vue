@@ -211,6 +211,13 @@ export default {
           permissions: ['manage.users', 'create.role', 'edit.role', 'delete.role', 'edit.permission']
         },
         {
+          title: this.$t('Settings'),
+          icon: 'settings',
+          to: '/settings',
+          class: 'sidebar-menu-item-settings',
+          permissions: ['manage.users']
+        },
+        {
           title: this.$t('Users'),
           icon: 'group',
           to: '/users',

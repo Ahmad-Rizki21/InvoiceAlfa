@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\SettingKey;
+use App\Enums\TransferToType;
+use App\Exports\InvoiceExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\InvoicePaymentProofResource;
 use Illuminate\Http\Request;
@@ -21,10 +23,14 @@ use App\Rules\ValidUsernameRule;
 use App\Services\Encrypter\Hashids;
 use App\Services\FileUpload\UploadedFile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelFactory;
 
 class InvoiceController extends Controller
 {
@@ -384,9 +390,15 @@ class InvoiceController extends Controller
             'fo_issuance_number' => $customer->fo_issuance_number,
             'customer_name' => $customer->name,
             'customer_address' => $customer->address,
+            'customer_npwp' => $customer->npwp,
 
             'ppn_percentage' => Settings::getValue(SettingKey::PpnPercentage),
             'stamp_duty' => Settings::getValue(SettingKey::StampDuty),
+
+            'transfer_to_type' => $customer->transfer_to_virtual_account_bank_name &&
+                                    $customer->transfer_to_virtual_account_number ?
+                                        TransferToType::VirtualAccount->value :
+                                        TransferToType::BankTransfer->value,
 
             'due_at' => $now->copy()->endOfMonth(),
             'note' => Settings::getValue(SettingKey::InvoiceNote),
@@ -398,6 +410,7 @@ class InvoiceController extends Controller
         $service = new InvoiceService();
         $service->id = $service->newUniqueId();
         $entry->setRelation('invoiceServices', collect([$service]));
+        $entry->load('distributionCenter', 'franchise');
 
         return $this->json([
             'status' => 'success',
@@ -436,6 +449,7 @@ class InvoiceController extends Controller
             'due_at' => ['required', 'date'],
             'note' => ['sometimes', 'nullable'],
             'receipt_remark' => ['sometimes', 'nullable'],
+            'transfer_to_type' => ['sometimes', 'nullable', new Enum(TransferToType::class)],
         ]);
 
         if ($request->distribution_center_id && $request->franchise_id) {
@@ -514,6 +528,7 @@ class InvoiceController extends Controller
             'fo_issuance_number' => $request->fo_issuance_number,
             'customer_name' => $customer->name,
             'customer_address' => $customer->address,
+            'customer_npwp' => $customer->npwp,
 
             'sub_total' => $subTotal,
             'ppn_percentage' => $ppnPercentage,
@@ -524,6 +539,7 @@ class InvoiceController extends Controller
             'due_at' => $request->due_at,
             'note' => $request->note,
             'receipt_remark' => $request->receipt_remark,
+            'transfer_to_type' => $request->transfer_to_type,
 
             'signatory_name' => Settings::getValue(SettingKey::SignatoryName),
             'signatory_position' => Settings::getValue(SettingKey::SignatoryPosition),
@@ -582,6 +598,8 @@ class InvoiceController extends Controller
             'receipt_remark' => ['sometimes', 'nullable'],
             'reject_reason' => ['sometimes', 'nullable'],
             'status' => ['sometimes', 'nullable', new Enum(InvoiceStatus::class)],
+            'transfer_to_type' => ['sometimes', 'nullable', new Enum(TransferToType::class)],
+            'actual_payment_date' => ['sometimes', 'nullable', 'date'],
         ]);
 
         $entry->fill([
@@ -600,6 +618,8 @@ class InvoiceController extends Controller
             'receipt_remark' => $request->filled('receipt_remark') ? $request->receipt_remark : $entry->receipt_remark,
             'ppn_percentage' => $request->filled('ppn_percentage') ? $request->ppn_percentage : $entry->ppn_percentage,
             'reject_reason' => $request->has('reject_reason') ? $request->reject_reason : $entry->reject_reason,
+            'transfer_to_type' => $request->filled('transfer_to_type') ? $request->transfer_to_type : $entry->transfer_to_type,
+            'actual_payment_date' => $request->has('actual_payment_date') ? $request->actual_payment_date : $entry->actual_payment_date,
         ]);
 
         if ($request->status) {
@@ -805,6 +825,73 @@ class InvoiceController extends Controller
             'message' => __(':entity successfully deleted', ['entity' => __('Invoice')]),
             'data' => new \stdClass(),
         ]);
+    }
+
+    public function requestExport(Request $request)
+    {
+        if (! in_array($request->ext, ['xlsx', 'pdf'])) {
+            return abort(400, __('Please specify extension to export'));
+        }
+
+        if (Cache::has(static::class . 'export')) {
+            return $this->json([
+                'status' => 'fail',
+                'data' => [
+                    'wait' => true,
+                ]
+            ], 202);
+        }
+
+        Cache::put(static::class . 'export', 1, 1 * 60);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Please wait while we are generating your export'),
+            'data' => [
+                'url' => route('invoices.export', array_merge($request->all(), [
+                    'api_token' => $request->bearerToken(),
+                ])),
+            ],
+        ]);
+    }
+
+    public function export(Request $request)
+    {
+        if (!in_array($request->ext, ['xlsx', 'pdf'])) {
+            return redirect('/invoices');
+        }
+
+        if (! Cache::has(static::class . 'export')) {
+            return redirect('/invoices');
+        }
+
+        $ext = $request->ext;
+
+        $date = $request->applicable_month ? Carbon::parse($request->applicable_month)->format('m-Y') : null;
+
+        if ($ext === 'xlsx') {
+            $ext = ExcelFactory::XLSX;
+        } else if ($ext === 'pdf') {
+            $ext = ExcelFactory::MPDF;
+        }
+
+        $export = new InvoiceExport($request->except(['ext', 'api_token']), $request->ext);
+        $exportFilename = 'invoices-' . $date . '' . (date('U')) . '.' . $request->ext;
+
+        Cache::put(static::class . 'export', 1, 1 * 60);
+        try {
+            if (intval($request->dl) === 1) {
+                return Excel::download($export, $exportFilename);
+            }
+
+            if (intval($request->inspect) === 1) {
+                return Excel::raw($export, $ext);
+            }
+
+            return Excel::download($export, $exportFilename);
+        } catch (\Throwable $e) {
+            Log::error($e);
+        }
     }
 
     public function revisions(Request $request, $id)

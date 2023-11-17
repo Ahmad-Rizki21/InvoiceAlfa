@@ -5,7 +5,7 @@
     </portal>
 
     <template v-if="$auth.authType === 'u'">
-
+      <content-dashboard />
     </template>
     <template v-else-if="['d', 'f'].includes($auth.authType)">
       <content-customer />
@@ -14,12 +14,14 @@
 </template>
 
 <script>
+import ContentDashboard from './Index/ContentDashboard'
 import ContentCustomer from './Index/ContentCustomer'
 
 export default {
   name: 'PageIndex',
   components: {
-    ContentCustomer
+    ContentCustomer,
+    ContentDashboard
   },
   meta() {
     return {

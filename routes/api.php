@@ -40,8 +40,10 @@ Route::group(['prefix' => '/auth', 'as' => 'auth.'], function () {
 });
 
 Route::group(['prefix' => '/data', 'middleware' => 'auth:api', 'as' => 'data.'], function () {
-    Route::get('/total-ticket-open', [ConsoleController::class, 'dataTotalTicketOpen'])->name('total-ticket-open');
-    Route::get('/total-ticket', [ConsoleController::class, 'dataTotalTicket'])->name('total-ticket');
+    Route::get('/total-unpaid-amount', [ConsoleController::class, 'dataTotalUnpaidAmount'])->name('total-unpaid-amount');
+    Route::get('/total-unpaid-customer', [ConsoleController::class, 'dataTotalUnpaidCustomer'])->name('total-unpaid-customer');
+    Route::get('/total-pending-review', [ConsoleController::class, 'dataTotalPendingReview'])->name('total-pending-review');
+    Route::get('/total-rejected', [ConsoleController::class, 'dataTotalRejected'])->name('total-rejected');
     Route::get('/working-clock/average', [ConsoleController::class, 'dataAverageWorkingClock'])->name('average-working-clock');
     Route::get('/working-clock/median', [ConsoleController::class, 'dataMedianWorkingClock'])->name('median-working-clock');
     Route::get('/total-users', [ConsoleController::class, 'dataTotalUsers'])->name('total-users');
@@ -102,6 +104,7 @@ Route::group(['prefix' => '/invoices', 'middleware' => 'auth:api', 'as' => 'invo
     Route::get('/', [InvoiceController::class, 'index'])->name('index');
     Route::get('/active', [InvoiceController::class, 'active'])->name('active');
     Route::get('/template', [InvoiceController::class, 'template'])->name('template');
+    Route::post('/export', [InvoiceController::class, 'requestExport'])->name('export.request');
     Route::post('/payment-proofs', [InvoiceController::class, 'uploadPaymentProofs'])->name('payment-proof');
     Route::get('/payment-proofs', [InvoiceController::class, 'getPaymentProofs']);
     Route::post('/payment-proofs/delete', [InvoiceController::class, 'destroyPaymentProofs'])->name('payment-proof.destroy');

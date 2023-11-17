@@ -452,6 +452,26 @@ wrapper {
   width: 50%;
   font-weight: 600;
   padding: 10px 5px 5px 15px;
+  position: relative;
+}
+
+.form-invoice .invoice-payment-left > .btn-edit {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+}
+.form-invoice .invoice-payment-left > .btn-edit .q-btn-dropdown__arrow {
+  display: none;
+}
+.form-invoice .invoice-payment-left .virtual-account-detail {
+  padding: 1mm 5mm;
+  line-height: 5mm;
+}
+
+@media print {
+  .form-invoice .invoice-payment-left>.btn-edit {
+    display: none;
+  }
 }
 
 .form-invoice .invoice-payment-right {
@@ -554,11 +574,15 @@ wrapper {
   font-size: 12px;
   padding-top: 6mm;
   padding-bottom: 10mm;
+  position: relative;
 }
 
 .form-invoice .invoice-signature-date {
   text-align: center;
   margin-left: 7mm;
+}
+
+.form-invoice .invoice-signature-date.expand {
   height: 25mm;
 }
 
@@ -572,6 +596,30 @@ wrapper {
   line-height: 1.7;
 }
 
+.form-invoice .person-signature {
+  height: 25mm;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  width: 50mm;
+  position: relative;
+  left: 30mm;
+}
+
+.form-invoice .signature-stamp {
+  position: absolute;
+  width: 39mm;
+  top: 8mm;
+  left: 8mm;
+  z-index: 3;
+}
+
 .form-invoice .q-stepper {
   background-color: transparent;
   -webkit-box-shadow: none;
@@ -581,6 +629,8 @@ wrapper {
 .form-invoice .invoice-table-unit-price.editable {
   padding-left: 10px;
 }
+
+
 
 
 /** Form Receipt **/
@@ -738,6 +788,7 @@ wrapper {
 .form-receipt .receipt-footer>.receipt-signature {
   width: 50%;
   text-align: center;
+  position: relative;
 }
 
 .form-receipt .receipt-footer>.receipt-signature>.receipt-signature-name {
@@ -745,6 +796,31 @@ wrapper {
   text-decoration: underline;
   margin-bottom: 5px;
 }
+
+.form-receipt .person-signature {
+  height: 25mm;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  width: 50mm;
+  position: relative;
+  left: 26mm;
+}
+
+.form-receipt .signature-stamp {
+  position: absolute;
+  width: 39mm;
+  top: 4mm;
+  left: 4mm;
+  z-index: 3;
+}
+
 
 
 
@@ -920,7 +996,7 @@ wrapper {
   text-decoration: underline;
   margin-bottom: 5px;
 }
-.example {
+/* .example {
    display: -ms-grid;
    display: grid;
    -webkit-transition: all .5s;
@@ -933,4 +1009,9 @@ wrapper {
    background: -webkit-gradient(linear, left top, left bottom, from(white), to(black));
    background: -o-linear-gradient(top, white, black);
    background: linear-gradient(to bottom, white, black);
+} */
+
+
+img.signature {
+  width: 100%;
 }
