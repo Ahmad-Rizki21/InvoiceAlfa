@@ -75,6 +75,12 @@ Route::group(['prefix' => '/distribution-centers', 'middleware' => 'auth:api', '
 
 Route::group(['prefix' => '/franchises', 'middleware' => 'auth:api', 'as' => 'franchise.'], function () {
     Route::get('/', [FranchiseController::class, 'index'])->name('index');
+    Route::post('/import/upload', [FranchiseController::class, 'importUpload'])->name('import.upload');
+    Route::post('/import/cache', [FranchiseController::class, 'importCache'])->name('import.cache');
+    Route::post('/import/process', [FranchiseController::class, 'importProcess'])->name('import.process');
+    Route::post('/import/fix', [FranchiseController::class, 'importFix'])->name('import.fix');
+    Route::get('/import/errors', [FranchiseController::class, 'importErrors'])->name('import.errors');
+    Route::delete('/import/row/{id}', [FranchiseController::class, 'importRowDelete'])->name('import.row.delete');
     Route::get('/{id}', [FranchiseController::class, 'show'])->name('show');
     Route::post('/', [FranchiseController::class, 'store'])->name('store');
     Route::patch('/{id}', [FranchiseController::class, 'update'])->name('update');

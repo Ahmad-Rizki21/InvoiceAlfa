@@ -36,7 +36,7 @@
                   <q-input
                     v-show="!fetching"
                     v-model="formEntry.code"
-                    :label="$t('Code')"
+                    :label="$t('Code') + '*'"
                     :filled="!readonly"
                     :borderless="readonly"
                     :readonly="readonly"
@@ -131,6 +131,47 @@
                     :rules="rules.address"
                     :error="!!errors.address"
                     :error-message="errors.address"
+                  />
+                </div>
+              </div>
+
+              <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-show="!fetching"
+                    v-model="formEntry.landline_number"
+                    :label="$t('Landline Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="landline_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.landline_number"
+                    :error="!!errors.landline_number"
+                    :error-message="errors.landline_number"
+                  />
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-show="!fetching"
+                    v-model="formEntry.phone_number"
+                    :label="$t('Phone Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="phone_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.phone_number"
+                    :error="!!errors.phone_number"
+                    :error-message="errors.phone_number"
                   />
                 </div>
               </div>
@@ -380,76 +421,76 @@
               </div>
 
               <div class="q-mb-md text-subtitle text-weight-bold">{{ $t('Virtual Account') }}</div>
-                <div class="row q-col-gutter-x-sm q-mb-md">
-                  <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
-                    <q-skeleton v-if="fetching" type="rect" />
-                    <q-input
-                      v-if="readonly"
-                      v-show="!fetching"
-                      :value="formEntry.transfer_to_virtual_account_bank_name"
-                      :label="$t('Bank Name')"
-                      :filled="!readonly"
-                      :borderless="readonly"
-                      :readonly="readonly"
-                      stack-label
-                      :placeholder="readonly ? '-' : ''"
-                      name="transfer_to_virtual_account_bank_name"
-                      autocomplete="off"
-                      :dense="!readonly"
-                    />
-                    <q-input
-                      v-else
-                      v-show="!fetching"
-                      v-model="formEntry.transfer_to_virtual_account_bank_name"
-                      :label="$t('Bank Name')"
-                      :filled="!readonly"
-                      :borderless="readonly"
-                      :readonly="readonly"
-                      stack-label
-                      :placeholder="readonly ? '-' : ''"
-                      name="transfer_to_virtual_account_bank_name"
-                      autocomplete="off"
-                      :dense="!readonly"
-                      :rules="rules.transfer_to_virtual_account_bank_name"
-                      :error="!!errors.transfer_to_virtual_account_bank_name"
-                      :error-message="errors.transfer_to_virtual_account_bank_name"
-                    />
-                  </div>
-                  <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
-                    <q-skeleton v-if="fetching" type="rect" />
-                    <q-input
-                      v-if="readonly"
-                      v-show="!fetching"
-                      :value="formEntry.transfer_to_virtual_account_number"
-                      :label="$t('Virtual Account Number')"
-                      :filled="!readonly"
-                      :borderless="readonly"
-                      :readonly="readonly"
-                      stack-label
-                      :placeholder="readonly ? '-' : ''"
-                      name="transfer_to_virtual_account_number"
-                      autocomplete="off"
-                      :dense="!readonly"
-                    />
-                    <q-input
-                      v-else
-                      v-show="!fetching"
-                      v-model="formEntry.transfer_to_virtual_account_number"
-                      :label="$t('Virtual Account Number')"
-                      :filled="!readonly"
-                      :borderless="readonly"
-                      :readonly="readonly"
-                      stack-label
-                      :placeholder="readonly ? '-' : ''"
-                      name="transfer_to_virtual_account_number"
-                      autocomplete="off"
-                      :dense="!readonly"
-                      :rules="rules.transfer_to_virtual_account_number"
-                      :error="!!errors.transfer_to_virtual_account_number"
-                      :error-message="errors.transfer_to_virtual_account_number"
-                    />
-                  </div>
+              <div class="row q-col-gutter-x-sm q-mb-md">
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.transfer_to_virtual_account_bank_name"
+                    :label="$t('Bank Name')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="transfer_to_virtual_account_bank_name"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.transfer_to_virtual_account_bank_name"
+                    :label="$t('Bank Name')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="transfer_to_virtual_account_bank_name"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.transfer_to_virtual_account_bank_name"
+                    :error="!!errors.transfer_to_virtual_account_bank_name"
+                    :error-message="errors.transfer_to_virtual_account_bank_name"
+                  />
                 </div>
+                <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-if="readonly"
+                    v-show="!fetching"
+                    :value="formEntry.transfer_to_virtual_account_number"
+                    :label="$t('Virtual Account Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="transfer_to_virtual_account_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                  />
+                  <q-input
+                    v-else
+                    v-show="!fetching"
+                    v-model="formEntry.transfer_to_virtual_account_number"
+                    :label="$t('Virtual Account Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="transfer_to_virtual_account_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.transfer_to_virtual_account_number"
+                    :error="!!errors.transfer_to_virtual_account_number"
+                    :error-message="errors.transfer_to_virtual_account_number"
+                  />
+                </div>
+              </div>
 
               <div class="q-mb-md text-subtitle text-weight-bold">{{ $t('Login Credentials') }}</div>
 
@@ -743,10 +784,9 @@
 
     <dialog-import
       v-model="isFormImportVisible"
+      v-bind="dialogImportProps"
       :status="currentImportStatus"
       :import-path="currentImportPath"
-      :import-type="$constant.import_type.Store"
-      :template-url="$q.lang.isoName === 'id' ? '/templates/template-toko.xlsx' : '/templates/store-template.xlsx'"
       :processing-page="currentImportProcessingPage"
       :has-error="currentImportHasError"
       @update:status="onFormImportUpdateStatus"
@@ -778,7 +818,9 @@ const DEFAULT_FORM_ENTRY = {
   password_confirmation: null,
   npwp: null,
   transfer_to_virtual_account_bank_name: null,
-  transfer_to_virtual_account_number: null
+  transfer_to_virtual_account_number: null,
+  landline_number: null,
+  phone_number: null
 }
 
 export default {
@@ -809,6 +851,9 @@ export default {
       rules: {
         name: [
           v => !!v || this.$t('{field} is required', { field: this.$t('Name') })
+        ],
+        code: [
+          v => !!v || this.$t('{field} is required', { field: this.$t('Code') })
         ],
         username: [
           v => !v || (!!v && v.length > 3) || this.$t('{field} must be at least {length} characters', { field: this.$t('Username'), length: 3 }),
@@ -866,6 +911,19 @@ export default {
     formattedFoApprovalDate() {
       if (this.readonly && this.formEntry.fo_approval_date) {
         return date.formatDate(date.extractDate(this.formEntry.fo_approval_date, 'DD/MM/YYYY'), 'DD MMM YYYY')
+      }
+    },
+    dialogImportProps() {
+      if (this.childTab === 'franchise') {
+        return {
+          importType: this.$constant.import_type.Franchise,
+          template: this.$q.lang.isoName === 'id' ? '/templates/template-franchise.xlsx' : '/templates/franchise-template.xlsx'
+        }
+      }
+
+      return {
+        importType: this.$constant.import_type.Store,
+        templateUrl: this.$q.lang.isoName === 'id' ? '/templates/template-toko.xlsx' : '/templates/store-template.xlsx'
       }
     }
   },
@@ -983,6 +1041,10 @@ export default {
 
       if (entry.fo_approval_date) {
         entry.fo_approval_date = date.formatDate(date.extractDate(entry.fo_approval_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
+      }
+
+      if (entry.npwp) {
+        entry.npwp = String(entry.npwp).replace(/[^\d]/g, '')
       }
 
       this.isLoading = true;

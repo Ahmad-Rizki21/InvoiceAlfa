@@ -540,3 +540,16 @@ if (! function_exists('terbilang')) {
         return $result ? ($result . ' rupiah') : '';
     }
 }
+
+if (! function_exists('format_npwp')) {
+    function format_npwp($npwp) {
+        $npwp = preg_replace('/\D/', '', (string) $npwp);
+        $npwp = str_pad($npwp, 15, '0', STR_PAD_LEFT);
+        return substr($npwp, 0, 2) . '.' .
+                substr($npwp, 2, 3) . '.' .
+                substr($npwp, 5, 3) . '.' .
+                substr($npwp, 8, 1) . '-' .
+                substr($npwp, 9, 3) . '.' .
+                substr($npwp, 12, 3);
+    }
+}

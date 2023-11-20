@@ -336,6 +336,16 @@ export default {
           sortable: true
         },
         {
+          name: 'npwp',
+          field: 'npwp',
+          format: (v, row) => row.npwp_formatted,
+          label: this.$t('NPWP'),
+          headerClasses: 'table-header-npwp',
+          classes: 'table-cell-npwp',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'location',
           field: 'location',
           label: this.$t('Location'),
@@ -350,6 +360,24 @@ export default {
           label: this.$t('Address'),
           headerClasses: 'table-header-address',
           classes: 'table-cell-address',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'landline_number',
+          field: 'landline_number',
+          label: this.$t('Landline Number'),
+          headerClasses: 'table-header-landline_number',
+          classes: 'table-cell-landline_number',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'phone_number',
+          field: 'phone_number',
+          label: this.$t('Phone Number'),
+          headerClasses: 'table-header-phone_number',
+          classes: 'table-cell-phone_number',
           align: 'left',
           sortable: true
         },
@@ -394,7 +422,10 @@ export default {
         'id',
         'code',
         'name',
+        'npwp',
         'location',
+        'landline_number',
+        'phone_number',
         'email',
         'username',
         'created_at'

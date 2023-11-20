@@ -173,7 +173,7 @@
 
 <script>
 import { date } from 'quasar'
-import FormEntry from './FormEntry'
+import { mapGetters } from 'vuex'
 import FormLoginCredentials from './FormLoginCredentials'
 import FormPassword from './FormPassword'
 import datatableMixins from 'src/mixins/datatable'
@@ -237,11 +237,57 @@ export default {
           sortable: true
         },
         {
+          name: 'npwp',
+          field: 'npwp',
+          format: (v, row) => row.npwp_formatted,
+          label: this.$t('NPWP'),
+          headerClasses: 'table-header-npwp',
+          classes: 'table-cell-npwp',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'location',
           field: 'location',
           label: this.$t('Location'),
           headerClasses: 'table-header-location',
           classes: 'table-cell-location',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'landline_number',
+          field: 'landline_number',
+          label: this.$t('Landline Number'),
+          headerClasses: 'table-header-landline_number',
+          classes: 'table-cell-landline_number',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'phone_number',
+          field: 'phone_number',
+          label: this.$t('Phone Number'),
+          headerClasses: 'table-header-phone_number',
+          classes: 'table-cell-phone_number',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'email',
+          field: 'email',
+          label: this.$t('Email'),
+          headerClasses: 'table-header-email',
+          classes: 'table-cell-email',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'username',
+          field: 'username',
+          label: this.$t('Username'),
+          headerClasses: 'table-header-username',
+          classes: 'table-cell-username',
           align: 'left',
           sortable: true
         },
@@ -266,9 +312,14 @@ export default {
       ],
       visibleColumns: [
         'id',
-        // 'code',
-        'location',
+        'code',
         'name',
+        // 'npwp',
+        'location',
+        // 'landline_number',
+        // 'phone_number',
+        // 'email',
+        // 'username',
         'created_at'
       ],
       isLoading: false,
@@ -277,6 +328,7 @@ export default {
       isFormEntryReadonly: false,
       isFormPasswordVisible: false,
       isFormLoginCredentialsVisible: false,
+      isFormImportVisible: false,
       formEntry: {},
       formPassword: {},
       pagination: {
@@ -298,6 +350,14 @@ export default {
     // if (!this.$store.getters['tourGuide/finishedGroups'].franchises) {
     //   this.$tourGuide.open('franchises')
     // }
+  },
+  computed: {
+    ...mapGetters({
+      'currentImportStatus': 'imports/status',
+      'currentImportPath': 'imports/importPath',
+      'currentImportProcessingPage': 'imports/processingPage',
+      'currentImportHasError': 'imports/hasError',
+    })
   },
   methods: {
     async onRequest(props) {

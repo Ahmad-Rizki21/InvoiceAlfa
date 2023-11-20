@@ -18,7 +18,7 @@ class DistributionCenterResource extends JsonResource
             'id' => (int) $this->id,
             'code' => (string) $this->code,
             'npwp' => (string) $this->npwp,
-            'npwp_raw' => preg_replace('~[^\\d]~', '', (string) $this->npwp),
+            'npwp_formatted' =>  $this->npwp ? format_npwp((string) $this->npwp) : null,
             'name' => (string) $this->name,
             'location' => $this->nullableString($this->location),
             'address' => $this->nullableString($this->address),

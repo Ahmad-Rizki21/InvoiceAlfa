@@ -84,7 +84,7 @@ export default {
       if (this.$route.query.customer_id) {
         this.$router.replace(`/customers/${this.$route.query.customer_id}`)
       } else {
-        this.$router.push(`/distribution-centers/${entry.id}`)
+        this.$router.replace(`/distribution-centers/${entry.id}`)
       }
     },
   }

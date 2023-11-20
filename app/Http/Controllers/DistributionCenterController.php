@@ -197,7 +197,7 @@ class DistributionCenterController extends Controller
         // $this->authorize('create.distribution_center');
 
         $input = $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id'],
             'name' => ['required', 'max:191'],
             'email' => ['bail', 'required', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -241,7 +241,7 @@ class DistributionCenterController extends Controller
         }
 
         $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,' . $id . ',id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,' . $id . ',id'],
             'name' => ['sometimes', 'nullable', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule($entry)],
             'username' => ['sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule($entry)],
@@ -363,7 +363,7 @@ class DistributionCenterController extends Controller
         $entries = ImportCache::where('import_path', $importPath)->paginate($limit, ['*'], 'page', $page);
 
         $rules = [
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id'],
             'name' => ['required', 'max:191'],
             'email' => ['bail', 'required', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -455,7 +455,7 @@ class DistributionCenterController extends Controller
         $importPath = $request->import_path;
 
         $rules = [
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id'],
             'name' => ['required', 'max:191'],
             'email' => ['bail', 'required', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],

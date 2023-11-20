@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ImportType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Franchise;
 use App\Http\Resources\FranchiseResource;
+use App\Imports\ImportCacheImport;
 use App\Models\DistributionCenter;
+use App\Models\ImportCache;
 use App\Rules\UniqueEmailRule;
 use App\Rules\UniqueUsernameRule;
 use App\Rules\ValidUsernameRule;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FranchiseController extends Controller
 {
@@ -192,7 +198,7 @@ class FranchiseController extends Controller
 
         $input = $request->validate([
             'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -242,7 +248,7 @@ class FranchiseController extends Controller
         }
 
         $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,' . $id . ',id,deleted_at,NULL'],
+            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,' . $id . ',id'],
             'name' => ['sometimes', 'nullable', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule($entry)],
             'username' => ['sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule($entry)],
@@ -300,6 +306,246 @@ class FranchiseController extends Controller
                 'franchise' => new FranchiseResource($entry),
             ],
         ]);
+    }
+
+
+    public function importUpload(Request $request)
+    {
+        // $this->authorize('manage.distribution_center');
+
+        $request->validate([
+            'file' => ['bail', 'required', 'file', 'mimes:xls,xlsx', 'max:' . (1024 * 500)],
+        ]);
+
+        $importPath = ImportCacheImport::uploadFile($request->file('file'));
+
+        return $this->json([
+            'status' => 'success',
+            'data' => [
+                'import_path' => $importPath,
+            ],
+        ]);
+    }
+
+    public function importCache(Request $request)
+    {
+        $importPath = $request->import_path;
+        // $this->authorize('manage.distribution_center');
+
+        Excel::import(new ImportCacheImport(ImportType::DistributionCenter, $importPath), ImportCacheImport::getUploadedFile($importPath));
+
+        return $this->json([
+            'status' => 'success',
+            'data' => [
+                'import_path' => $importPath,
+            ],
+        ]);
+    }
+
+    public function importProcess(Request $request)
+    {
+        $importPath = $request->import_path;
+        // $this->authorize('manage.distribution_center');
+
+        $limit = 50;
+        $page = $request->page ?: 1;
+        $entries = ImportCache::where('import_path', $importPath)->paginate($limit, ['*'], 'page', $page);
+
+        $rules = [
+            'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
+            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
+            'name' => ['required', 'max:191'],
+            'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
+            'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
+            // 'password' => ['required', 'min:6', 'confirmed'],
+            'landline_number' => ['sometimes', 'nullable'],
+            'phone_number' => ['sometimes', 'nullable'],
+            'location' => ['sometimes', 'nullable'],
+            'address' => ['sometimes', 'nullable'],
+            'approval_date' => ['sometimes', 'nullable', 'date'],
+            'fo_approval_date' => ['sometimes', 'nullable', 'date'],
+            'offering_letter_reference_number' => ['sometimes', 'nullable'],
+            'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
+            'issuance_number' => ['sometimes', 'nullable'],
+            'fo_issuance_number' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_bank_name' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_number' => ['sometimes', 'nullable'],
+            'npwp' => ['sometimes', 'nullable'],
+        ];
+        $deletingIds = [];
+        $hasError = false;
+
+        foreach ($entries as $entry) {
+            $content = $entry->content ?: [];
+
+            $content = [
+                'name' => $content[0] ?? null,
+                'code' => $content[1] ?? null,
+                'location' => $content[2] ?? null,
+                'address' => $content[3] ?? null,
+                'approval_date' => $content[4] ?? null,
+                'fo_approval_date' => $content[5] ?? null,
+                'offering_letter_reference_number' => $content[6] ?? null,
+                'fo_offering_letter_reference_number' => $content[7] ?? null,
+                'issuance_number' => $content[8] ?? null,
+                'fo_issuance_number' => $content[9] ?? null,
+                'email' => $content[10] ?? null,
+                'username' => $content[11] ?? null,
+                'password' => $content[12] ?? $content[1] ?? null,
+                'landline_number' => $content[13] ?? null,
+                'phone_number' => $content[14] ?? null,
+            ];
+
+            $validator = Validator::make($content, $rules);
+            $errors = [];
+
+            if ($validator->fails()) {
+                $errors = $validator->errors()->getMessages();
+                $entry->content = $content;
+                $entry->errors = $errors;
+                $entry->save();
+                $hasError = true;
+            } else {
+                $deletingIds[] = $entry->id;
+
+                if (isset($content['approval_date']) && !empty($content['approval_date'])) {
+                    $content['approval_date'] = Carbon::createFromFormat('d/m/Y', $content['approval_date']);
+                }
+                if (isset($content['approval_date']) && !empty($content['approval_date'])) {
+                    $content['fo_approval_date'] = Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']);
+                }
+                if (isset($content['password']) && !empty($content['password'])) {
+                    $content['password'] = bcrypt($content['password']);
+                }
+                Franchise::create($content);
+            }
+        }
+
+        if (count($deletingIds)) {
+            ImportCache::whereIn('id', $deletingIds)->delete();
+        }
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Ok'),
+            'data' => [
+                'import_path' => $importPath,
+                'has_error' => $hasError,
+            ],
+            'meta' => [
+                'searches' => '',
+                'total' => $entries->total(),
+                'sorts' => '',
+                'limit' => $limit,
+                'page' => $page,
+                'has_more_page' => $entries->hasMorePages(),
+            ],
+        ]);
+    }
+
+    public function importFix(Request $request)
+    {
+        $importPath = $request->import_path;
+
+        $rules = [
+            'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
+            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
+            'name' => ['required', 'max:191'],
+            'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
+            'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
+            // 'password' => ['required', 'min:6', 'confirmed'],
+            'landline_number' => ['sometimes', 'nullable'],
+            'phone_number' => ['sometimes', 'nullable'],
+            'location' => ['sometimes', 'nullable'],
+            'address' => ['sometimes', 'nullable'],
+            'approval_date' => ['sometimes', 'nullable', 'date'],
+            'fo_approval_date' => ['sometimes', 'nullable', 'date'],
+            'offering_letter_reference_number' => ['sometimes', 'nullable'],
+            'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
+            'issuance_number' => ['sometimes', 'nullable'],
+            'fo_issuance_number' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_bank_name' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_number' => ['sometimes', 'nullable'],
+            'npwp' => ['sometimes', 'nullable'],
+        ];
+
+
+        $deletingIds = [];
+        $hasError = false;
+
+        foreach ($request->import_cache as $data) {
+            $entry = ImportCache::findOrFail($data['id']);
+
+            $validator = Validator::make($data['content'], $rules);
+            $errors = [];
+
+            if ($validator->fails()) {
+                $errors = $validator->errors()->getMessages();
+                $entry->content = $data['content'];
+                $entry->errors = $errors;
+                $entry->save();
+                $hasError = true;
+            } else {
+                $deletingIds[] = $entry->id;
+                $content = $data['content'];
+
+                if (isset($content['approval_date']) && !empty($content['approval_date'])) {
+                    $content['approval_date'] = Carbon::createFromFormat('d/m/Y', $content['approval_date']);
+                }
+                if (isset($content['fo_approval_date']) && !empty($content['fo_approval_date'])) {
+                    $content['fo_approval_date'] = Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']);
+                }
+                if (isset($content['password']) && !empty($content['password'])) {
+                    $content['password'] = bcrypt($content['password']);
+                }
+                DistributionCenter::create($content);
+            }
+        }
+
+        if (count($deletingIds)) {
+            ImportCache::whereIn('id', $deletingIds)->delete();
+        }
+
+        return $this->json([
+            'status' => $hasError ? 'fail' : 'success',
+            'message' => __('Ok'),
+        ]);
+    }
+
+    public function importErrors(Request $request)
+    {
+        $urlQuery = $this->urlQuery($request);
+        $searches = $urlQuery->searches();
+        $limit = $urlQuery->limit();
+        $sorts = $urlQuery->sorts();
+        $page = $urlQuery->page();
+        $importPath = $request->import_path;
+        // $this->authorize('manage.distribution_center');
+
+        $entries = ImportCache::where('import_path', $importPath)->whereNotNull('errors')->paginate($limit, ['*'], 'page', $page);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Ok'),
+            'data' => [
+                'import_cache' => $entries->items(),
+            ],
+            'meta' => [
+                'searches' => '',
+                'total' => $entries->total(),
+                'sorts' => '',
+                'limit' => $limit,
+                'page' => $page,
+                'has_more_page' => $entries->hasMorePages(),
+            ],
+        ]);
+    }
+
+    public function importRowDelete(Request $request, $id)
+    {
+        ImportCache::findOrFail($id)->delete();
+
+        return $this->json([]);
     }
 
     public function destroy($id)
