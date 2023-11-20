@@ -68,7 +68,7 @@
                 </div>
               </div>
               <div
-                v-if="(formEntry.invoice_payment_proofs && formEntry.invoice_payment_proofs.length) || editable"
+                v-if="((formEntry.invoice_payment_proofs && formEntry.invoice_payment_proofs.length) || editable) && ! (formEntry.status == $constant.invoice_status.Draft || formEntry.status == $constant.invoice_status.Unpaid)"
                 class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md"
               >
                 <div class="col-xs-12">

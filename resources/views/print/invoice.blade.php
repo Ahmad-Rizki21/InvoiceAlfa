@@ -206,6 +206,23 @@
         <div class="invoice-signature">
           <div class="invoice-signature-inner">
             <div class="invoice-signature-date"> Jakarta, {{ $invoice->published_at?->format('d-F-Y') }} </div>
+
+            @if ($signatureImage ?? '')
+            <div class="person-signature">
+              <img src="{{ $signatureImage }}" class="signature">
+            </div>
+            @endif
+            @if ($stampImage ?? '')
+            <div class="signature-stamp">
+              <img src="{{ $stampImage }}" class="signature">
+            </div>
+            @endif
+            @if ($showStampDuty ?? false)
+            <div class="signature-stamp-duty">
+              <img src="/img/emtr.png" class="signature">
+            </div>
+            @endif
+
             <div class="invoice-signature-person">
               <div class="invoice-signature-person-name"> ({{ $signatoryName }}) </div>
               <div class="invoice-signature-person-role"> {{ $signatoryPosition }} </div>
@@ -273,7 +290,26 @@
           </div>
         </div>
         <div class="receipt-date">
-          <div class="receipt-date-inner"> Jakarta, {{ $invoice->published_at?->format('d-F-Y') }} </div>
+          <div class="receipt-date-inner">
+            Jakarta, {{ $invoice->published_at?->format('d-F-Y') }}
+
+            @if ($signatureImage ?? '')
+            <div class="person-signature">
+              <img src="{{ $signatureImage }}" class="signature">
+            </div>
+            @endif
+            @if ($stampImage ?? '')
+            <div class="signature-stamp">
+              <img src="{{ $stampImage }}" class="signature">
+            </div>
+            @endif
+            @if ($showStampDuty ?? false)
+            <div class="signature-stamp-duty">
+              <img src="/img/emtr.png" class="signature">
+            </div>
+            @endif
+
+          </div>
         </div>
         <div class="receipt-footer">
           <div class="receipt-owner">
@@ -281,6 +317,7 @@
             <div class="receipt-owner-address"> Menara Palma Lt. 12, Jl. HR. Rasuna Said Blok X2 Kav.6-Jakarta 12950 </div>
             <div class="receipt-owner-contact"> Telp: 021-293911111, 894 5212, 894 4821 </div>
           </div>
+
           <div class="receipt-signature">
             <div class="receipt-signature-name"> ({{ $signatoryName }}) </div>
             <div class="receipt-signature-role"> {{ $signatoryPosition }} </div>

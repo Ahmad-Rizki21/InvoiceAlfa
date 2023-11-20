@@ -188,6 +188,24 @@ export default {
           sortable: true
         },
         {
+          name: 'landline_number',
+          field: 'landline_number',
+          label: this.$t('Landline Number'),
+          headerClasses: 'table-header-landline_number',
+          classes: 'table-cell-landline_number',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'phone_number',
+          field: 'phone_number',
+          label: this.$t('Phone Number'),
+          headerClasses: 'table-header-phone_number',
+          classes: 'table-cell-phone_number',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'created_at',
           field: 'created_at',
           label: this.$t('Created At'),
@@ -208,9 +226,14 @@ export default {
       ],
       visibleColumns: [
         'id',
-        // 'code',
-        'location',
+        'code',
         'name',
+        // 'npwp',
+        'location',
+        // 'landline_number',
+        // 'phone_number',
+        // 'email',
+        // 'username',
         'created_at'
       ],
       isLoading: false,

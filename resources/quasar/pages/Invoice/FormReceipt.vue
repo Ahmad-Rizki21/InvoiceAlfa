@@ -114,6 +114,17 @@
           <div class="receipt-date">
             <div class="receipt-date-inner">
               Jakarta, {{ formattedPublishedAt }}
+
+              <div v-if="showSignatures && templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
+                <img :src="templateSettings[$constant.setting_key.SignatureImage]" class="signature">
+              </div>
+              <div v-if="showSignatures && templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
+                <img :src="templateSettings[$constant.setting_key.StampImage]" class="signature">
+              </div>
+              <div v-if="showSignatures && formEntry.total >= 5000000" class="signature-stamp-duty">
+                <img src="/img/emtr.png" class="signature">
+              </div>
+
             </div>
           </div>
 
@@ -133,12 +144,6 @@
             <div class="receipt-signature">
               <div class="receipt-signature-name">
                 ({{ invoice.signatory_name }})
-              </div>
-              <div v-if="templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
-                <img :src="templateSettings[$constant.setting_key.SignatureImage]" class="signature">
-              </div>
-              <div v-if="templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
-                <img :src="templateSettings[$constant.setting_key.StampImage]" class="signature">
               </div>
               <div class="receipt-signature-role">
                 {{ invoice.signatory_position }}
@@ -187,6 +192,10 @@ export default {
       default() {
         return {}
       }
+    },
+    showSignatures: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

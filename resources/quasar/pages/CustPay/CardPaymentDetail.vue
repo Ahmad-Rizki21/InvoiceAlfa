@@ -29,9 +29,21 @@
           </span><br />
         </template>
         <template v-else>
-          <span>{{ settings[constant.BankTransferName] }}</span><br />
-          <span>A/C {{ settings[constant.BankTransferAccountNumber] }}</span><br />
-          <span>A/N {{ settings[constant.BankTransferAccountName] }}</span>
+          <span class="bank-name">{{ settings[constant.BankTransferName] }}</span><br />
+          <span class="account-number">
+            {{ settings[constant.BankTransferAccountNumber] }}
+
+            <q-btn
+              size="sm"
+              flat
+              rounded
+              padding="sm"
+              icon="content_copy"
+              class="btn-copy"
+              @click="onAccountNumberCopy(settings[constant.BankTransferAccountNumber])"
+            />
+          </span><br />
+          <span clas="account-name">A/N {{ settings[constant.BankTransferAccountName] }}</span>
         </template>
       </div>
     </q-card-section>
@@ -141,32 +153,29 @@ export default {
 
     .bank-detail {
       font-weight: 500;
+      text-align: center;
+      padding: 1rem;
+      border: 1px solid #ebebeb;
+      box-shadow: 0px 0px 8px rgba(148, 139, 139, 0.16);
+      border-radius: 0.3rem;
 
       span {
         line-height: 1.8;
       }
 
-      &.va-detail {
-        text-align: center;
-        padding: 1rem;
-        border: 1px solid #ebebeb;
-        box-shadow: 0px 0px 8px rgba(148, 139, 139, 0.16);
-        border-radius: 0.3rem;
+      .bank-name {
+        color: #5d5d5d;
+      }
 
-        .bank-name {
+      .account-number {
+        font-size: 1.5em;
+      }
+
+      .btn-copy {
+        margin-right: -2.5rem;
+
+        .q-icon {
           color: #5d5d5d;
-        }
-
-        .account-number {
-          font-size: 1.5em;
-        }
-
-        .btn-copy {
-          margin-right: -2.5rem;
-
-          .q-icon {
-            color: #5d5d5d;
-          }
         }
       }
     }

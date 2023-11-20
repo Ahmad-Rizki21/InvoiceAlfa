@@ -197,7 +197,7 @@ class DistributionCenterController extends Controller
         // $this->authorize('create.distribution_center');
 
         $input = $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . DistributionCenter::class . ',code,NULL,id'],
+            'code' => ['required', 'unique:' . DistributionCenter::class . ',code,NULL,id'],
             'name' => ['required', 'max:191'],
             'email' => ['bail', 'required', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -378,6 +378,8 @@ class DistributionCenterController extends Controller
             'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
             'issuance_number' => ['sometimes', 'nullable'],
             'fo_issuance_number' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_bank_name' => ['sometimes', 'nullable'],
+            'transfer_to_virtual_account_number' => ['sometimes', 'nullable'],
         ];
         $deletingIds = [];
         $hasError = false;
@@ -388,19 +390,22 @@ class DistributionCenterController extends Controller
             $content = [
                 'name' => $content[0] ?? null,
                 'code' => $content[1] ?? null,
-                'location' => $content[2] ?? null,
-                'address' => $content[3] ?? null,
-                'approval_date' => $content[4] ?? null,
-                'fo_approval_date' => $content[5] ?? null,
-                'offering_letter_reference_number' => $content[6] ?? null,
-                'fo_offering_letter_reference_number' => $content[7] ?? null,
-                'issuance_number' => $content[8] ?? null,
-                'fo_issuance_number' => $content[9] ?? null,
-                'email' => $content[10] ?? null,
-                'username' => $content[11] ?? null,
-                'password' => $content[12] ?? $content[1] ?? null,
-                'landline_number' => $content[13] ?? null,
-                'phone_number' => $content[14] ?? null,
+                'npwp' => $content[2] ?? null,
+                'location' => $content[3] ?? null,
+                'address' => $content[4] ?? null,
+                'landline_number' => $content[5] ?? null,
+                'phone_number' => $content[6] ?? null,
+                'approval_date' => $content[7] ?? null,
+                'fo_approval_date' => $content[8] ?? null,
+                'offering_letter_reference_number' => $content[9] ?? null,
+                'fo_offering_letter_reference_number' => $content[10] ?? null,
+                'issuance_number' => $content[11] ?? null,
+                'fo_issuance_number' => $content[12] ?? null,
+                'transfer_to_virtual_account_bank_name' => $content[13] ?? null,
+                'transfer_to_virtual_account_number' => $content[14] ?? null,
+                'email' => $content[15] ?? null,
+                'username' => $content[16] ?? null,
+                'password' => $content[17] ?? $content[1] ?? null,
             ];
 
             $validator = Validator::make($content, $rules);

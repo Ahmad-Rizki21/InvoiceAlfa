@@ -3,11 +3,13 @@
     <form-invoice
       :entry="invoice"
       :template-settings="templateSettings"
+      :show-signatures="showSignatures"
     />
     <form-receipt
       :entry="receipt"
       :invoice="invoiceUpdated.invoice_no ? invoiceUpdated : invoice"
       :template-settings="templateSettings"
+      :show-signatures="showSignatures"
     />
     <form-store
       v-if="stores.length"
@@ -60,6 +62,10 @@ export default {
       default() {
         return {}
       }
+    },
+    showSignatures: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

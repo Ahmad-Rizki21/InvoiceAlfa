@@ -774,8 +774,9 @@
           />
           <table-store
             v-else-if="childTab === 'store'"
-            :customer="entry"
+            :distribution-center="entry"
             ref="tableStore"
+            as-relation
             key="store"
           />
         </transition>

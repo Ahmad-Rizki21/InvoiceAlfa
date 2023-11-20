@@ -580,6 +580,7 @@ wrapper {
 .form-invoice .invoice-signature-date {
   text-align: center;
   margin-left: 7mm;
+  margin-bottom: 6rem;
 }
 
 .form-invoice .invoice-signature-date.expand {
@@ -608,8 +609,10 @@ wrapper {
   -ms-flex-pack: center;
   justify-content: center;
   width: 50mm;
-  position: relative;
-  left: 30mm;
+  position: absolute;
+  left: 27mm;
+  top: 10mm;
+  z-index: 1;
 }
 
 .form-invoice .signature-stamp {
@@ -618,6 +621,13 @@ wrapper {
   top: 8mm;
   left: 8mm;
   z-index: 3;
+}
+
+.form-invoice .signature-stamp-duty {
+  position: absolute;
+  width: 20mm;
+  top: 10mm;
+  right: 3mm;
 }
 
 .form-invoice .q-stepper {
@@ -755,7 +765,7 @@ wrapper {
 .form-receipt .receipt-date>.receipt-date-inner {
   margin-left: auto;
   text-align: center;
-  width: 50%;
+  width: 50%;position: relative;
 }
 
 .form-receipt .receipt-footer {
@@ -809,8 +819,9 @@ wrapper {
   -ms-flex-pack: center;
   justify-content: center;
   width: 50mm;
-  position: relative;
+  position: absolute;
   left: 26mm;
+  z-index: 1;
 }
 
 .form-receipt .signature-stamp {
@@ -819,6 +830,12 @@ wrapper {
   top: 4mm;
   left: 4mm;
   z-index: 3;
+}
+.form-receipt .signature-stamp-duty {
+  position: absolute;
+  width: 20mm;
+  top: 6mm;
+  right: 4mm;
 }
 
 
@@ -964,6 +981,7 @@ wrapper {
   margin-left: auto;
   text-align: center;
   width: 50%;
+  position: relative;
 }
 .form-store-printable .receipt-footer {
   display: -webkit-box;
@@ -996,6 +1014,7 @@ wrapper {
   text-decoration: underline;
   margin-bottom: 5px;
 }
+
 /* .example {
    display: -ms-grid;
    display: grid;

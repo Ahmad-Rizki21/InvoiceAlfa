@@ -12,8 +12,7 @@ export default ({ Vue }) => {
   Vue.component('AutocompleteDistributionCenter', () => import('../components/AutocompleteDistributionCenter.vue'))
   Vue.component('AutocompleteFranchise', () => import('../components/AutocompleteFranchise.vue'))
   Vue.component('AutocompleteRole', () => import('../components/AutocompleteRole.vue'))
-  Vue.component('SelectTicketStatus', () => import('../components/SelectTicketStatus.vue'))
-  Vue.component('SelectTicketDownTime', () => import('../components/SelectTicketDownTime.vue'))
+  Vue.component('SelectInvoiceStatus', () => import('../components/SelectInvoiceStatus.vue'))
   Vue.component('DialogImport', () => import('../components/DialogImport.vue'))
   Vue.component('SignaturePad', () => import('../components/SignaturePad.vue'))
 }

@@ -52,7 +52,7 @@
             <template v-slot:append>
               <q-icon v-if="!readonly" name="event" class="cursor-pointer">
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
-                  <q-date v-model="actualPaymentDate" minimal mask="DD/MM/YYYY">
+                  <q-date v-model="actualPaymentDate" minimal mask="DD/MM/YYYY" :options="actualPaymentDateOptions">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="Close" color="primary" flat />
                     </div>
@@ -301,7 +301,7 @@ export default {
       const uploadingFile = this.paymentProofs.filter(v => !!v.file)
       const alreadyHasPaymentProofs = this.paymentProofs.filter((v) => {
 
-        return !!v.id
+        return !!v.id && !String(v.id).includes('new')
       }).length > 0
 
       if (!uploadingFile.length && !this.deletePaymentProofs.length && !alreadyHasPaymentProofs) {
@@ -347,9 +347,9 @@ export default {
       try {
         const hasUploaded = await this.onUploadItemIndex(-1)
 
-        if (hasUploaded >= 0) {
+        if (hasUploaded >= 0 && !alreadyHasPaymentProofs) {
           this.$q.notify({ message: this.$t('Payment proofs successfully sent') })
-        } else if (hasDeleted) {
+        } else {
           this.$q.notify({ message: this.$t('Payment proofs successfully updated') })
         }
         this.$emit('uploaded')
@@ -540,6 +540,9 @@ export default {
         preview: null,
         file: null
       }
+    },
+    actualPaymentDateOptions(d) {
+      return d <= date.formatDate(new Date(), 'YYYY/MM/DD')
     }
   }
 }

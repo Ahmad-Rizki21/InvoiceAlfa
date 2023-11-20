@@ -11,6 +11,7 @@ use App\Imports\ImportCacheImport;
 use App\Models\DistributionCenter;
 use App\Models\ImportCache;
 use App\Rules\UniqueEmailRule;
+use App\Rules\UniqueFranchiseCodeRule;
 use App\Rules\UniqueUsernameRule;
 use App\Rules\ValidUsernameRule;
 use Carbon\Carbon;
@@ -198,7 +199,7 @@ class FranchiseController extends Controller
 
         $input = $request->validate([
             'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
+            'code' => ['required', new UniqueFranchiseCodeRule($request->distribution_center_id)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -248,7 +249,7 @@ class FranchiseController extends Controller
         }
 
         $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,' . $id . ',id'],
+            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($entry->distribution_center_id, $entry->id)],
             'name' => ['sometimes', 'nullable', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule($entry)],
             'username' => ['sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule($entry)],
@@ -353,7 +354,7 @@ class FranchiseController extends Controller
 
         $rules = [
             'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
+            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($request->distribution_center_id)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -381,19 +382,22 @@ class FranchiseController extends Controller
             $content = [
                 'name' => $content[0] ?? null,
                 'code' => $content[1] ?? null,
-                'location' => $content[2] ?? null,
-                'address' => $content[3] ?? null,
-                'approval_date' => $content[4] ?? null,
-                'fo_approval_date' => $content[5] ?? null,
-                'offering_letter_reference_number' => $content[6] ?? null,
-                'fo_offering_letter_reference_number' => $content[7] ?? null,
-                'issuance_number' => $content[8] ?? null,
-                'fo_issuance_number' => $content[9] ?? null,
-                'email' => $content[10] ?? null,
-                'username' => $content[11] ?? null,
-                'password' => $content[12] ?? $content[1] ?? null,
-                'landline_number' => $content[13] ?? null,
-                'phone_number' => $content[14] ?? null,
+                'npwp' => $content[2] ?? null,
+                'location' => $content[3] ?? null,
+                'address' => $content[4] ?? null,
+                'landline_number' => $content[5] ?? null,
+                'phone_number' => $content[6] ?? null,
+                'approval_date' => $content[7] ?? null,
+                'fo_approval_date' => $content[8] ?? null,
+                'offering_letter_reference_number' => $content[9] ?? null,
+                'fo_offering_letter_reference_number' => $content[10] ?? null,
+                'issuance_number' => $content[11] ?? null,
+                'fo_issuance_number' => $content[12] ?? null,
+                'transfer_to_virtual_account_bank_name' => $content[13] ?? null,
+                'transfer_to_virtual_account_number' => $content[14] ?? null,
+                'email' => $content[15] ?? null,
+                'username' => $content[16] ?? null,
+                'password' => $content[17] ?? $content[1] ?? null,
             ];
 
             $validator = Validator::make($content, $rules);
@@ -449,7 +453,7 @@ class FranchiseController extends Controller
 
         $rules = [
             'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Franchise::class . ',code,NULL,id'],
+            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($request->distribution_center_id)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],

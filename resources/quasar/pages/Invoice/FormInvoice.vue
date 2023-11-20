@@ -45,7 +45,7 @@
                 <div class="invoice-recipient-colon">:</div>
               </div>
               <div class="invoice-recipient-value">
-                <template v-if="!isEditable">
+                <template v-if="!isEditable || true">
                   <span v-if="formEntry.customer_npwp">{{ formEntry.customer_npwp }}</span>
                   <span v-else v-html="'&nbsp;'"></span>
                 </template>
@@ -504,11 +504,14 @@
               <div class="invoice-signature-date" :class="{ expand: !templateSettings[$constant.setting_key.SignatureImage] }">
                 Jakarta, {{ formattedPublishedAt }}
               </div>
-              <div v-if="templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
+              <div v-if="showSignatures && templateSettings[$constant.setting_key.SignatureImage]" class="person-signature">
                 <img :src="templateSettings[$constant.setting_key.SignatureImage]" class="signature">
               </div>
-              <div v-if="templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
+              <div v-if="showSignatures && templateSettings[$constant.setting_key.StampImage]" class="signature-stamp">
                 <img :src="templateSettings[$constant.setting_key.StampImage]" class="signature">
+              </div>
+              <div v-if="showSignatures && formEntry.total >= 5000000" class="signature-stamp-duty">
+                <img src="/img/emtr.png" class="signature">
               </div>
               <div class="invoice-signature-person">
                 <div class="invoice-signature-person-name">
@@ -603,6 +606,10 @@ export default {
       default() {
         return {}
       }
+    },
+    showSignatures: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -812,7 +819,7 @@ export default {
       })
 
       this.isSyncing = false;
-    }, 1500)
+    }, 750)
   },
   methods: {
     fill(form) {

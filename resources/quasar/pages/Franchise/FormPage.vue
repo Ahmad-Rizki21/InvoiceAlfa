@@ -9,6 +9,29 @@
               <div class="q-mb-md text-subtitle text-weight-bold">{{ $t('Details') }}</div>
 
               <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
+                <div class="col-xs-12 col-sm-8 col-md-6 col-lg-6">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <autocomplete-distribution-center
+                    v-show="!fetching"
+                    v-model="formEntry.distribution_center_id"
+                    :label="$t('Distribution Center') + '*'"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="distribution_center_id"
+                    autocomplete="off"
+                    :disable="!!parentDistributionCenterId"
+                    :dense="!readonly"
+                    :rules="rules.distribution_center_id"
+                    :error="!!errors.distribution_center_id"
+                    :error-message="errors.distribution_center_id"
+                  />
+                </div>
+              </div>
+
+              <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
                 <div class="col-xs-12 col-sm-8 col-md-10 col-lg-8">
                   <q-skeleton v-if="fetching" type="rect" />
                   <q-input
@@ -754,6 +777,8 @@ const DEFAULT_FORM_ENTRY = {
   fo_issuance_number: null,
   password: null,
   password_confirmation: null,
+  landline_number: null,
+  phone_number: null
 }
 
 export default {
@@ -818,6 +843,9 @@ export default {
       }
 
       return !this.isCreate
+    },
+    parentDistributionCenterId() {
+      return parseInt(this.$route.query.distribution_center_id, 10) || null
     },
     formattedApprovalDate() {
       if (this.readonly && this.formEntry.approval_date) {

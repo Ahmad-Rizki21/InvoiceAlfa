@@ -45,6 +45,7 @@
           :receipt="entry"
           :stores="stores"
           :template-settings="formTemplateSettings"
+          show-signatures
         />
       </div>
     </div>

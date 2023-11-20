@@ -51,18 +51,63 @@
     <div class="page-body">
       <q-card>
         <q-toolbar>
-          <div class="col col-md-3 col-lg-2 quick-search-datatable">
-            <q-input
-              v-model="search.fuzzy.value"
-              :label="$t('Search {entity}', { entity: $t('no') })"
-              stack-label
-              :debounce="300"
-              dense
-              clearable
-              clear-icon="close"
-              @input="onRequest()"
-            />
+
+          <div class="col col-md-9 col-lg-8">
+            <div class="row q-col-gutter-md quick-search-datatable">
+              <div class="col col-md-3 col-lg-3">
+                <q-input
+                  v-model="search.applicable_month.formattedValue"
+                  :label="$t('Period')"
+                  autocomplete="off"
+                  stack-label
+                  class="input-quick-search-applicable_month"
+                  dense
+                  readonly
+                >
+                  <q-menu>
+                    <monthpicker
+                      v-model="search.applicable_month.value"
+                      mask="DD/MM/YYYY"
+                      :emit-immediately="false"
+                      color="primary"
+                      @input="onApplicableMonthChangeDebounced"
+                    >
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="Close" color="primary" flat />
+                      </div>
+                    </monthpicker>
+                  </q-menu>
+                </q-input>
+              </div>
+
+                <div class="col col-md-3 col-lg-3">
+                <q-input
+                  v-model="search.fuzzy.value"
+                  :label="$t('Search {entity}', { entity: $t('no') })"
+                  stack-label
+                  :debounce="300"
+                  dense
+                  clearable
+                  clear-icon="close"
+                  @input="onRequest()"
+                />
+              </div>
+              <div class="col col-md-3 col-lg-2">
+                <select-invoice-status
+                  v-model="search.status.value"
+                  :label="$t('Search {entity}', { entity: $t('status') })"
+                  stack-label
+                  :debounce="300"
+                  dense
+                  class="input-search-datatable-status"
+                  clearable
+                  clear-icon="close"
+                  @input="onRequest()"
+                />
+              </div>
+            </div>
           </div>
+
           <div class="col col-md-3 col-lg-2 q-ml-auto row">
             <q-btn
               unelevated
@@ -155,7 +200,7 @@
             <q-td>{{ rowIndex + 1 }}</q-td>
           </template>
           <template #body-cell-status="{ row }">
-            <q-td class="text-center">
+            <q-td>
               <invoice-status-chip :invoice="row" dense />
             </q-td>
           </template>
@@ -328,6 +373,13 @@ export default {
   data() {
     const search = {
       fuzzy: {
+        value: null
+      },
+      applicable_month: {
+        value: new Date(),
+        formattedValue: null
+      },
+      status: {
         value: null
       }
     }
@@ -507,7 +559,26 @@ export default {
       search,
       advancedSearch: search,
       exportUrl: null,
+      onApplicableMonthChangeDebounced: this.$utils.debounce(this.onRequest, 500)
     }
+  },
+  watch: {
+    'search.applicable_month.value': {
+      immediate: true,
+      handler(n) {
+        if (n) {
+          this.search.applicable_month.formattedValue = n ? date.formatDate(n, 'MMMM YYYY') : null
+        }
+      }
+    },
+    'advancedSearch.applicable_month.value': {
+      immediate: true,
+      handler(n) {
+        if (n) {
+          this.advancedSearch.applicable_month.formattedValue = n ? date.formatDate(n, 'MMMM YYYY') : null
+        }
+      }
+    },
   },
   async mounted() {
     await this.onRequest()
@@ -531,6 +602,12 @@ export default {
       const params = {
         table_pagination: { ...(props.pagination || {}) },
         table_search: { ...this.search }
+      }
+
+      if (params.table_search.applicable_month.value) {
+        params.table_search.applicable_month = {
+          value: date.formatDate(params.table_search.applicable_month.value, 'YYYY-MM-15')
+        }
       }
 
       try {

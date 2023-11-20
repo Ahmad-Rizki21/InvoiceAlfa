@@ -11,6 +11,7 @@ use App\Imports\ImportCacheImport;
 use App\Models\DistributionCenter;
 use App\Models\ImportCache;
 use App\Rules\UniqueEmailRule;
+use App\Rules\UniqueStoreCodeRule;
 use App\Rules\UniqueUsernameRule;
 use App\Rules\ValidUsernameRule;
 use Carbon\Carbon;
@@ -198,7 +199,7 @@ class StoreController extends Controller
 
         $input = $request->validate([
             'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Store::class . ',code'],
+            'code' => ['required', new UniqueStoreCodeRule($request->distribution_center_id)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191'],
             'landline_number' => ['sometimes', 'nullable'],
@@ -235,7 +236,7 @@ class StoreController extends Controller
         }
 
         $request->validate([
-            'code' => ['sometimes', 'nullable', 'unique:' . Store::class . ',code,' . $id . ',id'],
+            'code' => ['sometimes', 'nullable', new UniqueStoreCodeRule($entry->distribution_center_id, $entry->id)],
             'name' => ['sometimes', 'nullable', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191'],
             'landline_number' => ['sometimes', 'nullable'],
@@ -344,7 +345,7 @@ class StoreController extends Controller
 
         $rules = [
             // 'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', 'unique:' . Store::class . ',code'],
+            'code' => ['sometimes', 'nullable', new UniqueStoreCodeRule($distributionCenterId)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191'],
             'landline_number' => ['sometimes', 'nullable'],
@@ -369,15 +370,14 @@ class StoreController extends Controller
                 'code' => $content[1] ?? null,
                 'location' => $content[2] ?? null,
                 'address' => $content[3] ?? null,
-                'approval_date' => $content[4] ?? null,
-                'fo_approval_date' => $content[5] ?? null,
-                'offering_letter_reference_number' => $content[6] ?? null,
-                'fo_offering_letter_reference_number' => $content[7] ?? null,
-                'issuance_number' => $content[8] ?? null,
-                'fo_issuance_number' => $content[9] ?? null,
-                'email' => $content[10] ?? null,
-                'landline_number' => $content[11] ?? null,
-                'phone_number' => $content[12] ?? null,
+                'landline_number' => $content[4] ?? null,
+                'phone_number' => $content[5] ?? null,
+                'approval_date' => $content[6] ?? null,
+                'fo_approval_date' => $content[7] ?? null,
+                'offering_letter_reference_number' => $content[8] ?? null,
+                'fo_offering_letter_reference_number' => $content[9] ?? null,
+                'issuance_number' => $content[10] ?? null,
+                'fo_issuance_number' => $content[11] ?? null,
             ];
 
             $validator = Validator::make($content, $rules);

@@ -206,6 +206,9 @@ export default {
         table_pagination: { ...(props.pagination || {}) },
       }
 
+      params.table_pagination.sortBy = 'published_at'
+      params.table_pagination.descending = true
+
       try {
         const { data } = await this.$api.get('/v1/invoices/active', { params })
 

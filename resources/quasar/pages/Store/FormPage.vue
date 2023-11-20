@@ -135,6 +135,48 @@
                 </div>
               </div>
 
+
+              <div class="row q-col-gutter-x-sm q-col-gutter-y-md q-mb-md">
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-show="!fetching"
+                    v-model="formEntry.landline_number"
+                    :label="$t('Landline Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="landline_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.landline_number"
+                    :error="!!errors.landline_number"
+                    :error-message="errors.landline_number"
+                  />
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                  <q-skeleton v-if="fetching" type="rect" />
+                  <q-input
+                    v-show="!fetching"
+                    v-model="formEntry.phone_number"
+                    :label="$t('Phone Number')"
+                    :filled="!readonly"
+                    :borderless="readonly"
+                    :readonly="readonly"
+                    stack-label
+                    :placeholder="readonly ? '-' : ''"
+                    name="phone_number"
+                    autocomplete="off"
+                    :dense="!readonly"
+                    :rules="rules.phone_number"
+                    :error="!!errors.phone_number"
+                    :error-message="errors.phone_number"
+                  />
+                </div>
+              </div>
+
               <div class="row q-col-gutter-x-sm q-mb-md">
                 <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
                   <q-skeleton v-if="fetching" type="rect" />
@@ -462,6 +504,8 @@ const DEFAULT_FORM_ENTRY = {
   fo_issuance_number: null,
   password: null,
   password_confirmation: null,
+  landline_number: null,
+  phone_number: null
 }
 
 export default {

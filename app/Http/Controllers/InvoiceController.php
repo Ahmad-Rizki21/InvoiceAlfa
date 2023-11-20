@@ -185,10 +185,21 @@ class InvoiceController extends Controller
                     if ($value) {
                         $value = '%' . $value . '%';
 
-                        $q->where('name', 'like', $value);
+                        $q->where('invoice_no', 'like', $value)
+                            ->orWhere('receipt_no', 'like', $value);
                     }
                 });
+            } else if ($search->column() === 'applicable_month') {
+                $query->where(function ($q) use ($search) {
+                    try {
+                        $value = Carbon::parse($search->value());
+                    } catch (\Throwable $e) {
+                        $value = Carbon::now();
+                    }
 
+                    $q->where('created_at', '>=', (string) $value->startOfMonth()->startOfDay()->format('Y-m-d H:i:s'))
+                        ->where('created_at', '<=', (string) $value->copy()->endOfMonth()->endOfDay()->format('Y-m-d H:i:s'));
+                });
             } else if ($model->isColumnExists($search->column())) {
                 $value = $search->value();
                 $column = $search->column();
@@ -308,6 +319,7 @@ class InvoiceController extends Controller
             $stores = Store::where('distribution_center_id', $entry->distribution_center_id)->get();
         }
 
+        $showSignatures = $request->signs;
 
         return view('print.invoice', [
             'pageTitle' => 'Invoice',
@@ -318,6 +330,9 @@ class InvoiceController extends Controller
             'ppnPercentage' => Settings::getValue(SettingKey::PpnPercentage),
             'signatoryName' => Settings::getValue(SettingKey::SignatoryName),
             'signatoryPosition' => Settings::getValue(SettingKey::SignatoryPosition),
+            'signatureImage' => $showSignatures ? Settings::getValue(SettingKey::SignatureImage) : null,
+            'stampImage' => $showSignatures ? Settings::getValue(SettingKey::StampImage) : null,
+            'showStampDuty' => $showSignatures ? $entry->total >= 5000000 : null,
             'stores' => $stores,
         ]);
     }
@@ -355,6 +370,9 @@ class InvoiceController extends Controller
             'ppnPercentage' => Settings::getValue(SettingKey::PpnPercentage),
             'signatoryName' => Settings::getValue(SettingKey::SignatoryName),
             'signatoryPosition' => Settings::getValue(SettingKey::SignatoryPosition),
+            'signatureImage' => Settings::getValue(SettingKey::SignatureImage),
+            'stampImage' => Settings::getValue(SettingKey::StampImage),
+            'showStampDuty' => $entry->total >= 5000000,
         ]);
     }
 

@@ -256,7 +256,7 @@
                 @updated="onFormReceiptUpdated"
               />
             </div>
-            <div v-if="customerToFind === 'distribution_center'">
+            <div v-if="customerToFind === 'distribution_center' && formStores.length">
               <form-store
                 ref="formStores"
                 :entries="formStores"
