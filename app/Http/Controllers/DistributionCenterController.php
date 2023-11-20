@@ -408,6 +408,10 @@ class DistributionCenterController extends Controller
                 'password' => $content[17] ?? $content[1] ?? null,
             ];
 
+            if ($content['npwp']) {
+                $content['npwp'] = preg_replace('~[\D]~', '', (string) $content['npwp']);
+            }
+
             $validator = Validator::make($content, $rules);
             $errors = [];
 
