@@ -502,7 +502,7 @@ class FranchiseController extends Controller
                 if (isset($content['password']) && !empty($content['password'])) {
                     $content['password'] = bcrypt($content['password']);
                 }
-                DistributionCenter::create($content);
+                Franchise::create($content);
             }
         }
 
