@@ -517,8 +517,16 @@ export default {
         const { data } = await this.$api.get('/v1/invoices/template', { params })
 
         if (data.status === 'success') {
+          const distributionCenter = data.data.invoice.distribution_center
+          const franchise = data.data.invoice.franchise
+
+          data.data.invoice.distribution_center = null
+          data.data.invoice.franchise = null
+
           this.formInvoice = data.data.invoice
           this.formReceipt = data.data.invoice
+
+          this.selectedCustomer = distributionCenter || franchise
         }
       } catch (err) {
         this.$q.notify(err)
