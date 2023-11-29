@@ -28,11 +28,15 @@ class DatabaseSeeder extends Seeder
         $this->call(StoreSeeder::class);
         $this->call(FranchiseSeeder::class);
 
-        $fs = new Filesystem();
-        foreach ($fs->allFiles(storage_path('app/public/payment-proofs')) as $file) {
-            $fs->delete($file->getPath());
-        }
+        try {
+            $fs = new Filesystem();
+            if ($fs->isDirectory(storage_path('app/public/payment-proofs'))) {
+                foreach ($fs->allFiles(storage_path('app/public/payment-proofs')) as $file) {
+                    $fs->delete($file->getPath());
+                }
 
-        $fs->deleteDirectory(storage_path('app/public/payment-proofs'));
+                $fs->deleteDirectory(storage_path('app/public/payment-proofs'));
+            }
+        } catch (\Throwable $e) {}
     }
 }
