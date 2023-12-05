@@ -5,14 +5,16 @@
     </div>
 
     <q-card flat class="card-invoice-history">
-      <q-card-section>
+      <div v-if="isFetching"></div>
+      <q-card-section v-else-if="entries && entries.length">
         <router-link :to="`/c/bill/${entry.uid}`" class="bill-item" v-for="entry in entries" :key="entry.id">
           <div class="date">
-            <span>{{ $t('Month') }}</span>
+            <span class="span">{{ $t('Month') }}</span>
+            <span class="span span-invoice">{{ entry.invoice_no }}</span>
             <div>{{ formatMonth(entry) }}</div>
           </div>
           <div class="invoice">
-            <span>
+            <span class="span">
               Invoice
 
               <q-icon
@@ -22,11 +24,11 @@
             <div>{{ entry.invoice_no }}</div>
           </div>
           <div class="status">
-            <span>Tanggal Bayar</span>
+            <span class="span">Tanggal Bayar</span>
             <div>{{ formatDate(entry.paid_at) }}</div>
           </div>
           <div class="total-bill">
-            <span class="total-bill-label">
+            <span class="span total-bill-label">
               Total Tagihan
             </span>
             <div class="total-bill-amount">
@@ -39,6 +41,9 @@
             />
           </div>
         </router-link>
+      </q-card-section>
+      <q-card-section v-else class="empty-invoice">
+        Anda belum memiliki riwayat tagihan
       </q-card-section>
     </q-card>
   </div>
@@ -85,7 +90,8 @@ export default {
         table_pagination: { ...(props.pagination || {}) },
         status: `in:${[
           this.$constant.invoice_status.Paid
-        ].join('|')}`
+        ].join('|')}`,
+        me: 'y'
       }
 
       params.table_pagination.sortBy = 'published_at'
@@ -165,7 +171,7 @@ export default {
       display: flex;
       align-items: center;
       width: 100%;
-      padding-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
       text-decoration: none;
       color: #1d1d1d;
       color: var(--q-text-color-default);
@@ -177,10 +183,16 @@ export default {
         padding-left: 1.25rem;
         padding-right: 1.25rem;
 
-        > span {
+        > .span {
           color: rgba(49, 53, 60, 0.6);
           font-size: 0.9em;
           line-height: 1;
+          display: none;
+          margin-bottom: 0.25rem;
+
+          @media (min-width: $breakpoint-md-min) {
+            display: block;
+          }
         }
         > div {
           font-weight: 400;
@@ -191,20 +203,47 @@ export default {
 
       .date {
         // width: 9%;
-        width: 17%;
         padding-left: 0;
+
+        @media (min-width: $breakpoint-md-min) {
+          width: 17%;
+        }
+
+        > .span-invoice {
+          display: block;
+          font-size: 0.75em;
+
+          @media (min-width: $breakpoint-md-min) {
+            display: none;
+          }
+        }
       }
 
       .invoice {
         // width: 28%;
+        display: none;
+
+        @media (min-width: $breakpoint-md-min) {
+          display: block;
+        }
       }
 
       .status {
         // width: 16%;;
+        display: none;
+
+        @media (min-width: $breakpoint-md-min) {
+          display: block;
+        }
       }
 
       .due-at {
         flex: 1;
+        display: none;
+
+        @media (min-width: $breakpoint-md-min) {
+          display: block;
+        }
       }
 
 
@@ -248,19 +287,50 @@ export default {
 
       .total-bill {
         // text-align: right;
-        // flex: 1;
+        flex: 1;
         min-width: 20%;
+        display: flex;
+
+        @media (min-width: $breakpoint-md-min) {
+          flex: none;
+          display: block;
+        }
 
         &-label {
           color: rgba(49, 53, 60, 0.6);
+          font-size: 0.9em;
+          line-height: 1;
+          display: none;
+          margin-bottom: 0.25rem;
+
+          @media (min-width: $breakpoint-md-min) {
+            display: block;
+          }
         }
 
         &-amount {
           font-weight: 500;
-          font-size: 1.1em;
+          font-size: 1em;
+          flex: 1;
+          text-align: right;
+
+          @media (min-width: $breakpoint-md-min) {
+            // font-size: 1.1em;
+            text-align: left;
+            flex: none;
+          }
         }
       }
     }
+  }
+
+  .empty-invoice {
+    min-height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: italic;
+    color: rgba(49, 53, 60, 0.6);
   }
 }
 </style>

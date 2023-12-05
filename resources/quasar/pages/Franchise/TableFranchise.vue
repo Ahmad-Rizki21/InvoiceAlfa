@@ -318,7 +318,7 @@ export default {
         'location',
         // 'landline_number',
         // 'phone_number',
-        // 'email',
+        'email',
         // 'username',
         'created_at'
       ],

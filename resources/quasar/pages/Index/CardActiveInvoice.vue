@@ -50,11 +50,12 @@
         </div>
       </div>
       <template v-else-if="entries.length">
-        <div v-for="entry in entries" class="bill-item" :key="entry.id">
+        <div v-for="entry in entries" class="bill-item" :key="entry.id" @click="onBillClick(entry)">
           <div class="date">
             <span class="span">{{ $t('Month') }}</span>
             <span class="span-invoice">{{ entry.invoice_no }}</span>
-            <div>{{ formatMonth(entry) }}</div>
+            <div class="span-month">{{ formatMonth(entry) }}</div>
+            <div class="span-due-at">{{ formatDueAt(entry) }}</div>
           </div>
           <div class="invoice">
             <span class="span">
@@ -85,11 +86,16 @@
             <span class="span total-bill-label">
               {{ $t('Total Bill') }}
             </span>
+            <div class="total-bill-status">
+              {{ entry.status_description }}
+            </div>
             <div class="total-bill-amount">
               {{ formatTotal(entry) }}
             </div>
           </div>
           <div v-if="entries.length > 1" class="pay">
+            <q-icon name="chevron_right" class="pay-goto" size="xs" style="position: relative; top: -2px; right: -5px;" />
+
             <q-btn
               v-if="[$constant.invoice_status.Paid, $constant.invoice_status.Rejected, $constant.invoice_status.PendingReview].includes(entry.status)"
               color="primary"
@@ -238,6 +244,11 @@ export default {
         thousand: ',',
         symbol: 'Rp. '
       }) || '-'
+    },
+    onBillClick(entry) {
+      if (this.$q.screen.lt.md) {
+        this.$router.push(`/c/pay/${entry.uid}`)
+      }
     }
   }
 }
@@ -328,19 +339,23 @@ export default {
         font-size: 0.75em;
         line-height: 1;
 
-        @media (min-width: 786px) {
+        @media (min-width: $breakpoint-md-min) {
           font-size: 0.9em;
         }
       }
       > .span {
         display: none;
+        margin-bottom: 0.25rem;
 
-        @media (min-width: 786px) {
+        @media (min-width: $breakpoint-md-min) {
           display: block;
         }
       }
       > .span-invoice {
-        @media (min-width: 786px) {
+        display: block;
+        margin-bottom: 0.25rem;
+
+        @media (min-width: $breakpoint-md-min) {
           display: none;
         }
       }
@@ -348,6 +363,18 @@ export default {
         font-weight: 600;
         font-size: 1.1em;
         line-height: 1;
+      }
+      > .span-month {
+        display: none;
+
+        @media (min-width: $breakpoint-md-min) {
+          display: block;
+        }
+      }
+      > .span-due-at {
+        @media (min-width: $breakpoint-md-min) {
+          display: none;
+        }
       }
     }
 
@@ -361,7 +388,7 @@ export default {
       width: 34%;
       display: none;
 
-      @media (min-width: 768px) {
+      @media (min-width: $breakpoint-md-min) {
         display: block;
       }
     }
@@ -370,7 +397,7 @@ export default {
       width: 13%;
       display: none;
 
-      @media (min-width: 768px) {
+      @media (min-width: $breakpoint-md-min) {
         display: block;
       }
     }
@@ -379,7 +406,7 @@ export default {
       flex: 1;
       display: none;
 
-      @media (min-width: 768px) {
+      @media (min-width: $breakpoint-md-min) {
         display: block;
       }
     }
@@ -388,7 +415,7 @@ export default {
       // text-align: right;
       flex: 1;
 
-      @media (min-width: 768px) {
+      @media (min-width: $breakpoint-md-min) {
         min-width: 22%;
       }
 
@@ -401,8 +428,14 @@ export default {
         line-height: 1;
         font-size: 1em;
 
-        @media (min-width: 768px) {
-          font-size: 1.72em;
+        @media (min-width: $breakpoint-md-min) {
+          font-size: 1.1em;
+        }
+      }
+
+      &-status {
+        @media (min-width: $breakpoint-md-min) {
+          display: none;
         }
       }
     }
@@ -476,20 +509,53 @@ export default {
           color: rgba(49, 53, 60, 0.6);
         }
 
+        &-status {
+          color: rgba(49, 53, 60, 0.6);
+          font-size: 0.75em;
+          line-height: 1;
+          text-align: right;
+          font-weight: 400;
+          margin-bottom: 0.25rem;
+
+          @media (min-width: $breakpoint-md-min) {
+            display: none;
+          }
+        }
+
         &-amount {
-          font-weight: 900;
+          font-weight: 500;
           font-size: 1.1em;
-          line-height: 1.5;
+          line-height: 1;
+          text-align: right;
+
+          @media (min-width: $breakpoint-md-min) {
+            text-align: left;
+            font-size: 1.1em;
+          }
         }
       }
 
       .pay {
-        flex: 1;
-        display: flex;
         align-items: center;
         justify-content: flex-end;
 
+        @media (min-width: $breakpoint-md-min) {
+          flex: 1;
+        }
+
+        .pay-goto {
+          @media (min-width: $breakpoint-md-min) {
+            display: none;
+          }
+        }
+
         .q-btn {
+          display: none;
+
+          @media (min-width: $breakpoint-md-min) {
+            display: block;
+          }
+
           .q-btn__wrapper {
             padding-top: 0;
             padding-bottom: 0;
