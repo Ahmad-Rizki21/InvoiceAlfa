@@ -918,7 +918,7 @@ export default {
       if (this.childTab === 'franchise') {
         return {
           importType: this.$constant.import_type.Franchise,
-          template: this.$q.lang.isoName === 'id' ? '/templates/template-franchise.xlsx' : '/templates/franchise-template.xlsx'
+          templateUrl: this.$q.lang.isoName === 'id' ? '/templates/template-franchise.xlsx' : '/templates/franchise-template.xlsx'
         }
       }
 
