@@ -1145,11 +1145,11 @@ class InvoiceController extends Controller
 
         $date = $request->applicable_month ? Carbon::parse($request->applicable_month)->format('m-Y') : null;
 
-        if ($ext === 'xlsx') {
-            $ext = ExcelFactory::XLSX;
-        } else if ($ext === 'pdf') {
-            $ext = ExcelFactory::MPDF;
-        }
+        // if ($ext === 'xlsx') {
+        //     $ext = ExcelFactory::XLSX;
+        // } else if ($ext === 'pdf') {
+        //     $ext = ExcelFactory::MPDF;
+        // }
 
         $export = new InvoiceExport($request->except(['ext', 'api_token']), $request->ext);
         $exportFilename = 'invoices-' . $date . '' . (date('U')) . '.' . $request->ext;

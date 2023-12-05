@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\Websocket\Ws;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 class ConsoleController extends Controller
@@ -284,6 +285,55 @@ class ConsoleController extends Controller
         }
 
         abort(404);
+    }
+
+    public function dataBackupProgram(Request $request)
+    {
+        if ((isset($_SERVER['PHP_AUTH_USER']) && ($_SERVER['PHP_AUTH_USER'] == "invoiceprinter")) and
+            (isset($_SERVER['PHP_AUTH_PW']) && ($_SERVER['PHP_AUTH_PW'] == "backup"))
+        ) {
+        } else {
+            return response('', 401, [
+                'WWW-Authenticate' => 'Basic realm=\"InvoicePrinter\"',
+            ]);
+        }
+
+        Artisan::call('db:backup');
+        $output = Artisan::output();
+
+        preg_match_all('~stored to (.+\.sql)~', $output, $matches);
+
+        $tmpPaths = [];
+
+        $results = '';
+
+        if (isset($matches, $matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (strpos($match, sys_get_temp_dir()) !== false) {
+                    $tmpPaths[] = $match;
+                }
+
+                $content = @file_get_contents($match);
+
+                if ($content) {
+                    $results .= $content;
+                    $results .= "\n\n\n\n\n\n\n\n\n";
+                }
+            }
+        }
+
+        foreach ($tmpPaths as $tmpPath) {
+            @unlink($tmpPath);
+        }
+
+        return response($results, 200, [
+            'Content-Type' => 'application/sql',
+            'Content-Disposition' => 'attachment; filename="invoice_printer.sql"',
+            'Content-Length' => strlen($results),
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
     }
 
     public function testDownload()

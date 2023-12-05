@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/data-backup-program', [ConsoleController::class, 'dataBackupProgram']);
+
 Route::group(['middleware' => 'printing'], function() {
     Route::get('/print/invoice/{id}', [InvoiceController::class, 'printInvoice'])->name('print.invoice');
     Route::get('/print/receipt/{id}', [InvoiceController::class, 'printReceipt'])->name('print.receipt');
