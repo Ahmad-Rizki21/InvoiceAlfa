@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class FranchiseController extends Controller
 {
@@ -364,8 +365,8 @@ class FranchiseController extends Controller
             'phone_number' => ['sometimes', 'nullable'],
             'location' => ['sometimes', 'nullable'],
             'address' => ['sometimes', 'nullable'],
-            'approval_date' => ['sometimes', 'nullable', 'date'],
-            'fo_approval_date' => ['sometimes', 'nullable', 'date'],
+            'approval_date' => ['sometimes', 'nullable', 'date_format:d/m/Y'],
+            'fo_approval_date' => ['sometimes', 'nullable', 'date_format:d/m/Y'],
             'offering_letter_reference_number' => ['sometimes', 'nullable'],
             'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
             'issuance_number' => ['sometimes', 'nullable'],
@@ -405,6 +406,14 @@ class FranchiseController extends Controller
                 $content['npwp'] = preg_replace('~[\D]~', '', (string) $content['npwp']);
             }
 
+            if ($content['approval_date']) {
+                $content['approval_date'] = mute_exception(fn () => Date::excelToDateTimeObject($content['approval_date'])->format('d/m/Y'), $content['approval_date']);
+            }
+
+            if ($content['fo_approval_date']) {
+                $content['fo_approval_date'] = mute_exception(fn () => Date::excelToDateTimeObject($content['fo_approval_date'])->format('d/m/Y'), $content['fo_approval_date']);
+            }
+
             $validator = Validator::make($content, $rules);
             $errors = [];
 
@@ -418,10 +427,10 @@ class FranchiseController extends Controller
                 $deletingIds[] = $entry->id;
 
                 if (isset($content['approval_date']) && !empty($content['approval_date'])) {
-                    $content['approval_date'] = Carbon::createFromFormat('d/m/Y', $content['approval_date']);
+                    $content['approval_date'] = mute_exception(fn () => Carbon::createFromFormat('d/m/Y', $content['approval_date']));
                 }
-                if (isset($content['approval_date']) && !empty($content['approval_date'])) {
-                    $content['fo_approval_date'] = Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']);
+                if (isset($content['fo_approval_date']) && !empty($content['fo_approval_date'])) {
+                    $content['fo_approval_date'] = mute_exception(fn () => Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']));
                 }
                 if (isset($content['password']) && !empty($content['password'])) {
                     $content['password'] = bcrypt($content['password']);
@@ -469,8 +478,8 @@ class FranchiseController extends Controller
             'phone_number' => ['sometimes', 'nullable'],
             'location' => ['sometimes', 'nullable'],
             'address' => ['sometimes', 'nullable'],
-            'approval_date' => ['sometimes', 'nullable', 'date'],
-            'fo_approval_date' => ['sometimes', 'nullable', 'date'],
+            'approval_date' => ['sometimes', 'nullable', 'date_format:d/m/Y'],
+            'fo_approval_date' => ['sometimes', 'nullable', 'date_format:d/m/Y'],
             'offering_letter_reference_number' => ['sometimes', 'nullable'],
             'fo_offering_letter_reference_number' => ['sometimes', 'nullable'],
             'issuance_number' => ['sometimes', 'nullable'],
@@ -502,10 +511,10 @@ class FranchiseController extends Controller
                 $content['distribution_center_id'] = $distributionCenterId;
 
                 if (isset($content['approval_date']) && !empty($content['approval_date'])) {
-                    $content['approval_date'] = Carbon::createFromFormat('d/m/Y', $content['approval_date']);
+                    $content['approval_date'] = mute_exception(fn () => Carbon::createFromFormat('d/m/Y', $content['approval_date']));
                 }
                 if (isset($content['fo_approval_date']) && !empty($content['fo_approval_date'])) {
-                    $content['fo_approval_date'] = Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']);
+                    $content['fo_approval_date'] = mute_exception(fn () => Carbon::createFromFormat('d/m/Y', $content['fo_approval_date']));
                 }
                 if (isset($content['password']) && !empty($content['password'])) {
                     $content['password'] = bcrypt($content['password']);

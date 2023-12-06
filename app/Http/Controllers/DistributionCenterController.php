@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class DistributionCenterController extends Controller
 {
@@ -410,6 +411,14 @@ class DistributionCenterController extends Controller
 
             if ($content['npwp']) {
                 $content['npwp'] = preg_replace('~[\D]~', '', (string) $content['npwp']);
+            }
+
+            if ($content['approval_date']) {
+                $content['approval_date'] = mute_exception(fn () => Date::excelToDateTimeObject($content['approval_date'])->format('d/m/Y'), $content['approval_date']);
+            }
+
+            if ($content['fo_approval_date']) {
+                $content['fo_approval_date'] = mute_exception(fn () => Date::excelToDateTimeObject($content['fo_approval_date'])->format('d/m/Y'), $content['fo_approval_date']);
             }
 
             $validator = Validator::make($content, $rules);
