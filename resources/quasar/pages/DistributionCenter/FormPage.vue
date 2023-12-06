@@ -769,6 +769,7 @@
           <table-franchise
             v-if="childTab === 'franchise'"
             :distribution-center="entry"
+            ref="tableFranchise"
             as-relation
             key="franchise"
           />
@@ -974,7 +975,9 @@ export default {
       handler(n, o) {
         if (n !== o) {
           if (n) {
-            this.onFormImport()
+            if (n !== 'proceed') {
+              this.onFormImport()
+            }
           }
         }
       }
@@ -1175,9 +1178,15 @@ export default {
       this.$store.dispatch('imports/sync')
     },
     onFormImportSuccess() {
-      if (this.$refs.tableStore) {
+      if (this.$refs.tableStore && this.$refs.tableStore.onRequest) {
         this.$refs.tableStore.onRequest()
       }
+
+      if (this.$refs.tableFranchise && this.$refs.tableFranchise.onRequest) {
+        this.$refs.tableFranchise.onRequest()
+      }
+
+      this.isFormImportVisible = false
     }
   }
 }

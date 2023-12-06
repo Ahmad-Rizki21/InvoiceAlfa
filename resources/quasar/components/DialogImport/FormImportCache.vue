@@ -91,6 +91,9 @@ export default {
       } else if (importType === constant.Store) {
         endpoint = `/v1/stores/import/cache`
         formData.distribution_center_id = this.$route.params.id
+      } else if (importType === constant.Franchise) {
+        endpoint = `/v1/franchises/import/cache`
+        formData.distribution_center_id = this.$route.params.id
       }
 
       if (!endpoint) {

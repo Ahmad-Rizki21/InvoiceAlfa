@@ -87,11 +87,18 @@ export default {
         this.isLoading = false
         return
       }
+      const payload = {
+        import_path: importPath
+      }
 
       if (importType === constant.DistributionCenter) {
         endpoint = `/v1/distribution-centers/import/process`
       } else if (importType === constant.Store) {
         endpoint = `/v1/stores/import/process`
+        payload.distribution_center_id = this.$route.params.id
+      } else if (importType === constant.Franchise) {
+        endpoint = `/v1/franchises/import/process`
+        payload.distribution_center_id = this.$route.params.id
       }
 
       if (!endpoint) {
@@ -101,9 +108,7 @@ export default {
       }
 
       try {
-        let { data } = await this.$api.post(endpoint, {
-          import_path: importPath
-        }, {
+        let { data } = await this.$api.post(endpoint, payload, {
           params: {
             page: this.processingPage
           }

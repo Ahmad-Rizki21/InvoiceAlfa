@@ -13,18 +13,26 @@
       :import-path="importPath"
       @success="$emit('success')"
     />
+    <table-franchise
+      v-else-if="importType == $constant.import_type.Franchise"
+      :import-type="importType"
+      :import-path="importPath"
+      @success="$emit('success')"
+    />
   </q-card>
 </template>
 
 <script>
 import TableDistributionCenter from './TableDistributionCenter'
 import TableStore from './TableStore'
+import TableFranchise from './TableFranchise'
 
 export default {
   name: 'FormImportFix',
   components: {
     TableDistributionCenter,
-    TableStore
+    TableStore,
+    TableFranchise
   },
   props: {
     loading: Boolean,
@@ -92,6 +100,10 @@ export default {
         endpoint = `/v1/distribution-centers/import/errors`
       } else if (importType === constant.Store) {
         endpoint = `/v1/stores/import/errors`
+        params.distribution_center_id = this.$route.params.id
+      } else if (importType === constant.Franchise) {
+        endpoint = `/v1/franchises/import/errors`
+        params.distribution_center_id = this.$route.params.id
       }
 
       if (!endpoint) {

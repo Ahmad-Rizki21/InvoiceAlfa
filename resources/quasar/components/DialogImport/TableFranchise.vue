@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class="form-import-fix-table-store">
+  <q-card flat class="form-import-fix-table-franchise">
     <q-table
       :data="entries"
       :columns="columns"
@@ -320,13 +320,13 @@
       <template #body-cell-action="{ row, rowIndex }">
         <q-td class="text-right table-cell-action">
           <q-btn
-            v-if="$auth.can('delete.distribution_center')"
+            v-if="$auth.can('delete.francise')"
             unelevated
             color="default"
             size="sm"
             padding="xs"
             icon="delete"
-            class="q-ml-xs btn-datatable-delete-distribution-center"
+            class="q-ml-xs btn-datatable-delete-franchise"
             @click.prevent="onDelete(row, rowIndex)"
           >
             <q-tooltip>
@@ -355,7 +355,7 @@ import { debounce } from 'quasar'
 import datatableMixins from 'src/mixins/datatable'
 
 export default {
-  name: 'TableStore',
+  name: 'TableFranchise',
   props: {
     customer: {
       type: Object,
@@ -498,6 +498,24 @@ export default {
           sortable: false
         },
         {
+          name: 'username',
+          field: 'username',
+          label: this.$t('Username'),
+          headerClasses: 'table-header-username',
+          classes: 'table-cell-username',
+          align: 'left',
+          sortable: false
+        },
+        {
+          name: 'password',
+          field: 'password',
+          label: this.$t('Password'),
+          headerClasses: 'table-header-password',
+          classes: 'table-cell-password',
+          align: 'left',
+          sortable: false
+        },
+        {
           name: 'action',
           label: '',
           align: 'right',
@@ -536,8 +554,8 @@ export default {
     await this.onRequest()
     await this.$nextTick()
 
-    // if (!this.$store.getters['tourGuide/finishedGroups'].distribution_centers) {
-    //   this.$tourGuide.open('distribution_centers')
+    // if (!this.$store.getters['tourGuide/finishedGroups'].francises) {
+    //   this.$tourGuide.open('francises')
     // }
   },
   methods: {
@@ -559,12 +577,11 @@ export default {
       const params = {
         table_pagination: { ...(props.pagination || {}) },
         table_search: { ...this.search },
-        import_path: this.importPath,
-        distribution_center_id: this.$route.params.id
+        import_path: this.importPath
       }
 
       try {
-        const { data } = await this.$api.get('/v1/stores/import/errors', { params })
+        const { data } = await this.$api.get('/v1/franchises/import/errors', { params })
 
         if (data.status === 'success') {
           this.entries = data.data.import_cache
@@ -592,7 +609,7 @@ export default {
       }
 
       try {
-        let { data } = await this.$api.post('/v1/stores/import/fix', {
+        let { data } = await this.$api.post('/v1/franchises/import/fix', {
           import_cache: this.entries,
           distribution_center_id: this.$route.params.id
         });
@@ -630,7 +647,7 @@ export default {
       this.isAdvancedSearchVisible = false
     },
     onFormEntryCreate() {
-      this.$router.push('/distribution-centers/create')
+      this.$router.push('/franchises/create')
 
       this.formEntry = {}
       this.isFormEntryReadonly = false
@@ -655,13 +672,13 @@ export default {
     onView(row) {
       if (this.customer.id) {
         this.$router.push({
-          path: `/distribution-centers/${row.id}`,
+          path: `/franchises/${row.id}`,
           query: {
             customer_id: this.customer.id
           }
         })
       } else {
-        this.$router.push(`/distribution-centers/${row.id}`)
+        this.$router.push(`/franchises/${row.id}`)
       }
 
       this.formEntry = { ...row }
@@ -679,11 +696,7 @@ export default {
     },
     async onDelete(row, rowIndex) {
       try {
-        let { data } = await this.$api.delete(`/v1/stores/import/row/${row.id}`, {
-          params: {
-            distribution_center_id: this.$route.params.id
-          }
-        });
+        let { data } = await this.$api.delete(`/v1/franchises/import/row/${row.id}`);
 
         if (data.status !== 'success') {
           this.$q.notify({ message: this.$t('Failed to delete row' )})
@@ -701,7 +714,7 @@ export default {
 </script>
 
 <style lang="scss">
-.form-import-fix-table-store {
+.form-import-fix-table-franchise {
   height: 100%;
 
   .table-header-name,

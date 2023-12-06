@@ -346,6 +346,7 @@ class FranchiseController extends Controller
     public function importProcess(Request $request)
     {
         $importPath = $request->import_path;
+        $distributionCenterId = $request->distribution_center_id;
         // $this->authorize('manage.distribution_center');
 
         $limit = 50;
@@ -353,8 +354,8 @@ class FranchiseController extends Controller
         $entries = ImportCache::where('import_path', $importPath)->paginate($limit, ['*'], 'page', $page);
 
         $rules = [
-            'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($request->distribution_center_id)],
+            // 'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
+            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($distributionCenterId)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -425,6 +426,7 @@ class FranchiseController extends Controller
                 if (isset($content['password']) && !empty($content['password'])) {
                     $content['password'] = bcrypt($content['password']);
                 }
+                $content['distribution_center_id'] = $distributionCenterId;
                 Franchise::create($content);
             }
         }
@@ -454,10 +456,11 @@ class FranchiseController extends Controller
     public function importFix(Request $request)
     {
         $importPath = $request->import_path;
+        $distributionCenterId = $request->distribution_center_id;
 
         $rules = [
-            'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
-            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($request->distribution_center_id)],
+            // 'distribution_center_id' => ['required', 'exists:' . DistributionCenter::class . ',id'],
+            'code' => ['sometimes', 'nullable', new UniqueFranchiseCodeRule($distributionCenterId)],
             'name' => ['required', 'max:191'],
             'email' => ['sometimes', 'nullable', 'email', 'max:191', new UniqueEmailRule()],
             'username' => ['bail', 'sometimes', 'nullable', 'min:3', 'max:30', new ValidUsernameRule(), new UniqueUsernameRule()],
@@ -496,6 +499,7 @@ class FranchiseController extends Controller
             } else {
                 $deletingIds[] = $entry->id;
                 $content = $data['content'];
+                $content['distribution_center_id'] = $distributionCenterId;
 
                 if (isset($content['approval_date']) && !empty($content['approval_date'])) {
                     $content['approval_date'] = Carbon::createFromFormat('d/m/Y', $content['approval_date']);

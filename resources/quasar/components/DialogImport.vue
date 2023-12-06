@@ -87,6 +87,16 @@ export default {
     }
   },
   watch: {
+    status: {
+      immediate: true,
+      handler(n, o) {
+        if (n !== o) {
+          if (n === 'proceed') {
+            this.onFormImportFixSuccess()
+          }
+        }
+      }
+    },
     value: {
       immediate: true,
       handler(n, o) {
@@ -126,11 +136,16 @@ export default {
       })
     },
     onFormImportProcessSuccess({ hasError }) {
+      const status = hasError || this.hasError ? 'fix' : 'proceed'
       this.$emit('update:status', {
-        status: hasError || this.hasError ? 'fix' : 'proceed',
+        status,
         importPath: this.importPath,
         hasError
       })
+
+      if (status === 'proceed') {
+        this.onFormImportFixSuccess()
+      }
     },
     onFormImportFixSuccess() {
       this.$store.dispatch('imports/reset')
