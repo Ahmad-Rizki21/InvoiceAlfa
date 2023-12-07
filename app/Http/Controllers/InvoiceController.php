@@ -246,11 +246,10 @@ class InvoiceController extends Controller
                 }
             }
         }
+        $user = $request->user();
 
-        if ($request->show_franchise) {
-            $query->where(function ($q) use ($request) {
-                $user = $request->user();
-
+        if ($request->show_franchise && $user instanceof DistributionCenter) {
+            $query->where(function ($q) use ($user) {
                 $q->where('distribution_center_id', $user->id)
                     ->orWhereIn('franchise_id', Franchise::where('distribution_center_id', $user->id)->pluck('id')->toArray());
             });
