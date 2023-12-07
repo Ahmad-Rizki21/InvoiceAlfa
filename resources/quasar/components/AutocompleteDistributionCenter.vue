@@ -7,6 +7,22 @@
     :display-value="valueToDisplay"
     @filter="onFilter"
   >
+    <template v-if="detailed" v-slot:option="scope">
+      <q-item
+        v-bind="scope.itemProps"
+        v-on="scope.itemEvents"
+      >
+        <q-item-section>
+          <q-item-label class="flex">
+            {{ scope.opt.name }}
+
+            <span class="text-caption q-item__label--caption q-ml-auto">{{ scope.opt.code }}</span>
+          </q-item-label>
+          <q-item-label caption>{{ scope.opt.location }}</q-item-label>
+        </q-item-section>
+      </q-item>
+    </template>
+
     <template #no-option>
       <q-item>
         <q-item-section class="text-grey">
@@ -39,6 +55,10 @@ export default {
     emitValue: {
       type: Boolean,
       default: true
+    },
+    detailed: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

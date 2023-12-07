@@ -7,6 +7,28 @@
     :display-value="valueToDisplay"
     @filter="onFilter"
   >
+    <template v-if="detailed" v-slot:option="scope">
+      <q-item
+        v-bind="scope.itemProps"
+        v-on="scope.itemEvents"
+      >
+        <q-item-section>
+          <q-item-label class="flex">
+            {{ scope.opt.name }}
+
+            <span class="text-caption q-item__label--caption q-ml-auto">{{ scope.opt.code }}</span>
+          </q-item-label>
+          <q-item-label caption>
+            <span>{{ scope.opt.location }}</span>
+            <span v-if="scope.opt.location && scope.opt.distribution_center" class="q-mx-sm">
+              |
+            </span>
+            <span v-if="scope.opt.distribution_center">{{ scope.opt.distribution_center.name }}</span>
+          </q-item-label>
+        </q-item-section>
+      </q-item>
+    </template>
+
     <template #no-option>
       <q-item>
         <q-item-section class="text-grey">
@@ -39,6 +61,10 @@ export default {
     emitValue: {
       type: Boolean,
       default: true
+    },
+    detailed: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -85,7 +111,8 @@ export default {
 
       const params = {
         table_pagination: { ...(props.pagination || {}) },
-        table_search: { fuzzy: { value: this.search }, status: { value: 1 } }
+        table_search: { fuzzy: { value: this.search }, status: { value: 1 } },
+        includes: 'distributionCenter'
       }
 
       try {

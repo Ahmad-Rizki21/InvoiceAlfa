@@ -194,6 +194,7 @@
                   v-model="entry.distribution_center_id"
                   :readonly="isLoading || isSyncing"
                   filled
+                  detailed
                   :label="$t('Select {entity}', { entity: $t('distribution center') })"
                 />
                 <autocomplete-franchise
@@ -201,6 +202,7 @@
                   v-model="entry.franchise_id"
                   :readonly="isLoading || isSyncing"
                   filled
+                  detailed
                   :label="$t('Select {entity}', { entity: $t('franchise') })"
                 />
 
