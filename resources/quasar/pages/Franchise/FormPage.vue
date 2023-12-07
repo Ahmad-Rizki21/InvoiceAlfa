@@ -895,6 +895,10 @@ export default {
         form.sla = parseFloat(form.sla, 10)
       }
 
+      if (!form.distribution_center_id) {
+        form.distribution_center_id = this.parentDistributionCenterId
+      }
+
       if (form.created_at) {
         form.created_at = date.formatDate(form.created_at, 'DD MMM YYYY HH:mm')
         form.updated_at = date.formatDate(form.updated_at, 'DD MMM YYYY HH:mm')
@@ -948,7 +952,7 @@ export default {
         entry.fo_approval_date = date.formatDate(date.extractDate(entry.fo_approval_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
       }
 
-      entry.distribution_center_id = entry.distribution_center_id || this.$route.query.distribution_center_id;
+      entry.distribution_center_id = entry.distribution_center_id || this.parentDistributionCenterId
 
       this.isLoading = true;
 
