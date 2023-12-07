@@ -103,9 +103,11 @@ class InvoiceController extends Controller
         $user = $request->user();
 
         if ($user instanceof DistributionCenter) {
-            $request->merge([
-                'distribution_center_id' => $user->id,
-            ]);
+            if (! $request->show_franchise) {
+                $request->merge([
+                    'distribution_center_id' => (string) $user->id,
+                ]);
+            }
         } else if ($user instanceof Franchise) {
             $request->merge([
                 'franchise_id' => 'in:' . Franchise::where('distribution_center_id', $user->distribution_center_id)->pluck('id')->implode('|'),
@@ -243,6 +245,15 @@ class InvoiceController extends Controller
                     $query->where($column, $operator->value(), $value);
                 }
             }
+        }
+
+        if ($request->show_franchise) {
+            $query->where(function ($q) use ($request) {
+                $user = $request->user();
+
+                $q->where('distribution_center_id', $user->id)
+                    ->orWhereIn('franchise_id', Franchise::where('distribution_center_id', $user->id)->pluck('id')->toArray());
+            });
         }
 
         foreach ($sorts->values() as $sort) {

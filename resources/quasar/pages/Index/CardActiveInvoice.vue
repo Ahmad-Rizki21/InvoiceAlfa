@@ -245,6 +245,7 @@ export default {
 
       if (this.franchiseColumnVisible) {
         params.includes = 'franchise'
+        params.show_franchise = '1'
       }
 
       try {
