@@ -4,6 +4,20 @@
     class="card-bill-detail"
   >
     <q-card-section>
+      <div v-if="invoice.franchise && invoice.franchise.id" class="row-detail invoice-no">
+        <div class="key">
+          <q-skeleton v-if="fetching" type="text" />
+          <template v-else>
+            {{ $t('Franchise') }}
+          </template>
+        </div>
+        <div class="value">
+          <q-skeleton v-if="fetching" type="rect" />
+          <template v-else>
+            {{ invoice.franchise.name }}
+          </template>
+        </div>
+      </div>
       <div class="row-detail invoice-no">
         <div class="key">
           <q-skeleton v-if="fetching" type="text" />

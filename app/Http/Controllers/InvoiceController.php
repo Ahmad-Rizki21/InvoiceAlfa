@@ -108,7 +108,7 @@ class InvoiceController extends Controller
             ]);
         } else if ($user instanceof Franchise) {
             $request->merge([
-                'franchise_id' => (string) $user->id,
+                'franchise_id' => 'in:' . Franchise::where('distribution_center_id', $user->distribution_center_id)->pluck('id')->implode('|'),
             ]);
         } else {
             $request->merge([

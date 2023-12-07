@@ -134,6 +134,16 @@ export default {
 <style lang="scss">
 .invoice-history-wrapper {
 
+  @media (min-width: 1200px) {
+    max-width: 992px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (min-width: 1600px) {
+    max-width: 1104px;
+  }
+
   .card-label {
     font-size: 1.2em;
     font-weight: 500;

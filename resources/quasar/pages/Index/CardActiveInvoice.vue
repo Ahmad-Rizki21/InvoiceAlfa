@@ -28,6 +28,10 @@
           <span><q-skeleton type="text" /></span>
           <div><q-skeleton type="rect" /></div>
         </div>
+        <div v-if="franchiseColumnVisible" class="invoice">
+          <span><q-skeleton type="text" /></span>
+          <div><q-skeleton type="rect" /></div>
+        </div>
         <div class="invoice">
           <span><q-skeleton type="text" /></span>
           <div><q-skeleton type="rect" /></div>
@@ -56,6 +60,12 @@
             <span class="span-invoice">{{ entry.invoice_no }}</span>
             <div class="span-month">{{ formatMonth(entry) }}</div>
             <div class="span-due-at">{{ formatDueAt(entry) }}</div>
+          </div>
+          <div v-if="franchiseColumnVisible" class="franchise">
+            <span class="span franchise-name">
+              Franchise
+            </span>
+            <div>{{ entry.franchise?.name || '-' }}</div>
           </div>
           <div class="invoice">
             <span class="span">
@@ -177,11 +187,18 @@ import { date } from 'quasar'
 
 export default {
   name: 'CardActiveInvoice',
+  props: {
+    showFranchise: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       entries: [],
       isFetching: true,
-      isLoading: false
+      isLoading: false,
+      onRequestDebounced: this.$utils.debounce(this.onRequest, 300)
     }
   },
   computed: {
@@ -190,6 +207,17 @@ export default {
     },
     firstInvoice() {
       return this.entries[0]
+    },
+    franchiseColumnVisible() {
+      return this.$auth.authType == 'f' || this.showFranchise
+    }
+  },
+  watch: {
+    showFranchise(n, o) {
+      if (n !== o) {
+        this.isFetching = true
+        this.onRequestDebounced()
+      }
     }
   },
   mounted() {
@@ -214,6 +242,10 @@ export default {
 
       params.table_pagination.sortBy = 'published_at'
       params.table_pagination.descending = true
+
+      if (this.franchiseColumnVisible) {
+        params.includes = 'franchise'
+      }
 
       try {
         const { data } = await this.$api.get('/v1/invoices/active', { params })
@@ -416,7 +448,11 @@ export default {
       flex: 1;
 
       @media (min-width: $breakpoint-md-min) {
-        min-width: 22%;
+        min-width: 14%;
+      }
+
+      @media (min-width: 1380px) {
+        min-width: 16%;
       }
 
       &-label {
@@ -488,17 +524,54 @@ export default {
         min-width: 10%;
       }
 
+      .franchise {
+        width: 31%;
+
+        @media (min-width: 1380px) {
+          width: 28%;
+        }
+
+        > div {
+          font-size: 0.9em;
+
+          @media (min-width: 1380px) {
+            font-size: 1.1em;
+          }
+        }
+      }
+
       .invoice {
-        width: 27%;
+        width: 30%;
+
+        @media (min-width: 1380px) {
+          width: 27%;
+        }
       }
 
       .status {
-        width: 15%;
+        width: 13%;
+
+        @media (min-width: 1380px) {
+          width: 15%;
+        }
       }
 
       .due-at {
         flex: none;
-        width: 15%;
+        width: 13%;
+      }
+
+      .franchise-name {
+        @media (max-width: 1299px) {
+          color: rgba(49, 53, 60, 0.6);
+          font-size: 0.75em;
+          line-height: 1;
+          text-align: right;
+          font-weight: 400;
+          margin-bottom: 0.25rem;
+          display: block;
+          text-align: left;
+        }
       }
 
       .total-bill {
@@ -567,6 +640,9 @@ export default {
       &.fetching {
         .date {
           width: 9%;
+        }
+        .franchise {
+          width: 28%;
         }
         .invoice {
           width: 28%;

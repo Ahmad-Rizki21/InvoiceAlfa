@@ -152,7 +152,7 @@ export default {
           this.customer = data.data.invoice.distribution_center || data.data.invoice.franchise
 
           data.data.invoice.distribution_center = null
-          data.data.invoice.franchise = null
+          // data.data.invoice.franchise = null
 
           this.entry = data.data.invoice
 

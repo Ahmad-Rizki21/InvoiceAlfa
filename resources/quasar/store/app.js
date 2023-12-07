@@ -5,6 +5,7 @@ const state = {
   dashboardCardMiniSummaryTimeTakenType: 'avg',
   dashboardCardMiniSummaryUnpaidCustomer: null,
   storedSearches: {},
+  isFranchiseBillVisible: false
 };
 
 const getters = {
