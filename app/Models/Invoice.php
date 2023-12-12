@@ -88,6 +88,7 @@ class Invoice extends Model
         }
 
         $idStart = 1743;
+        $invoiceId += $idStart;
 
         $invoiceId = str_pad((string) $invoiceId, 5, '0', STR_PAD_LEFT);
 
