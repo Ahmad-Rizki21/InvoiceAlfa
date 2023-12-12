@@ -84,7 +84,7 @@ class Invoice extends Model
         if ($invoiceId) {
             $invoiceId = ((int) $invoiceId->id) + 1;
         } else {
-            $invoiceId = 1742;
+            $invoiceId = 1743;
         }
 
         $invoiceId = str_pad((string) $invoiceId, 5, '0', STR_PAD_LEFT);
