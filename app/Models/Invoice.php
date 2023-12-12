@@ -82,7 +82,7 @@ class Invoice extends Model
         $invoiceId = Invoice::latest('id')->first(['id']);
 
         if ($invoiceId) {
-            $invoiceId = $invoiceId->id + 1;
+            $invoiceId = ((int) $invoiceId->id) + 1;
         } else {
             $invoiceId = 1;
         }
