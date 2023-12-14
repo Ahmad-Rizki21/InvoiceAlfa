@@ -619,7 +619,7 @@ wrapper {
   position: absolute;
   width: 39mm;
   top: 8mm;
-  left: 8mm;
+  left: 26mm;
   z-index: 3;
 }
 
@@ -828,7 +828,7 @@ wrapper {
   position: absolute;
   width: 39mm;
   top: 4mm;
-  left: 4mm;
+  left: 26mm;
   z-index: 3;
 }
 .form-receipt .signature-stamp-duty {
