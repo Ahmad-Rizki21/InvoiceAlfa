@@ -346,7 +346,7 @@ class InvoiceController extends Controller
             }
         }
 
-        if ($entry->distribution_center_id) {
+        if ($entry->distribution_center_id && $entry->print_store) {
             $stores = Store::where('distribution_center_id', $entry->distribution_center_id)->get();
         }
 
@@ -454,6 +454,7 @@ class InvoiceController extends Controller
             'signatory_name' => Settings::getValue(SettingKey::SignatoryName),
             'signatory_position' => Settings::getValue(SettingKey::SignatoryPosition),
             'status' => InvoiceStatus::Draft->value,
+            'print_store' => 1,
         ]);
 
         $service = new InvoiceService();
@@ -499,6 +500,7 @@ class InvoiceController extends Controller
             'note' => ['sometimes', 'nullable'],
             'receipt_remark' => ['sometimes', 'nullable'],
             'transfer_to_type' => ['sometimes', 'nullable', new Enum(TransferToType::class)],
+            'print_store' => ['sometimes', 'nullable', 'numeric', 'in:0,1'],
         ]);
 
         if ($request->distribution_center_id && $request->franchise_id) {
@@ -593,6 +595,8 @@ class InvoiceController extends Controller
             'signatory_name' => Settings::getValue(SettingKey::SignatoryName),
             'signatory_position' => Settings::getValue(SettingKey::SignatoryPosition),
 
+            'print_store' => (int) $request->print_store,
+
             'status' => InvoiceStatus::Draft->value,
         ]);
 
@@ -649,6 +653,7 @@ class InvoiceController extends Controller
             'status' => ['sometimes', 'nullable', new Enum(InvoiceStatus::class)],
             'transfer_to_type' => ['sometimes', 'nullable', new Enum(TransferToType::class)],
             'actual_payment_date' => ['sometimes', 'nullable', 'date'],
+            'print_store' => ['sometimes', 'nullable', 'numeric', 'in:0,1'],
         ]);
 
         $entry->fill([
@@ -669,6 +674,7 @@ class InvoiceController extends Controller
             'reject_reason' => $request->has('reject_reason') ? $request->reject_reason : $entry->reject_reason,
             'transfer_to_type' => $request->filled('transfer_to_type') ? $request->transfer_to_type : $entry->transfer_to_type,
             'actual_payment_date' => $request->has('actual_payment_date') ? $request->actual_payment_date : $entry->actual_payment_date,
+            'print_store' => $request->has('print_store') ? $request->print_store : $entry->print_store,
         ]);
 
         if ($request->status) {

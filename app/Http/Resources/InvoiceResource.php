@@ -65,6 +65,8 @@ class InvoiceResource extends JsonResource
             'signatory_name' => (string) $this->signatory_name,
             'signatory_position' => (string) $this->signatory_position,
 
+            'print_store' => (int) $this->print_store,
+
             'unpaid_updated_at' => $this->formatDateTime($this->unpaid_updated_at),
             'pending_review_updated_at' => $this->formatDateTime($this->pending_review_updated_at),
             'paid_at' => $this->formatDateTime($this->paid_at),

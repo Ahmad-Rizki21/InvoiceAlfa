@@ -328,7 +328,7 @@
   </div>
 </div>
 
-
+@if(count($stores))
 <div class="form-store-printable q-pa-sm q-gutter-md">
   <div class="print-paper-wrapper A4">
     <div class="print-paper">
@@ -368,4 +368,5 @@
     </div>
   </div>
 </div>
+@endif
 @endsection

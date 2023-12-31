@@ -28,6 +28,7 @@ class Invoice extends Model
         'status', 'unpaid_updated_at', 'pending_review_updated_at', 'paid_at',
         'rejected_at', 'reject_reason', 'transfer_to_type', 'customer_npwp',
         'actual_payment_date',
+        'print_store',
     ];
 
     /**

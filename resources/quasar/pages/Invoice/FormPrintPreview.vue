@@ -12,7 +12,7 @@
       :show-signatures="showSignatures"
     />
     <form-store
-      v-if="stores.length"
+      v-if="stores.length && !!invoice.print_store"
       :entries="stores"
       :invoice="invoiceUpdated.invoice_no ? invoiceUpdated : invoice"
       :template-settings="templateSettings"

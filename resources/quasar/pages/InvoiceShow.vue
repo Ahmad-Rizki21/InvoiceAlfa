@@ -258,7 +258,15 @@
                 @updated="onFormReceiptUpdated"
               />
             </div>
-            <div v-if="customerToFind === 'distribution_center' && formStores.length">
+
+            <div v-if="customerToFind === 'distribution_center' && formStores.length" class="text-center">
+              <q-toggle
+                v-model="shouldPrintStore"
+                :label="$t('Show store list')"
+              />
+            </div>
+
+            <div v-if="customerToFind === 'distribution_center' && formStores.length && shouldPrintStore">
               <form-store
                 ref="formStores"
                 :entries="formStores"
@@ -387,7 +395,8 @@ export default {
       customerToFind: 'distribution_center',
       isEditable: true,
       printUrl: null,
-      selectedCustomer: {}
+      selectedCustomer: {},
+      shouldPrintStore: true
     }
   },
   computed: {
@@ -471,6 +480,7 @@ export default {
           this.formInvoice = data.data.invoice
           this.formReceipt = data.data.invoice
           this.selectedCustomer = distributionCenter || franchise
+          this.shouldPrintStore = !!data.data.invoice.print_store
           this.requestStores()
         }
       } catch (err) {
@@ -494,8 +504,9 @@ export default {
     },
     async requestStores() {
       const params = {
-        distribution_center_id: this.entry.distribution_center_id
+        distribution_center_id: this.entry.distribution_center_id || this.formInvoice.distribution_center_id
       }
+
       try {
         const { data } = await this.$api.get(`/v1/stores`, { params })
 
@@ -527,6 +538,7 @@ export default {
 
           this.formInvoice = data.data.invoice
           this.formReceipt = data.data.invoice
+          this.shouldPrintStore = !!data.data.invoice.print_store
 
           this.selectedCustomer = distributionCenter || franchise
         }
@@ -689,10 +701,9 @@ export default {
         customer_address: formInvoice.customer_address,
         receipt_remark: this.formReceipt.receipt_remark,
         transfer_to_type: formInvoice.transfer_to_type,
+        print_store: this.shouldPrintStore ? 1 : 0,
         invoice_services: formInvoice.services || [],
       }
-
-      console.log(entry)
 
       const $formPage = this.$refs.formPage
 
@@ -739,6 +750,7 @@ export default {
             this.formInvoiceUpdated = {}
             this.formInvoice = {}
             this.formReceipt = {}
+            this.shouldPrintStore = true
             this.isEditable = false
           }
           this.$emit('success', data.data.invoice);
