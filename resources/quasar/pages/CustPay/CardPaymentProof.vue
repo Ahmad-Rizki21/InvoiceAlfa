@@ -94,19 +94,24 @@
         />
       </div>
 
-      <!-- <p class="label-meta">
-        {{ $t('Add a remark if necessary') }}
+      <p v-if="!readonly" class="label-meta q-mt-lg">
+        <span>{{ $t('Add a remark if necessary') }}</span>
       </p>
 
       <q-input
         :label="$t('Remark')"
         v-model="paymentProofRemark"
-        filled
-        stack-label
-        row="1"
-        autogrow
         type="textarea"
-      /> -->
+        autogrow
+        :class="{ 'q-mt-lg': readonly }"
+        :filled="!readonly"
+        :borderless="readonly"
+        :readonly="readonly"
+        stack-label
+        :placeholder="readonly ? '-' : ''"
+        name="payment_proof_remark"
+        autocomplete="off"
+      />
     </q-card-section>
 
     <q-card-actions v-if="uploadable">
@@ -209,6 +214,8 @@ export default {
               this.actualPaymentDate = null
             }
 
+            this.paymentProofRemark = n.payment_proof_remark || null
+
             this.canUpload = true
 
             if (this.editable) {
@@ -272,12 +279,16 @@ export default {
     },
     async onSubmit() {
       const formEntry = {
-        actual_payment_date: null
+        actual_payment_date: null,
+        payment_proof_remark: null
       }
 
       if (this.actualPaymentDate) {
         formEntry.actual_payment_date = date.formatDate(date.extractDate(this.actualPaymentDate, 'DD/MM/YYYY'), 'YYYY-MM-DD')
-      } else {}
+      }
+      if (this.paymentProofRemark) {
+        formEntry.payment_proof_remark = this.paymentProofRemark
+      }
 
       try {
         const { data } = await this.$api.patch(`/v1/invoices/${this.invoice.id}`, formEntry);

@@ -71,6 +71,7 @@ class InvoiceResource extends JsonResource
             'pending_review_updated_at' => $this->formatDateTime($this->pending_review_updated_at),
             'paid_at' => $this->formatDateTime($this->paid_at),
             'actual_payment_date' => $this->formatDate($this->actual_payment_date),
+            'payment_proof_remark' => $this->nullableString($this->payment_proof_remark),
             'rejected_at' => $this->formatDateTime($this->rejected_at),
             'reject_reason' => $this->nullableString($this->reject_reason),
 

@@ -654,6 +654,7 @@ class InvoiceController extends Controller
             'transfer_to_type' => ['sometimes', 'nullable', new Enum(TransferToType::class)],
             'actual_payment_date' => ['sometimes', 'nullable', 'date'],
             'print_store' => ['sometimes', 'nullable', 'numeric', 'in:0,1'],
+            'payment_proof_remark' => ['sometimes', 'nullable'],
         ]);
 
         $entry->fill([
@@ -675,6 +676,7 @@ class InvoiceController extends Controller
             'transfer_to_type' => $request->filled('transfer_to_type') ? $request->transfer_to_type : $entry->transfer_to_type,
             'actual_payment_date' => $request->has('actual_payment_date') ? $request->actual_payment_date : $entry->actual_payment_date,
             'print_store' => $request->has('print_store') ? $request->print_store : $entry->print_store,
+            'payment_proof_remark' => $request->has('payment_proof_remark') ? $request->payment_proof_remark : $entry->payment_proof_remark,
         ]);
 
         if ($request->status) {

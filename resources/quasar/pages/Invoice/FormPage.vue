@@ -81,6 +81,7 @@
                     <card-payment-proof
                       ref="cardPaymentProof"
                       :invoice="formEntry"
+                      class="col"
                       :uploadable="false"
                       :editable="editable"
                       flat
@@ -584,9 +585,12 @@ export default {
       margin-left: -1rem;
     }
 
-    .label-header,
-    .label-meta {
+    .label-header {
       display: none;
+    }
+    .label-meta span {
+      visibility: hidden !important;
+      opacity: 0 !important;
     }
   }
 }

@@ -27,7 +27,7 @@ class Invoice extends Model
         'signatory_name', 'signatory_position',
         'status', 'unpaid_updated_at', 'pending_review_updated_at', 'paid_at',
         'rejected_at', 'reject_reason', 'transfer_to_type', 'customer_npwp',
-        'actual_payment_date',
+        'actual_payment_date', 'payment_proof_remark',
         'print_store',
     ];
 
