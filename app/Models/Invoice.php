@@ -88,7 +88,7 @@ class Invoice extends Model
         } else {
             $invoiceId = static::selectRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') AS `no`")
                             ->whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') < 1747")
-                            ->whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') > 1867")
+                            ->orWhereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') > 1867")
                             ->orderByDesc('no')->first();
 
             if ($invoiceId) {
