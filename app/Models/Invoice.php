@@ -80,12 +80,22 @@ class Invoice extends Model
 
     public static function generateInvoiceReceiptNo(DateTimeInterface $date)
     {
-        $invoiceId = Invoice::latest('id')->first(['id']);
+        $currentNo = 1461;
+        $currentNoExists = static::whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') = {$currentNo}")->first();
 
-        if ($invoiceId) {
-            $invoiceId = ((int) $invoiceId->id) + 1;
+        if (! $currentNoExists) {
+            $invoiceId = $currentNo;
         } else {
-            $invoiceId = 1743;
+            $invoiceId = static::selectRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') AS `no`")
+                            ->whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') < 1747")
+                            ->whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') > 1867")
+                            ->orderByDesc('no')->first();
+
+            if ($invoiceId) {
+                $invoiceId = ((int) $invoiceId->no) + 1;
+            } else {
+                $invoiceId = $currentNo;
+            }
         }
 
         $invoiceId = str_pad((string) $invoiceId, 5, '0', STR_PAD_LEFT);
