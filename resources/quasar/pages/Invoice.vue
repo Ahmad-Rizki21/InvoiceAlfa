@@ -580,7 +580,27 @@ export default {
       }
     },
   },
+  beforeRouteLeave(to, from, next) {
+    if (!to.name.includes('invoices')) {
+      this.$store.dispatch('app/storeSearches', { id: this.$options.name, payload: null })
+    }
+    next()
+  },
   async mounted() {
+    try {
+      let storedSearches = this.$store.getters['app/storedSearches']
+      if (storedSearches && storedSearches[this.$options.name]) {
+        storedSearches = JSON.parse(storedSearches[this.$options.name])
+
+        if (storedSearches.applicable_month && storedSearches.applicable_month.value) {
+          storedSearches.applicable_month.value = new Date(storedSearches.applicable_month.value)
+        }
+
+        this.search = storedSearches
+      }
+
+      await this.$nextTick()
+    } catch (err) {}
     await this.onRequest()
     await this.$nextTick()
     // if (!this.$store.getters['tourGuide/finishedGroups'].invoices) {
@@ -601,8 +621,10 @@ export default {
 
       const params = {
         table_pagination: { ...(props.pagination || {}) },
-        table_search: { ...this.search }
+        table_search: this.$utils.merge({}, { ...this.search })
       }
+
+      this.$store.dispatch('app/storeSearches', { id: this.$options.name, payload: params.table_search })
 
       if (params.table_search.applicable_month.value) {
         params.table_search.applicable_month = {

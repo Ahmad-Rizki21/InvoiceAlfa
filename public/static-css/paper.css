@@ -589,6 +589,8 @@ wrapper {
 
 .form-invoice .invoice-signature-person {
   text-align: center;
+  margin-left: 7mm;
+  padding-top: 2mm;
 }
 
 .form-invoice .invoice-signature-person-name {
@@ -796,6 +798,7 @@ wrapper {
 }
 
 .form-receipt .receipt-footer>.receipt-signature {
+  margin-top: 4mm;
   width: 50%;
   text-align: center;
   position: relative;

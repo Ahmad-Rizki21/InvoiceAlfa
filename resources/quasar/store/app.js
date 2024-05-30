@@ -54,6 +54,7 @@ const actions = {
     const settings = { ...getters.settings };
     delete settings.sidebar
     delete settings.sidebarMiniVariant
+    delete settings.storedSearches
 
     this._vm.$storage.set('__app_settings', settings);
   },
