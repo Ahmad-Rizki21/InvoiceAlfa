@@ -70,7 +70,10 @@ export default {
         if (data.status === 'success') {
           this.invoice = data.data.invoice
           this.receipt = data.data.invoice
-          this.requestStores()
+
+          if (this.$route.query.store !== 'n') {
+            this.requestStores()
+          }
         }
       } catch (err) {
         this.$q.notify(err)

@@ -606,6 +606,10 @@ export default {
       this.isFormPrintPreviewVisible = false
       this.printUrl = this.$router.resolve(`/invoices/${this.$route.params.id}/print`).href
 
+      if (!this.shouldPrintStore) {
+        this.printUrl += '?store=n'
+      }
+
       this.$nextTick(() => {
         if (this.$refs.printIframe) {
           const $refs = this.$refs.printIframe
