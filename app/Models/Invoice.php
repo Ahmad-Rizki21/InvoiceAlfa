@@ -80,15 +80,32 @@ class Invoice extends Model
 
     public static function generateInvoiceReceiptNo(DateTimeInterface $date)
     {
-        $currentNo = 1461;
-        $currentNoExists = static::whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') = {$currentNo}")->first();
+        $currentNos = [
+            '2024-06' => 1461,
+        ];
+
+        $currentNo = 1;
+
+        $dateFindCurrentNo = $date->format('Y-m');
+
+        if (isset($currentNos[$dateFindCurrentNo])) {
+            $currentNo = $currentNos[$dateFindCurrentNo];
+        }
+
+
+
+        // $currentNo = 1461;
+        $currentNoExists = static::whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') = {$currentNo}")
+                                    ->whereMonth('published_at', $date->format('m'))
+                                    ->whereYear('published_at', $date->format('Y'))
+                                    ->first();
 
         if (! $currentNoExists) {
             $invoiceId = $currentNo;
         } else {
             $invoiceId = static::selectRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') AS `no`")
-                            ->whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') < 1747")
-                            ->orWhereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') > 1867")
+                            ->whereMonth('published_at', $date->format('m'))
+                            ->whereYear('published_at', $date->format('Y'))
                             ->orderByDesc('no')->first();
 
             if ($invoiceId) {
