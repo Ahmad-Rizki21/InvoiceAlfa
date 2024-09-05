@@ -1269,6 +1269,10 @@ class InvoiceController extends Controller
         $uploadedFile = InvoiceImport::getUploadedFile($request->import_path);
         Excel::import(new InvoiceImport($request->import_path), $uploadedFile);
 
+        sleep(2);
+        InvoiceImport::deleteUploadedFile($request->import_path);
+        Cache::driver('database')->delete(static::class . 'simpleimport');
+
         return $this->json([
             'status' => 'success',
             'message' => __('Your file successfully imported'),

@@ -55,6 +55,11 @@ class ImportCacheImport implements ToCollection
         return Storage::disk('local')->path($importPath);
     }
 
+    public static function deleteUploadedFile($importPath)
+    {
+        return Storage::disk('local')->delete($importPath);
+    }
+
     /**
     * @param Collection $collection
     */

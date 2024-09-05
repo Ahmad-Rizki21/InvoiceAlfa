@@ -107,6 +107,14 @@ class Invoice extends Model
             $date = $date->format('m/Y');
         }
 
+
+        $existing = static::latest()->first(['no']);
+        $existing = $existing->no + 1;
+
+        if ($existing > $no) {
+            $no = $existing;
+        }
+
         return [
             $no . '/INV-AJNusa/' . $date,
             $no . '/KWT-AJNusa/' . $date,

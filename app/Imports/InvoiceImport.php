@@ -268,19 +268,13 @@ class InvoiceImport extends ImportCacheImport
                 'total' => $total,
             ]);
 
-            $items[] = $data;
-        }
+            $services = $data['services'];
+            unset($data['services']);
+            $invoice = Invoice::create($data);
 
-        DB::transaction(function () use ($items) {
-            foreach ($items as $item) {
-                $services = $item['services'];
-                unset($item['services']);
-                $invoice = Invoice::create($item);
-
-                foreach ($services as $service) {
-                    $invoice->invoiceServices()->create($service);
-                }
+            foreach ($services as $service) {
+                $invoice->invoiceServices()->create($service);
             }
-        });
+        }
     }
 }
