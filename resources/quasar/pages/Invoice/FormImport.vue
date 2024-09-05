@@ -156,6 +156,8 @@ export default {
             await this.waitUpload(data.data.url)
           } else {
             this.$emit('success')
+
+            this.internalValue = null
           }
         }
       } catch (err) {
@@ -163,7 +165,11 @@ export default {
           this.errors = {
             ...err.validation.errors
           }
+          this.internalValue = null
+          this.isLoading = false;
         } else {
+          this.isLoading = false
+          this.cancel();
           this.$q.notify(err);
         }
       }
@@ -182,6 +188,7 @@ export default {
             await this.waitUpload(url)
           } else {
             this.$q.notify({ message: data.message || this.$t('Failed to upload import file') })
+            this.internalValue = null
           }
         } else {
           if (data.data.url) {
@@ -189,6 +196,7 @@ export default {
           } else {
             this.$emit('success')
             this.isLoading = false;
+            this.internalValue = null
           }
         }
       } catch (err) {
@@ -196,8 +204,12 @@ export default {
           this.errors = {
             ...err.validation.errors
           }
+          this.internalValue = null
+          this.isLoading = false;
         } else {
           this.$q.notify(err);
+          this.isLoading = false
+          this.cancel();
         }
       }
     },

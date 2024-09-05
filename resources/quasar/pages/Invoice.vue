@@ -190,6 +190,7 @@
               icon="delete"
               padding="sm"
               :disable="!selectedEntries.length"
+              @click.prevent="onBulkDelete"
             >
             </q-btn>
 
@@ -817,6 +818,58 @@ export default {
           } else {
             if (data.status === 'success') {
               this.$q.notify({ message: this.$t('{entity} deleted', { entity: this.$t('Invoice') }) })
+              this.onRequest()
+            } else {
+              this.$t('Failed to delete {entity}', { entity: this.$t('invoice') })
+            }
+          }
+        } catch (err) {
+          this.$q.notify(err);
+        }
+
+      }).onCancel(() => {
+        this.isLoading = false
+      })
+    },
+    onBulkDelete() {
+      if (this.isLoading) {
+        return;
+      }
+
+      const selected = this.selectedEntries
+
+      if (!selected.length) {
+        return
+      }
+
+      this.$q.dialog({
+        title: this.$t('Confirm'),
+        message: this.$t(`Apakah Anda yakin ingin menghapus ${selected.length} data yang dipilih?`),
+        cancel: {
+          label: this.$t('Cancel'),
+          color: 'dark',
+          flat: true
+        },
+        ok: {
+          label: this.$t('Yes'),
+          color: 'primary',
+          unelevated: true,
+          flat: true,
+          class: 'text-weight-bold'
+        },
+        persistent: true
+      }).onOk(async () => {
+        try {
+          let { data } = await this.$api.post(`/v1/invoices/delete`, {
+            ids: selected.map(v => v.id)
+          });
+
+          if (data.message) {
+            this.$q.notify({ message: data.message })
+            this.onRequest()
+          } else {
+            if (data.status === 'success') {
+              this.$q.notify({ message: this.$t(`${selected.length} invoice berhasil dihapus`) })
               this.onRequest()
             } else {
               this.$t('Failed to delete {entity}', { entity: this.$t('invoice') })

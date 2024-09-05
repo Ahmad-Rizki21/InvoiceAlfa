@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Facades\Excel;
+use Throwable;
 
 class InvoiceController extends Controller
 {
@@ -1112,9 +1113,40 @@ class InvoiceController extends Controller
             return abort(404, __(':entity not found', ['entity' => __('Invoice')]));
         }
 
-        if ($entry->status == InvoiceStatus::Draft->value) {
+        if (! in_array($entry->status, [InvoiceStatus::Draft->value, InvoiceStatus::Unpaid->value])) {
             $entry->delete();
         } else {
+            $entry->invoiceServices()->delete();
+
+            foreach ($entry->invoicePaymentProofs()->get() as $paymentProof) {
+                if (Storage::disk($paymentProof->disk)->exists($paymentProof->path)) {
+                    Storage::disk($paymentProof->disk)->delete($paymentProof->path);
+                }
+
+                $paymentProof->delete();
+            }
+
+            $entry->forceDelete();
+        }
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __(':entity successfully deleted', ['entity' => __('Invoice')]),
+            'data' => new \stdClass(),
+        ]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        // $this->authorize('delete.invoice');
+
+        $request->validate([
+            'ids' => ['required', 'array'],
+        ]);
+
+        foreach ($request->ids as $id) {
+            $entry = Invoice::findOrFail($id);
+
             $entry->invoiceServices()->delete();
 
             foreach ($entry->invoicePaymentProofs()->get() as $paymentProof) {
@@ -1267,7 +1299,16 @@ class InvoiceController extends Controller
             }
         }
         $uploadedFile = InvoiceImport::getUploadedFile($request->import_path);
-        Excel::import(new InvoiceImport($request->import_path), $uploadedFile);
+        try {
+            Excel::import(new InvoiceImport($request->import_path), $uploadedFile);
+        } catch (Throwable $e) {
+            sleep(2);
+
+            InvoiceImport::deleteUploadedFile($request->import_path);
+            Cache::driver('database')->delete(static::class . 'simpleimport');
+
+            throw $e;
+        }
 
         sleep(2);
         InvoiceImport::deleteUploadedFile($request->import_path);
