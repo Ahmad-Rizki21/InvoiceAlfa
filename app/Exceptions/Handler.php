@@ -90,6 +90,10 @@ class Handler extends ExceptionHandler
             $message = $msg;
         }
 
+        if ($e instanceof InvoiceImportRowException) {
+            $message = $e->getMessage();
+        }
+
         return $debug ? [
             'status' => $status,
             'message' => $message,

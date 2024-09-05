@@ -6,6 +6,7 @@ use App\Enums\ImportType;
 use App\Enums\InvoiceStatus;
 use App\Enums\SettingKey;
 use App\Enums\TransferToType;
+use App\Exceptions\InvoiceImportRowException;
 use App\Models\DistributionCenter;
 use App\Models\Franchise;
 use App\Models\ImportCache;
@@ -136,7 +137,7 @@ class InvoiceImport extends ImportCacheImport
                 }
 
                 if (! $customer) {
-                    throw new Exception('Customer on row ' . ($i + 1) . ' could not be found');
+                    throw new InvoiceImportRowException('Customer on row ' . ($i + 1) . ' could not be found');
                 }
 
                 if (! $offeringLetterReferenceNumber) {
