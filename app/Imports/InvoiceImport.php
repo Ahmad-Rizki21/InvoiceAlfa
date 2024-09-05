@@ -264,7 +264,7 @@ class InvoiceImport extends ImportCacheImport
                 'sub_total' => $subTotal,
                 'ppn_percentage' => $ppnPercentage,
                 'ppn_total' => $ppnTotal,
-                'stamp_duty' => $stampDuty === null ? null : (int) $stampDuty,
+                'stamp_duty' => $stampDuty === null ? null : (float) $stampDuty,
                 'total' => $total,
             ]);
 

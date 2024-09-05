@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Enums\InvoiceStatus;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TicketController;
@@ -87,6 +88,47 @@ class InvoiceExport implements
     {
         return [
             $this->rowHeadings(),
+            [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+
+                __('Deskripsi 1'),
+                __('Qty 1'),
+                __('Unit Price 1'),
+                __('Deskripsi 2'),
+                __('Qty 2'),
+                __('Unit Price 2'),
+                __('Deskripsi 3'),
+                __('Qty 3'),
+                __('Unit Price 3'),
+                __('Deskripsi 4'),
+                __('Qty 4'),
+                __('Unit Price 4'),
+                __('Deskripsi 5'),
+                __('Qty 5'),
+                __('Unit Price 5'),
+
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+            ]
         ];
     }
 
@@ -95,15 +137,42 @@ class InvoiceExport implements
 
         return [
             __('No'),
-            __('NO INVOICE'),
-            __('NO KWITANSI'),
-            __('KODE CUSTOMER'),
-            __('NAMA CUSTOMER'),
-            __('TIPE CUSTOMER'),
-            __('JUMLAH PEMBAYARAN'),
-            __('TANGGAL PUBLISH'),
-            __('TANGGAL PEMBAYARAN'),
-            __('STATUS'),
+            __('No Invoice'),
+            __('No Kwitansi'),
+            __('Tipe Customer'),
+            __('Kode Customer'),
+            __('Nama Customer'),
+            __('Tanggal'),
+            __('Surat Penawaran/Our Ref.'),
+            __('Surat Penawaran FO/Our Ref.'),
+            __('Tanggal Persetujuan SAT-HO'),
+            __('Tanggal Persetujuan SAT-HO untuk FO'),
+            __('Dasar untuk menerbitkan Invoice Tagihan'),
+            __('Dasar untuk menerbitkan Invoice Tagihan FO'),
+            __('Rincian'),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            __('Bea Meterai'),
+            __('Due Date'),
+            __('Catatan'),
+            __('Pekerjaan'),
+            __('Status'),
+            __('Tanggal Pembayaran'),
+            __('VAT'),
+            __('Sub Total'),
+            __('Total'),
         ];
     }
 
@@ -119,21 +188,56 @@ class InvoiceExport implements
             $customerType = 'DC';
         } else if ($row->franchise_id) {
             $customer = $row->franchise;
-            $customerType = 'FRANCHISE';
+            $customerType = 'Franchise';
         }
 
-        return [
-            $this->getRowNumber() ?: $this->currentRow,
+        $result = [
+            // $this->getRowNumber() ?: $this->currentRow,
+            $row->no ?? null,
             $row->invoice_no ?? null,
             $row->receipt_no ?? null,
+            $customerType ?? null,
             $customer?->code ?? null,
             $customer?->name ?? null,
-            $customerType ?? null,
-            $row->total ?? null,
-            $row->published_at ? $row->published_at->format('d-m-Y') : null,
-            $row->actual_payment_date ? $row->actual_payment_date->format('d-m-Y') : null,
-            $row->status_description,
+            $row->published_at ? $row->published_at->format('d/m/Y') : null,
+            $row->offering_letter_reference_number ?? null,
+            $row->fo_offering_letter_reference_number ?? null,
+            $row->approval_date ? $row->approval_date->format('d/m/Y') : null,
+            $row->fo_approval_date ? $row->fo_approval_date->format('d/m/Y') : null,
+            $row->issuance_number ?? null,
+            $row->fo_issuance_number ?? null,
         ];
+
+        $invoiceServices = $row->invoiceServices;
+        $invoiceServicesCount = count($invoiceServices);
+
+        foreach ($invoiceServices as $service) {
+            $result[] = $service->description;
+            $result[] = $service->qty;
+            $result[] = $service->unit_price;
+        }
+
+        if ($invoiceServicesCount < 5) {
+            for ($i = 0; $i < (5 - $invoiceServicesCount); $i++) {
+                $result[] = null;
+                $result[] = null;
+                $result[] = null;
+            }
+        }
+
+        $result = array_merge($result, [
+            $row->stamp_duty ?? null,
+            $row->due_at ? $row->due_at->format('d/m/Y') : null,
+            $row->note ?? null,
+            $row->receipt_remark ?? null,
+            InvoiceStatus::tryFrom((int) ($row->status ?? 0))?->description() ?: null,
+            $row->actual_payment_date ? $row->actual_payment_date->format('d/m/Y') : null,
+            $row->ppn_total ?? null,
+            $row->sub_total ?? null,
+            $row->total ?? null,
+        ]);
+
+        return $result;
     }
 
 
@@ -162,10 +266,11 @@ class InvoiceExport implements
 
         $totalData = $this->querySize();
         $totalHeadings = count($this->rowHeadings()) - 1;
-        $startRow = 1;
-
+        $startRow = 2;
         $key = num2alpha($totalHeadings);
-        $key = 'A' . $startRow . ':' . $key . $startRow;
+
+
+        $key = 'A1:' . $key . $startRow;
 
         $styles[$key] = [
             'font' => [
@@ -188,7 +293,7 @@ class InvoiceExport implements
 
             foreach (range(0, $totalHeadings) as $num) {
                 $key = num2alpha($num);
-                $key = $key . $startRow . ':' . $key . ($totalData + $startRow);
+                $key = $key . '1:' . $key . ($totalData + $startRow);
 
                 $styles[$key] = [
                     'borders' => [
@@ -207,7 +312,7 @@ class InvoiceExport implements
         } else {
             foreach (range(0, $totalHeadings) as $num) {
                 $key = num2alpha($num);
-                $key = $key . $startRow . ':' . $key . ($totalData + $startRow);
+                $key = $key . '1:' . $key . ($totalData + $startRow);
 
                 $styles[$key] = [
                     'borders' => [
@@ -224,6 +329,16 @@ class InvoiceExport implements
 
         // $key = num2alpha($totalHeadings);
         // $sheet->mergeCells('A1:' . $key . '1');
+        // $sheet->mergeCells('A1:' . $key . '1');
+
+        for ($j = 0; $j < 14; $j++) {
+            $mergingCell = num2alpha($j);
+            $sheet->mergeCells($mergingCell . '1:' . $mergingCell . '2');
+        }
+        for ($j = 28; $j < 37; $j++) {
+            $mergingCell = num2alpha($j);
+            $sheet->mergeCells($mergingCell . '1:' . $mergingCell . '2');
+        }
 
         return $styles;
     }
