@@ -111,6 +111,8 @@ Route::group(['prefix' => '/invoices', 'middleware' => 'auth:api', 'as' => 'invo
     Route::get('/active', [InvoiceController::class, 'active'])->name('active');
     Route::get('/template', [InvoiceController::class, 'template'])->name('template');
     Route::post('/export', [InvoiceController::class, 'requestExport'])->name('export.request');
+    Route::post('/simple-import', [InvoiceController::class, 'simpleImport'])->name('simple-import');
+    Route::post('/simple-import/upload', [InvoiceController::class, 'simpleImportUpload'])->name('simple-import.upload');
     Route::post('/payment-proofs', [InvoiceController::class, 'uploadPaymentProofs'])->name('payment-proof');
     Route::get('/payment-proofs', [InvoiceController::class, 'getPaymentProofs']);
     Route::post('/payment-proofs/delete', [InvoiceController::class, 'destroyPaymentProofs'])->name('payment-proof.destroy');

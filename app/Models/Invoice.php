@@ -29,6 +29,7 @@ class Invoice extends Model
         'rejected_at', 'reject_reason', 'transfer_to_type', 'customer_npwp',
         'actual_payment_date', 'payment_proof_remark',
         'print_store',
+        'no',
     ];
 
     /**
@@ -80,46 +81,36 @@ class Invoice extends Model
 
     public static function generateInvoiceReceiptNo(DateTimeInterface $date)
     {
-        $currentNos = [
-            '2024-06' => 1461,
-        ];
+        $no = static::latest()->first(['no']);
+        $no = $no->no;
 
-        $currentNo = 1;
+        $inject = file_get_contents(storage_path('injectinvoiceno.txt'));
 
-        $dateFindCurrentNo = $date->format('Y-m');
-
-        if (isset($currentNos[$dateFindCurrentNo])) {
-            $currentNo = $currentNos[$dateFindCurrentNo];
+        if ($inject > $no) {
+            $no = $inject;
         }
 
+        $no = $no + 1;
 
-
-        // $currentNo = 1461;
-        $currentNoExists = static::whereRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') = {$currentNo}")
-                                    ->whereMonth('published_at', $date->format('m'))
-                                    ->whereYear('published_at', $date->format('Y'))
-                                    ->first();
-
-        if (! $currentNoExists) {
-            $invoiceId = $currentNo;
-        } else {
-            $invoiceId = static::selectRaw("regexp_replace(invoice_no, '([0-9]+)/.+', '$1') AS `no`")
-                            ->whereMonth('published_at', $date->format('m'))
-                            ->whereYear('published_at', $date->format('Y'))
-                            ->orderByDesc('no')->first();
-
-            if ($invoiceId) {
-                $invoiceId = ((int) $invoiceId->no) + 1;
-            } else {
-                $invoiceId = $currentNo;
-            }
-        }
-
-        $invoiceId = str_pad((string) $invoiceId, 5, '0', STR_PAD_LEFT);
+        $invoiceId = str_pad((string) $no, 5, '0', STR_PAD_LEFT);
 
         return [
             $invoiceId . '/INV-AJNusa/' . $date->format('m/Y'),
             $invoiceId . '/KWT-AJNusa/' . $date->format('m/Y'),
+            $no,
+        ];
+    }
+
+    public static function generateInvoiceReceiptFormat($no, $date)
+    {
+        if ($date instanceof DateTimeInterface) {
+            $date = $date->format('m/Y');
+        }
+
+        return [
+            $no . '/INV-AJNusa/' . $date,
+            $no . '/KWT-AJNusa/' . $date,
+            $no,
         ];
     }
 }

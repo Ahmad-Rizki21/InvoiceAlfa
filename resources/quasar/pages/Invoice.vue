@@ -28,6 +28,16 @@
 
       <q-btn
         v-if="$auth.can('create.invoice')"
+        color="default"
+        class="q-btn-lg btn-page-invoice-import q-mr-sm"
+        icon="cloud_upload"
+        @click="onFormImport"
+      >
+        <span class="q-ml-xs">{{ $t('Import') }}</span>
+      </q-btn>
+
+      <q-btn
+        v-if="$auth.can('create.invoice')"
         color="secondary"
         class="q-ml-sm q-btn-lg btn-page-invoices-export"
         :loading="isExporting"
@@ -339,6 +349,32 @@
     </q-dialog>
 
     <a v-if="exportUrl" :href="exportUrl" download ref="exportHiddenLink" style="display: none;"> </a>
+
+
+    <q-dialog
+      v-model="isFormImportVisible"
+      persistent
+    >
+      <form-import
+        :visible="isFormImportVisible"
+        :entries="selectedEntries"
+        :loading="isLoading"
+        @success="onFormImportSuccess"
+        @cancel="onFormImportCancel"
+      />
+    </q-dialog>
+
+    <!-- <dialog-import
+      v-model="isFormImportVisible"
+      :status="currentImportStatus"
+      :import-path="currentImportPath"
+      :import-type="$constant.import_type.Invoice"
+      :template-url="$q.lang.isoName === 'id' ? '/templates/template-invoice.xlsx' : '/templates/invoice-template.xlsx'"
+      :processing-page="currentImportProcessingPage"
+      :has-error="currentImportHasError"
+      @update:status="onFormImportUpdateStatus"
+      @success="onRequest"
+    /> -->
   </q-page>
 </template>
 
@@ -346,9 +382,11 @@
 import { date } from 'quasar'
 import FormEntry from './Invoice/FormEntry'
 import FormPassword from './Invoice/FormPassword'
+import FormImport from './Invoice/FormImport'
 import InvoiceStatusChip from './Invoice/InvoiceStatusChip'
 import AdapterPrinter from './Invoice/AdapterPrinter'
 import datatableMixins from 'src/mixins/datatable'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PageInvoice',
@@ -356,7 +394,8 @@ export default {
     FormEntry,
     FormPassword,
     InvoiceStatusChip,
-    AdapterPrinter
+    AdapterPrinter,
+    FormImport
   },
   meta() {
     return {
@@ -542,6 +581,7 @@ export default {
       ],
       isLoading: false,
       isExporting: false,
+      isFormImportVisible: false,
       isAdvancedSearchVisible: false,
       isFormEntryVisible: false,
       isFormEntryReadonly: false,
@@ -561,6 +601,14 @@ export default {
       exportUrl: null,
       onApplicableMonthChangeDebounced: this.$utils.debounce(this.onRequest, 500)
     }
+  },
+  computed: {
+    ...mapGetters({
+      'currentImportStatus': 'imports/status',
+      'currentImportPath': 'imports/importPath',
+      'currentImportProcessingPage': 'imports/processingPage',
+      'currentImportHasError': 'imports/hasError',
+    })
   },
   watch: {
     'search.applicable_month.value': {
@@ -873,7 +921,34 @@ export default {
       this.isExporting = false;
 
       this.exportUrl = null
-    }
+    },
+    onFormImport() {
+      this.isFormEntryVisible = false
+      this.isFormImportVisible = true
+    },
+    onFormImportSuccess() {
+      this.onRequest();
+      this.isFormEntryVisible = false
+      this.isFormImportVisible = false
+    },
+    onFormImportCancel() {
+      this.isFormEntryVisible = false
+      this.isFormImportVisible = false
+    },
+    onFormImportUpdateStatus({ status, importPath, processingPage, hasError }) {
+      this.$store.dispatch('imports/setStatus', status)
+      this.$store.dispatch('imports/setImportPath', importPath)
+
+      if (processingPage) {
+        this.$store.dispatch('imports/setProcessingPage', processingPage)
+      }
+
+      if (typeof hasError !== 'undefined') {
+        this.$store.dispatch('imports/setHasError', hasError)
+      }
+
+      this.$store.dispatch('imports/sync')
+    },
   }
 }
 </script>

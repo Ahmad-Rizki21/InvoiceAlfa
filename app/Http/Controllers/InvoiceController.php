@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Http\Resources\InvoiceResource;
 use App\Imports\ImportCacheImport;
+use App\Imports\InvoiceImport;
 use App\Models\DistributionCenter;
 use App\Models\Franchise;
 use App\Models\ImportCache;
@@ -217,7 +218,11 @@ class InvoiceController extends Controller
                     try {
                         $value = Carbon::parse($search->value());
                     } catch (\Throwable $e) {
-                        $value = Carbon::now();
+                        try {
+                            $value = Carbon::createFromFormat('D M d Y H:i:s e+', $search->value());
+                        } catch (\Throwable $e) {
+                            $value = Carbon::now();
+                        }
                     }
 
                     $q->where('created_at', '>=', (string) $value->startOfMonth()->startOfDay()->format('Y-m-d H:i:s'))
@@ -425,6 +430,17 @@ class InvoiceController extends Controller
         $now = Carbon::now();
         [$invoiceNo, $receiptNo] = Invoice::generateInvoiceReceiptNo($now);
 
+        $transferToType = TransferToType::BankTransfer->value;
+
+        if (
+            $customer->transfer_to_virtual_account_bank_name &&
+            $customer->transfer_to_virtual_account_number &&
+            trim((string) $customer->transfer_to_virtual_account_bank_name) !== '-' &&
+            trim((string) $customer->transfer_to_virtual_account_number) !== '-'
+        ) {
+            $transferToType = TransferToType::VirtualAccount->value;
+        }
+
         $entry = new Invoice([
             'distribution_center_id' => $request->distribution_center_id,
             'franchise_id' => $request->franchise_id,
@@ -444,10 +460,7 @@ class InvoiceController extends Controller
             'ppn_percentage' => Settings::getValue(SettingKey::PpnPercentage),
             'stamp_duty' => Settings::getValue(SettingKey::StampDuty),
 
-            'transfer_to_type' => $customer->transfer_to_virtual_account_bank_name &&
-                                    $customer->transfer_to_virtual_account_number ?
-                                        TransferToType::VirtualAccount->value :
-                                        TransferToType::BankTransfer->value,
+            'transfer_to_type' => $transferToType,
 
             'due_at' => $now->copy()->endOfMonth(),
             'note' => Settings::getValue(SettingKey::InvoiceNote),
@@ -543,7 +556,7 @@ class InvoiceController extends Controller
 
 
         $publishedAt = Carbon::parse($request->published_at);
-        [$invoiceNo, $receiptNo] = Invoice::generateInvoiceReceiptNo($publishedAt);
+        [$invoiceNo, $receiptNo, $currentNo] = Invoice::generateInvoiceReceiptNo($publishedAt);
 
         $services = [];
         $subTotal = 0;
@@ -566,6 +579,7 @@ class InvoiceController extends Controller
         $total = $subTotal + $ppnTotal + (((int) $request->stamp_duty ) ?: 0);
 
         $entry = Invoice::create([
+            'no' => $currentNo,
             'distribution_center_id' => $request->distribution_center_id,
             'franchise_id' => $request->franchise_id,
             'invoice_no' => $invoiceNo,
@@ -1127,7 +1141,7 @@ class InvoiceController extends Controller
             return abort(400, __('Please specify extension to export'));
         }
 
-        if (Cache::has(static::class . 'export')) {
+        if (Cache::driver('database')->has(static::class . 'export')) {
             return $this->json([
                 'status' => 'fail',
                 'data' => [
@@ -1136,7 +1150,7 @@ class InvoiceController extends Controller
             ], 202);
         }
 
-        Cache::put(static::class . 'export', 1, 1 * 60);
+        Cache::driver('database')->put(static::class . 'export', 1, 1 * 60);
 
         return $this->json([
             'status' => 'success',
@@ -1155,13 +1169,21 @@ class InvoiceController extends Controller
             return redirect('/invoices');
         }
 
-        if (! Cache::has(static::class . 'export')) {
+        if (! Cache::driver('database')->has(static::class . 'export')) {
             return redirect('/invoices');
         }
 
         $ext = $request->ext;
 
-        $date = $request->applicable_month ? Carbon::parse($request->applicable_month)->format('m-Y') : null;
+        $date = null;
+
+        if ($request->applicable_month) {
+            try {
+                $date = Carbon::parse($request->applicable_month)->format('m-Y');
+            } catch (\Throwable $e) {
+                $date = Carbon::createFromFormat('D M d Y H:i:s e+', $request->applicable_month)->format('m-Y');
+            }
+        }
 
         // if ($ext === 'xlsx') {
         //     $ext = ExcelFactory::XLSX;
@@ -1172,7 +1194,7 @@ class InvoiceController extends Controller
         $export = new InvoiceExport($request->except(['ext', 'api_token']), $request->ext);
         $exportFilename = 'invoices-' . $date . '' . (date('U')) . '.' . $request->ext;
 
-        Cache::put(static::class . 'export', 1, 1 * 60);
+        Cache::driver('database')->put(static::class . 'export', 1, 1 * 60);
         try {
             if (intval($request->dl) === 1) {
                 return Excel::download($export, $exportFilename);
@@ -1187,6 +1209,72 @@ class InvoiceController extends Controller
             Log::error($e);
         }
     }
+
+
+    public function simpleImportUpload(Request $request)
+    {
+
+        $request->validate([
+            'file' => ['bail', 'required', 'file', 'mimes:xls,xlsx', 'max:' . (1024 * 500)],
+        ]);
+
+        if (Cache::driver('database')->has(static::class . 'simpleimport')) {
+            return $this->json([
+                'status' => 'fail',
+                'data' => [
+                    'wait' => true,
+                    'url' => route('api.invoice.simple-import', array_merge(Cache::driver('database')->get(static::class . 'simpleimport'), [
+                        'api_token' => $request->bearerToken(),
+                    ])),
+                ],
+            ], 202);
+        }
+
+        $uploadedFile = UploadedFile::from($request->file('file'));
+        $upload = InvoiceImport::uploadFile($uploadedFile);
+
+        $payload = array_merge($request->except('file'), [
+            'import_path' => $upload,
+        ]);
+
+        Cache::driver('database')->put(static::class . 'simpleimport', $payload, 3 * 60);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Please wait while we are generating your import'),
+            'data' => [
+                'url' => route('api.invoice.simple-import', array_merge($payload, [
+                    'api_token' => $request->bearerToken(),
+                ])),
+            ],
+        ]);
+    }
+
+    public function simpleImport(Request $request)
+    {
+        if (! Cache::driver('database')->has(static::class . 'simpleimport')) {
+            return redirect('/invoices');
+        }
+
+
+        $date = null;
+
+        if ($request->applicable_month) {
+            try {
+                $date = Carbon::parse($request->applicable_month)->format('m-Y');
+            } catch (\Throwable $e) {
+                $date = Carbon::createFromFormat('D M d Y H:i:s e+', $request->applicable_month)->format('m-Y');
+            }
+        }
+        $uploadedFile = InvoiceImport::getUploadedFile($request->import_path);
+        Excel::import(new InvoiceImport($request->import_path), $uploadedFile);
+
+        return $this->json([
+            'status' => 'success',
+            'message' => __('Your file successfully imported'),
+        ]);
+    }
+
 
     public function revisions(Request $request, $id)
     {
