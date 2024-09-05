@@ -102,7 +102,7 @@ class InvoiceExport implements
                 null,
                 null,
                 null,
-                null,
+                // null,
 
                 __('Deskripsi 1'),
                 __('Qty 1'),
@@ -331,7 +331,7 @@ class InvoiceExport implements
         // $sheet->mergeCells('A1:' . $key . '1');
         // $sheet->mergeCells('A1:' . $key . '1');
 
-        for ($j = 0; $j < 14; $j++) {
+        for ($j = 0; $j < 13; $j++) {
             $mergingCell = num2alpha($j);
             $sheet->mergeCells($mergingCell . '1:' . $mergingCell . '2');
         }
@@ -339,6 +339,10 @@ class InvoiceExport implements
             $mergingCell = num2alpha($j);
             $sheet->mergeCells($mergingCell . '1:' . $mergingCell . '2');
         }
+
+        $aCell = num2alpha(13);
+        $bCell = num2alpha(26);
+        $sheet->mergeCells($aCell . '1:' . $bCell . '1');
 
         return $styles;
     }
