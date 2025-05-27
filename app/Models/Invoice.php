@@ -109,7 +109,11 @@ class Invoice extends Model
 
 
         $existing = static::latest()->first(['no']);
-        $existing = $existing->no + 1;
+        $existing = $existing?->no;
+
+        if ($existing) {
+            $existing = $existing + 1;
+        }
 
         if ($existing > $no) {
             $no = $existing;
