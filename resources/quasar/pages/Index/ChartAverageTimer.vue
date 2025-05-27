@@ -121,7 +121,7 @@ export default {
 
     this.chart.setOption(this.chartOptions)
 
-    this.getChartTicketTimer()
+    // this.getChartTicketTimer()
   },
   methods: {
     async getChartTicketTimer() {

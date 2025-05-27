@@ -82,11 +82,11 @@ class Invoice extends Model
     public static function generateInvoiceReceiptNo(DateTimeInterface $date)
     {
         $no = static::latest()->first(['no']);
-        $no = $no->no;
+        $no = $no?->no;
 
         $inject = file_get_contents(storage_path('injectinvoiceno.txt'));
 
-        if ($inject > $no) {
+        if (! $no || $inject > $no) {
             $no = $inject;
         }
 
