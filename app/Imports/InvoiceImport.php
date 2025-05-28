@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Throwable;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class InvoiceImport extends ImportCacheImport
 {
@@ -103,6 +104,13 @@ class InvoiceImport extends ImportCacheImport
                 }
 
                 if ($date) {
+                    if ($date > 10000 && $date < 300000) {
+                        try {
+                            $date = Date::excelToDateTimeObject($date)->format('Y-m-d');
+                        } catch (Exception $e) {
+                        }
+                    }
+
                     $date = Carbon::createFromFormat('d/m/Y', $date);
                 } else {
                     $date = $now;
@@ -118,7 +126,7 @@ class InvoiceImport extends ImportCacheImport
                 $distributionCenter = null;
                 $franchise = null;
 
-                if ($customerType === 'dc') {
+                if ($customerType === 'dc' || strtolower((string) $customerType) === 'distribution center') {
                     if ($customerCode) {
                         $distributionCenter = DistributionCenter::where(DB::raw('lower(code)'), strtolower($customerCode))->first();
                         $customer = $distributionCenter;
@@ -149,12 +157,24 @@ class InvoiceImport extends ImportCacheImport
                 }
 
                 if ($approvalDate) {
+                    if ($approvalDate > 10000 && $approvalDate < 300000) {
+                        try {
+                            $approvalDate = Date::excelToDateTimeObject($approvalDate)->format('Y-m-d');
+                        } catch (Exception $e) {
+                        }
+                    }
                     $approvalDate = Carbon::createFromFormat('d/m/Y', $approvalDate);
                 } else {
                     $approvalDate = $customer->approval_date;
                 }
 
                 if ($foApprovalDate) {
+                    if ($foApprovalDate > 10000 && $foApprovalDate < 300000) {
+                        try {
+                            $foApprovalDate = Date::excelToDateTimeObject($foApprovalDate)->format('Y-m-d');
+                        } catch (Exception $e) {
+                        }
+                    }
                     $foApprovalDate = Carbon::createFromFormat('d/m/Y', $foApprovalDate);
                 } else {
                     $foApprovalDate = $customer->fo_approval_date;
@@ -173,6 +193,12 @@ class InvoiceImport extends ImportCacheImport
                 }
 
                 if ($dueDate) {
+                    if ($dueDate > 10000 && $dueDate < 300000) {
+                        try {
+                            $dueDate = Date::excelToDateTimeObject($dueDate)->format('Y-m-d');
+                        } catch (Exception $e) {
+                        }
+                    }
                     $dueDate = Carbon::createFromFormat('d/m/Y', $dueDate);
                 } else {
                     $dueDate = $endOfMonth;
