@@ -106,7 +106,7 @@ class InvoiceImport extends ImportCacheImport
                 if ($date) {
                     if ($date > 10000 && $date < 300000) {
                         try {
-                            $date = Date::excelToDateTimeObject($date)->format('Y-m-d');
+                            $date = Date::excelToDateTimeObject($date)->format('d/m/Y');
                         } catch (Exception $e) {
                         }
                     }
@@ -159,7 +159,7 @@ class InvoiceImport extends ImportCacheImport
                 if ($approvalDate) {
                     if ($approvalDate > 10000 && $approvalDate < 300000) {
                         try {
-                            $approvalDate = Date::excelToDateTimeObject($approvalDate)->format('Y-m-d');
+                            $approvalDate = Date::excelToDateTimeObject($approvalDate)->format('d/m/Y');
                         } catch (Exception $e) {
                         }
                     }
@@ -171,7 +171,7 @@ class InvoiceImport extends ImportCacheImport
                 if ($foApprovalDate) {
                     if ($foApprovalDate > 10000 && $foApprovalDate < 300000) {
                         try {
-                            $foApprovalDate = Date::excelToDateTimeObject($foApprovalDate)->format('Y-m-d');
+                            $foApprovalDate = Date::excelToDateTimeObject($foApprovalDate)->format('d/m/Y');
                         } catch (Exception $e) {
                         }
                     }
@@ -195,7 +195,7 @@ class InvoiceImport extends ImportCacheImport
                 if ($dueDate) {
                     if ($dueDate > 10000 && $dueDate < 300000) {
                         try {
-                            $dueDate = Date::excelToDateTimeObject($dueDate)->format('Y-m-d');
+                            $dueDate = Date::excelToDateTimeObject($dueDate)->format('d/m/Y');
                         } catch (Exception $e) {
                         }
                     }
