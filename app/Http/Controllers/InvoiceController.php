@@ -434,10 +434,10 @@ class InvoiceController extends Controller
         $transferToType = TransferToType::BankTransfer->value;
 
         if (
-            $customer->transfer_to_virtual_account_bank_name &&
-            $customer->transfer_to_virtual_account_number &&
-            trim((string) $customer->transfer_to_virtual_account_bank_name) !== '-' &&
-            trim((string) $customer->transfer_to_virtual_account_number) !== '-'
+            $customer?->transfer_to_virtual_account_bank_name &&
+            $customer?->transfer_to_virtual_account_number &&
+            trim((string) $customer?->transfer_to_virtual_account_bank_name) !== '-' &&
+            trim((string) $customer?->transfer_to_virtual_account_number) !== '-'
         ) {
             $transferToType = TransferToType::VirtualAccount->value;
         }
