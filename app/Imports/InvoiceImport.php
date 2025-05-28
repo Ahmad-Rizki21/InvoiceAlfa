@@ -107,7 +107,7 @@ class InvoiceImport extends ImportCacheImport
                     if ($date > 10000 && $date < 300000) {
                         try {
                             $date = Date::excelToDateTimeObject($date)->format('d/m/Y');
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
                         }
                     }
 
@@ -160,7 +160,7 @@ class InvoiceImport extends ImportCacheImport
                     if ($approvalDate > 10000 && $approvalDate < 300000) {
                         try {
                             $approvalDate = Date::excelToDateTimeObject($approvalDate)->format('d/m/Y');
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
                         }
                     }
                     $approvalDate = Carbon::createFromFormat('d/m/Y', $approvalDate);
@@ -172,7 +172,7 @@ class InvoiceImport extends ImportCacheImport
                     if ($foApprovalDate > 10000 && $foApprovalDate < 300000) {
                         try {
                             $foApprovalDate = Date::excelToDateTimeObject($foApprovalDate)->format('d/m/Y');
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
                         }
                     }
                     $foApprovalDate = Carbon::createFromFormat('d/m/Y', $foApprovalDate);
@@ -196,7 +196,7 @@ class InvoiceImport extends ImportCacheImport
                     if ($dueDate > 10000 && $dueDate < 300000) {
                         try {
                             $dueDate = Date::excelToDateTimeObject($dueDate)->format('d/m/Y');
-                        } catch (Exception $e) {
+                        } catch (Throwable $e) {
                         }
                     }
                     $dueDate = Carbon::createFromFormat('d/m/Y', $dueDate);
