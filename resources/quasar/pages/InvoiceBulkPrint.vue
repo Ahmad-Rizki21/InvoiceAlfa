@@ -83,12 +83,13 @@ export default {
 
         if (data.status === 'success') {
           this.invoices = data.data.invoices;
-          this.receipts = {}
           const receipts = {}
 
           data.data.invoices.forEach(v => {
             receipts[v.id] = { ...v }
           })
+
+          this.receipts = receipts
         }
       } catch (err) {
         this.$q.notify(err)
