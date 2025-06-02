@@ -36,6 +36,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
+use Barryvdh\Snappy\Facades\SnappyPdf;
+use Illuminate\Support\Facades\Http;
 
 class InvoiceController extends Controller
 {
@@ -1197,13 +1199,13 @@ class InvoiceController extends Controller
 
     public function export(Request $request)
     {
-        if (!in_array($request->ext, ['xlsx', 'pdf'])) {
-            return redirect('/invoices');
-        }
+        // if (!in_array($request->ext, ['xlsx', 'pdf'])) {
+        //     return redirect('/invoices');
+        // }
 
-        if (! Cache::driver('database')->has(static::class . 'export')) {
-            return redirect('/invoices');
-        }
+        // if (! Cache::driver('database')->has(static::class . 'export')) {
+        //     return redirect('/invoices');
+        // }
 
         $ext = $request->ext;
 
@@ -1222,6 +1224,31 @@ class InvoiceController extends Controller
         // } else if ($ext === 'pdf') {
         //     $ext = ExcelFactory::MPDF;
         // }
+
+        if ($request->ext === 'pdf') {
+            $route = url('/invoices/bulk-print?' . http_build_query([
+                'ids' => $request->ids,
+                'applicable_month' => $request->applicable_month,
+                'api_token' => $request->api_token,
+                'ext' => $request->ext,
+            ]));
+
+
+            // dd($route);
+            // return [
+            //     $route,
+            // ];
+
+            $output = SnappyPdf::loadFile($route)
+                ->setPaper('a4')
+                ->setOrientation('portrait')
+                ->setOption('margin-bottom', 0)
+                ->setOption('print-media-type', true)
+                ->setOption('javascript-delay', 10000)
+                ->setOption('enable-javascript', true);
+
+            return $output->inline('pdf.pdf');
+        }
 
         $export = new InvoiceExport($request->except(['ext', 'api_token']), $request->ext);
         $exportFilename = 'invoices-' . $date . '' . (date('U')) . '.' . $request->ext;

@@ -41,6 +41,7 @@ const routes = [
     component: () => import('layouts/BlankLayout.vue'),
     children: [
       { path: 'invoices/:id([0-9]+)/print', name: 'invoices.print', component: () => import('pages/InvoicePrint.vue') },
+      { path: 'invoices/bulk-print', name: 'invoices.bulk-print', component: () => import('pages/InvoiceBulkPrint.vue') },
       { path: 'c/invoice/:id([a-zA-Z0-9]+)', name: 'cust.invoice', component: () => import('pages/CustInvoice.vue') },
     ]
   },

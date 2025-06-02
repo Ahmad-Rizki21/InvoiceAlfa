@@ -36,7 +36,7 @@
         <span class="q-ml-xs">{{ $t('Import') }}</span>
       </q-btn>
 
-      <q-btn
+      <!-- <q-btn
         v-if="$auth.can('create.invoice')"
         color="secondary"
         class="q-ml-sm q-btn-lg btn-page-invoices-export"
@@ -45,7 +45,32 @@
         @click="onFormEntryExport"
       >
         <span class="q-ml-sm">{{ $t('Export') }}</span>
-      </q-btn>
+      </q-btn> -->
+
+      <q-btn-dropdown
+        v-if="$auth.can('create.invoice')"
+        color="secondary"
+        :label="$t('Export')"
+        class="q-ml-sm q-btn-lg btn-page-invoices-export"
+        :loading="isExporting"
+        icon="system_update_alt"
+      >
+        <q-list>
+          <q-item clickable v-close-popup @click="onFormEntryExport({ ext: 'xlsx' })">
+            <q-item-section>
+              <q-item-label>Excel</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup @click="onFormEntryExport({ ext: 'pdf' })">
+            <q-item-section>
+              <q-item-label>Print</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+
+
 
       <q-btn
         v-if="$auth.can('create.invoice')"
@@ -376,6 +401,8 @@
       @update:status="onFormImportUpdateStatus"
       @success="onRequest"
     /> -->
+
+    <iframe v-if="printUrl" ref="printIframe" :src="printUrl" style="opacity: 0; visibility: hidden; width: 0; height: 0;"></iframe>
   </q-page>
 </template>
 
@@ -425,6 +452,7 @@ export default {
     }
 
     return {
+      printUrl: null,
       entries: [],
       selectedEntries: [],
       columns: [
@@ -883,14 +911,90 @@ export default {
         this.isLoading = false
       })
     },
+
+    onPrint(props = {}) {
+      this.isExporting = false
+
+      const params = {
+        table_pagination: { ...(props.pagination || {}) },
+        table_search: { ...this.search },
+        ext: props.ext || 'xlsx'
+      }
+
+      if (this.selectedEntries && this.selectedEntries.length) {
+        params.id = this.selectedEntries.map(v => v.id).join('|')
+      } else {
+        this.$q.notify('Please select invoice to print')
+        return
+      }
+
+      if (params.table_search.applicable_month.value) {
+        params.table_search.applicable_month = {
+          value: date.formatDate(params.table_search.applicable_month.value, 'YYYY-MM-15')
+        }
+      }
+
+
+      this.printUrl = this.$router.resolve({
+        path: '/invoices/bulk-print',
+        query: this.$api.defaults.paramsTransformer(params)
+      }).href
+
+      console.log(this.printUrl)
+
+      this.$nextTick(() => {
+        if (this.$refs.printIframe) {
+          const $refs = this.$refs.printIframe
+          const contentWindow = $refs.contentWindow
+
+          contentWindow.doPrinting = true
+          contentWindow.doPrint = () => {
+            this.printUrl = null
+          }
+
+          // let loaded = false
+
+          // $refs.onload = () => {
+          //   if (!loaded) {
+          //     loaded = true
+
+          //     setTimeout(() => {
+          //       contentWindow.print()
+
+          //       setTimeout(() => {
+          //         this.printUrl = null
+          //       }, 300)
+          //     }, 100)
+          //   }
+          // }
+
+          // setTimeout(() => {
+          //   if (!loaded) {
+          //     contentWindow.print()
+          //     setTimeout(() => {
+          //       this.printUrl = null
+          //     }, 300)
+          //   }
+          // }, 4000)
+        }
+
+        this.isExporting = false
+      })
+    },
+
     async onFormEntryExport(props) {
 
       if (this.isLoading || this.isExporting) {
         return false;
       }
 
+
       if (!props) {
         props = { pagination: this.pagination }
+      }
+
+      if (props && props.ext === 'pdf') {
+        return this.onPrint(props)
       }
 
       this.isLoading = true
@@ -901,6 +1005,17 @@ export default {
         table_search: { ...this.search },
         ext: props.ext || 'xlsx'
       }
+
+      if (this.selectedEntries && this.selectedEntries.length) {
+        params.ids = this.selectedEntries.map(v => v.id).join('|')
+      }
+
+      if (params.table_search.applicable_month.value) {
+        params.table_search.applicable_month = {
+          value: date.formatDate(params.table_search.applicable_month.value, 'YYYY-MM-15')
+        }
+      }
+
 
       // if (params.table_search.created_at_range.value && params.table_search.created_at_range.value.to) {
       //   params.table_search = {
@@ -1009,6 +1124,12 @@ export default {
 <style lang="scss">
 .page-invoices {
   padding-bottom: 3rem;
+
+  .q-btn-dropdown {
+    &.btn-page-invoices-export {
+      padding: 0.25rem 1rem;
+    }
+  }
 
   .page-body > .q-card > .q-toolbar {
     margin-bottom: 0.5rem !important;
