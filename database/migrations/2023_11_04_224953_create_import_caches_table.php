@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('import_caches', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('import_path');
-            $table->unsignedTinyInteger('import_type');
+            $table->string('import_hash')->nullable();
+            $table->unsignedTinyInteger('import_type')->nullable();
             $table->longText('content')->nullable();
             $table->longText('errors')->nullable();
             $table->timestamps();

@@ -33,7 +33,7 @@ class ImportCacheImport implements ToCollection
 
     public static function removeOldFiles()
     {
-        $storage = Storage::disk('local');
+        $storage = static::getStorage();
         $files = $storage->allFiles('import-cache');
 
         foreach ($files as $file) {
@@ -52,12 +52,12 @@ class ImportCacheImport implements ToCollection
 
     public static function getUploadedFile($importPath)
     {
-        return Storage::disk('local')->path($importPath);
+        return static::getStorage()->path($importPath);
     }
 
     public static function deleteUploadedFile($importPath)
     {
-        return Storage::disk('local')->delete($importPath);
+        return static::getStorage()->delete($importPath);
     }
 
     /**
@@ -69,7 +69,9 @@ class ImportCacheImport implements ToCollection
         $now = Carbon::now();
         $model = new ImportCache();
 
-        ImportCache::where('created_at', '<=', Carbon::now()->startOfDay())->delete();
+        ImportCache::where('import_type', $this->importType->value)
+                ->where('import_path', $this->importPath)
+                ->where('created_at', '<=', Carbon::now()->startOfDay())->delete();
 
         foreach ($collection as $i => $row) {
             if ($i === 0) {
@@ -93,5 +95,13 @@ class ImportCacheImport implements ToCollection
         }
 
         ImportCache::insert($items);
+    }
+
+    protected static function getStorage()
+    {
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk('local');
+
+        return $storage;
     }
 }
