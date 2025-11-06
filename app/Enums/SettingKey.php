@@ -18,5 +18,6 @@ enum SettingKey: int
     case BankTransferAccountName = 8;
     case SignatureImage = 9;
     case StampImage = 10;
+    case InjectInvoiceNo = 11;
 
 }

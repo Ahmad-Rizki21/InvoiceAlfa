@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\SettingKey;
 use App\Services\Database\Eloquent\Model;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -84,7 +85,9 @@ class Invoice extends Model
         $no = static::latest()->first(['no']);
         $no = $no?->no;
 
-        $inject = file_get_contents(storage_path('injectinvoiceno.txt'));
+        $inject = (int) Settings::getValue(SettingKey::InjectInvoiceNo, 0);
+
+        // $inject = file_get_contents(storage_path('injectinvoiceno.txt'));
 
         if (! $no || $inject > $no) {
             $no = $inject;

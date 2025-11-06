@@ -238,6 +238,25 @@
             />
           </div>
         </div>
+        <div class="row q-col-gutter-sm">
+          <div class="col-xs-12 col-md-4 col-lg-3">
+            <q-input
+              v-model="formEntry[constant.InjectInvoiceNo]"
+              :label="$t('Last Invoice No')"
+              :filled="!readonly"
+              :borderless="readonly"
+              :readonly="readonly"
+              :name="'' + constant.InjectInvoiceNo"
+              stack-label
+              autocomplete="off"
+              dense
+              :rules="rules[constant.InjectInvoiceNo]"
+              :error="!!errors[constant.InjectInvoiceNo]"
+              :error-message="errors[constant.InjectInvoiceNo]"
+              @keypress="$globalListeners.onKeypressOnlyUnsignedNumber($event)"
+            />
+          </div>
+        </div>
       </q-card-section>
 
       <q-separator />
@@ -368,6 +387,7 @@ export default {
         [constant.StampDuty]: null,
         [constant.SignatureImage]: null,
         [constant.StampImage]: null,
+        [constant.InjectInvoiceNo]: null,
       }
     },
     fill(form) {

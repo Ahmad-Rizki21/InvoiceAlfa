@@ -75,6 +75,10 @@ class SettingsSeeder extends Seeder
                 'key' => SettingKey::StampImage->value,
                 'value' => '',
             ],
+            [
+                'key' => SettingKey::InjectInvoiceNo->value,
+                'value' => '',
+            ],
         ];
 
         foreach ($data as $value) {
