@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y \
     libmcrypt-dev \
     libgd-dev \
     supervisor \
-    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -34,8 +33,7 @@ COPY . /var/www
 # Install application dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install node dependencies (build assets can be done separately)
-RUN npm install
+# Note: npm dependencies removed - WebSocket server only needs PHP
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
