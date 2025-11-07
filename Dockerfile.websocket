@@ -34,8 +34,8 @@ COPY . /var/www
 # Install application dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install node dependencies and build assets
-RUN npm install && npm run build
+# Install node dependencies (build assets can be done separately)
+RUN npm install
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
