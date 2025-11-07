@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     cron \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    && pecl install redis \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
