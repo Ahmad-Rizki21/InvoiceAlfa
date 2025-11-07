@@ -47,8 +47,9 @@ services:
     restart: unless-stopped
     networks:
       - invoice-network
-    ports:
-      - "6379:6379"
+    # Comment out ports untuk avoid conflict dengan Redis host
+    # ports:
+    #   - "6379:6379"
 
   websocket:
     build:
